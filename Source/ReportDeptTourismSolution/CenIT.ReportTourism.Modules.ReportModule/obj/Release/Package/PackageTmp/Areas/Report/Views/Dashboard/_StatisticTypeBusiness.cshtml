@@ -1,0 +1,20 @@
+﻿@model List<CenIT.ReportTourism.Models.Report.ReportStatisticTypeBusinessModel>
+
+<div class="box box-body no-footer no-header no-border">
+    <p class="text-center">
+        <strong>Thống kê Doanh nghiệp theo lĩnh vực</strong>
+    </p>
+    @{
+        foreach (var typeBiz in Model)
+        {
+            double percent = typeBiz.TotalEnterpiseViaType * 100 / typeBiz.TotalEnterpise;
+            <div class="progress-group">
+                <span class="progress-text">@typeBiz.TypeBusinessName</span>
+                <span class="progress-number"><b>@typeBiz.TotalEnterpiseViaType</b>/@typeBiz.TotalEnterpise</span>
+                <div class="progress sm">
+                    <div class="progress-bar progress-bar-@(typeBiz.MainColor.ToLower())" style="width: @(percent)%"></div>
+                </div>
+            </div>
+        }
+    }
+</div>

@@ -1,0 +1,18 @@
+﻿@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceTypeServiceModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.AccommodationTypeServiceId)
+@Html.HiddenFor(model => model.EnterpriseId)
+@Html.HiddenFor(model => model.Reason)
+
+<div id="TypeService">
+    <div class="form-group">
+        @Html.TitleFor(model => model.ServiceId, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.DropDownListFor(model => model.ServiceId, new SelectList(Model.ListTypeServices, "Value", "Text"), "", new { @class = "col-md-10", onchange = "OnChangeCombo(this, '#ServiceName')" })
+            @Html.ValidationMessageFor(model => model.ServiceId, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.ServiceName)
+        </div>
+    </div>
+</div>

@@ -1,0 +1,229 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateEnterpriseModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.EnterpriseId)
+@Html.HiddenFor(model => model.IsConfirm)
+
+<div id="Enterprise">
+    <div class="box box-body no-shadow disabled">
+        <h4 class="box-title text-bold text-blue"><i class="fa fa-building-o"></i>&nbsp;Thông tin doanh nghiệp</h4>
+        <div class="form-group">
+            @Html.TitleFor(model => model.OwnerEnterpriseName, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.OwnerEnterpriseName, new { @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Owner") })
+                @Html.ValidationMessageFor(model => model.OwnerEnterpriseName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.BusinessName, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.BusinessName, new { @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_BusinessName") })
+                @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.TaxCode, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.TaxCode, new { @class = "col-md-4", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_TaxCode") })
+                @Html.ValidationMessageFor(model => model.TaxCode, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.TypeBusiness, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.TypeBusiness, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { @class = "col-md-7", onchange = "OnChangeCombo(this, '#TypeBusinessName');" })
+                <br/> @Html.ValidationMessageFor(model => model.TypeBusiness, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.TypeBusinessName)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Website, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.Website, new { rows = 3, @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Website") })
+                @Html.ValidationMessageFor(model => model.Website, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Phone, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.Phone, new { @class = "col-md-4", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Phone") })
+                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Email, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.Email, new { rows = 3, @class = "col-md-6", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Email") })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-body no-shadow disabled">
+        <h4 class="box-title text-bold text-blue"><i class="fa fa-address-card-o"></i>&nbsp;Địa chỉ kinh doanh</h4>
+        <div class="form-group">
+            @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "col-md-5", onchange = "OnChangeProvince(this, 'select#DistrictId');" })
+                @Html.ValidationMessageFor(model => model.ProvinceId, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.ProvinceName)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.DistrictId, new { @class = "control-label col-md-3" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(model => model.DistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeDistrict(this, 'select#WardId')" })
+                @Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.DistrictName)
+            </div>
+            @Html.TitleFor(model => model.WardId, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(model => model.WardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeCombo(this, '#WardName');" })
+                @Html.ValidationMessageFor(model => model.WardId, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.WardName)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.BusinessAddress, new { @class = "control-label col-md-3" })
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.BusinessAddress, new { @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Address") })
+                @Html.ValidationMessageFor(model => model.BusinessAddress, "", new { @class = "text-danger" })
+            </div>
+            @Html.TitleFor(model => model.StreetName, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(model => model.StreetName, new { @class = "col-md-12", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Street") })
+                @Html.ValidationMessageFor(model => model.StreetName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group disabled">
+        @Html.TitleFor(model => model.ListCertificateFiles, new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            @{
+                if (!string.IsNullOrEmpty(Model.ListPathCertificateFiles))
+                {
+                    @Html.Raw(Model.ListPathCertificateFiles)
+                    ;
+                }
+            }
+
+            @Html.FileFor(model => model.ListCertificateFiles, ".docx,.pdf,.xlsx,.xls", true, new { @class = "col-md-8" })
+            @Html.ValidationMessageFor(model => model.ListCertificateFiles, "", new { @class = "text-danger" })
+            <br/>
+        </div>
+    </div>
+
+    <div class="box box-body no-shadow disabled">
+        <h4 class="box-title text-bold text-blue"><i class="fa fa-user-circle"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentation")</h4>
+        <div class="form-group">
+            @Html.TitleFor(model => model.LegalRepresentationName, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.LegalRepresentationName, new { @class = "col-md-6", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationName") })
+                @Html.ValidationMessageFor(model => model.LegalRepresentationName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.LegalRepresentationPhone, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.LegalRepresentationPhone, new { @class = "col-md-3", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationPhone") })
+                @Html.ValidationMessageFor(model => model.LegalRepresentationPhone, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.LegalRepresentationEmail, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.LegalRepresentationEmail, new { @class = "col-md-6", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationEmail") })
+                @Html.ValidationMessageFor(model => model.LegalRepresentationEmail, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("a[name='DownloadRefDoc']").on('click',
+            function() {
+                var url = $(this).data('href');
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    success: function(response) {
+                        if (typeof response != "undefined" && response != null && response.status) {
+                            window.location = response.downloadPath;
+                        } else if (typeof response != "undefined" && response != null && !response.status) {
+                            eval(response.message);
+                        }
+                    }
+                });
+            });
+
+        OnChangeProvince('select#ProvinceId', 'select#DistrictId');
+    });
+
+    function OnChangeCombo(cbb, eleName) {
+        $(eleName).val($(cbb).children("option:selected").text());
+    }
+
+    function OnChangeDistrict(cbbDistrict, cbbWard) {
+        if ($("#DistrictName").length > 0) {
+            $("#DistrictName").val($(cbbDistrict).children("option:selected").text());
+        }
+
+        var wardId = $(cbbWard).val();
+
+        $(cbbWard).empty();
+        $(".chosen-select").trigger("chosen:updated");
+        var selected = $(cbbDistrict).val();
+        var url = "@Url.Action("WardViaDistrict")?districtId=" + selected;
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "JSON",
+            success: function(response) {
+                $(cbbWard).append('<option value=""></option>');
+                $.each(response.Wards,
+                    function(index, item) {
+                        var selected = "";
+                        if (wardId.length > 0 && wardId != "0") {
+                            if (item.WardId == wardId)
+                                selected = "selected";
+                        }
+                        $(cbbWard).append('<option value="' + item.WardId + '" ' + selected + '>' + item.WardName + "</option>");
+                    });
+            }
+        });
+    }
+
+    function OnChangeProvince(cbbProvince, cbbDistrict) {
+        if ($("#ProvinceName").length > 0) {
+            $("#ProvinceName").val($(cbbProvince).children("option:selected").text());
+        }
+        var districtId = $(cbbDistrict).val();
+
+        $(cbbDistrict).empty();
+        $(".chosen-select").trigger("chosen:updated");
+        var selected = $(cbbProvince).val();
+        var url = "@Url.Action("DistrictsViaProvince")?provinceId=" + selected;
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "JSON",
+            success: function(response) {
+                $(cbbDistrict).append('<option value=""></option>');
+                $.each(response.Districts,
+                    function(index, item) {
+                        var selected = "";
+                        if (districtId.length > 0 && districtId != "0") {
+                            if (item.DistrictId == districtId)
+                                selected = "selected";
+                        }
+                        $(cbbDistrict).append('<option value="' + item.DistrictId + '" ' + selected + '>' + item.DistrictName + "</option>");
+                    });
+            }
+        });
+    }
+
+</script>

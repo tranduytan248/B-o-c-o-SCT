@@ -1,0 +1,33 @@
+﻿@model CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models.ReportViewModel
+
+@Html.HiddenFor(model => model.ReportKey)
+@Html.HiddenFor(model => model.ReportName)
+@Html.HiddenFor(model => model.ViewName)
+@Html.HiddenFor(model => model.Reporter)
+
+<div id="UocKetQuaHoatDongKinhDoanh">
+    <div class="form-group">
+        <label class="control-label col-md-3">Tháng báo cáo</label>
+        <div class="col-md-3">
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                @Html.TextBox("OnMonth", DateTime.Now.ToString("MM/yyyy"), new {@class = "col-sm-12", placeholder = "MM/YYYY"})
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#OnMonth").datepicker("remove");
+        $("#OnMonth").datepicker({
+            format: "mm/yyyy",
+            viewMode: "months",
+            minViewMode: "months",
+            autoclose: true
+        });
+        $("#OnMonth").datepicker().trigger("update");
+    });
+</script>

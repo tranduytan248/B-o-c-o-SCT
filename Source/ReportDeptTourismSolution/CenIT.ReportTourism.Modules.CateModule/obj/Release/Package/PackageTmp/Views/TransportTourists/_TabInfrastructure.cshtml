@@ -1,0 +1,48 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.TransportTourists.CateTransportTouristsServiceInfrastructureModel
+@Html.AntiForgeryToken()
+
+@using (Html.BeginForm("SaveInfrastructure", "TransportTourists", new {area = ""}, FormMethod.Post, new {encType = "multipart/form-data", id = "SaveInfrastructure", @class = "form-horizontal"}))
+{
+    @Html.HiddenFor(model => model.EnterpriseId)
+
+    <div class="box-body" id="bodyForm">
+        <div class="form-group">
+            @Html.TitleFor(model => model.TotalTransports, new {@class = "control-label col-md-3"})
+            <div class="col-md-2">
+                <div class="input-group col-md-12">
+                    @Html.TextBoxFor(model => model.TotalTransports, new {@class = "form-control", type = "number", min = 0, placeholder = "0", onblur = "OnFormatNumber(this);"})
+                </div>
+                @Html.ValidationMessageFor(model => model.TotalTransports, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <hr/>
+
+        @Html.Partial("_InfrastructureClassTransports")
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new {rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title")})
+                @Html.ValidationMessageFor(model => model.Reason, "", new {@class = "text-danger"})
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <button type="button" class="btn btn-primary pull-right" onclick="$('form#SaveInfrastructure').submit();"><i class="fa fa-save"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Save")</button>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $('form#SaveInfrastructure').ajaxForm({
+        success: function(response) {
+            if (response.status != undefined) {
+                eval(response.message);
+                $("#Infrastructures").load('@Url.Action("Infrastructure", new {enterpriseId = Model.EnterpriseId})');
+                response.status = undefined;
+            } else {
+                $("#Infrastructures").html(response);
+            }
+        }
+    });
+</script>

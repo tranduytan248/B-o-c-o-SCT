@@ -1,0 +1,299 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models.DigitalSignModel
+@{
+    ViewBag.Title = AppProcessor.Messagor.GetMessage("DigitalSign_Title");
+}
+
+@section Title
+{
+    <i class="fa fa-pencil-square-o"></i> @ViewBag.Title
+}
+
+@section Action
+{
+    @{
+        if (string.IsNullOrEmpty(Model.AccessToken))
+        {
+            <a id="LoginSmartCA" href="@Url.Action("LoginSmartCA")" data-modal="true" data-modal-id="LoginSmartCA" class="pull-right btn btn-sm btn-default">
+                <img class="pull-right" alt="" src="~/Contents/imgs/VNPT SmartCA_sm.png"/>
+            </a>
+        }
+    }
+}
+
+@section HeadCss
+{
+    <style type="text/css">
+        .todo-list > li .label {
+            font-size: 11px;
+            margin-left: 10px;
+        }
+
+        .label-status { padding-top: 4px; }
+
+        .box .overlay span {
+            font-size: large;
+            position: absolute;
+            text-align: center;
+            top: 65%;
+            width: 100%;
+        }
+    </style>
+}
+
+<section class="content box">
+    <div class="row">
+
+        @{
+            <div class="col-md-5 @(string.IsNullOrEmpty(Model.AccessToken) ? "hidden" : "")">
+                <div class="box box-primary no-footer">
+                    <div class="box-header">
+                        <h3 class="box-title text-bold">Thông tin tài khoản Smart CA</h3>
+                    </div>
+                    <div class="box-body" id="UserInfo">
+                        @{
+                            if (!string.IsNullOrEmpty(Model.AccessToken))
+                            {
+                                Html.RenderAction("UserInfo");
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="col-md-7 @(string.IsNullOrEmpty(Model.AccessToken) ? "hidden" : "")">
+            <div class="box box-body no-footer no-border no-shadow" id="BoxDigitalSign">
+                <div class="overlay hidden">
+                    <i class="fa fa-refresh fa-spin"></i>
+                    <span class="text-danger text-bold">Vui lòng xác nhận ký số trên ứng dụng</span>
+                </div>
+                @using (Html.BeginForm("Sign", "DigitalSign", new {area = "Sys"}, FormMethod.Post, new {encType = "multipart/form-data", id = "SignDocument", @class = "form-horizontal"}))
+                {
+                    @Html.HiddenFor(model => model.AccessToken)
+                    @Html.HiddenFor(model => model.FileGuids)
+
+                    <div id="bodyForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">@AppProcessor.Messagor.GetMessage("DataImport_Label_FileImport")</label>
+                            <div class="col-md-10">
+                                @Html.FileFor(model => model.FileImports, ".pdf, .docx, .xlsx, .pptx, .xml", true, new {@class = "col-md-10"})
+                                @Html.ValidationMessageFor(model => model.FileImports, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-10">
+                                <button type="submit" id="btnSign" class="btn btn-primary" disabled="disabled"><i class="fa fa-pencil-square-o"></i>&nbsp;Ký dữ liệu</button>
+                                <button type="button" id="btnReset" class="btn btn-default" onclick="resetForm('#FileImports')"><i class="fa fa-refresh"></i>&nbsp;Reset</button>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <div class="box box-primary no-footer">
+                                    <div class="box-header">
+                                        <i class="fa fa-list-alt"></i>
+                                        <h3 class="box-title">Danh sách tệp tin</h3>
+                                    </div>
+                                    <div class="box-body">
+                                        <ul class="todo-list" id="listFileUnsign">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>*@
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@section CustomJS
+{
+    <script type="text/javascript">
+        debugger;
+        var arrAcceptExtFiles = ["pdf", "docx", "xlsx", "pptx", "xml"];
+        var arrIconFiles = {
+            "pdf": "pdf",
+            "docx": "word",
+            "xlsx": "excel",
+            "pptx": "powerpoint",
+            "xml": "code"
+        };
+        var arrColorFiles = {
+            "pdf": "danger",
+            "docx": "blue",
+            "xlsx": "green",
+            "pptx": "yellow",
+            "xml": "aqua"
+        };
+        var fileTemplate =
+            '<li><span class="handle"><i class="fa fa-ellipsis-v"></i><i class="fa fa-ellipsis-v"></i></span><i class="fa fa-file-{0}-o text-{1}"></i><span class="text">Design a nice theme</span><small class="label label-info"><i class="fa fa-clock-o"></i> Chờ ký số</small><div class="tools"><i class="fa fa-edit"></i></div></li>';
+
+        String.format = function() {
+            var s = arguments[0];
+            for (var i = 0; i < arguments.length - 1; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                s = s.replace(reg, arguments[i + 1]);
+            }
+            return s;
+        };
+
+        $(document).on(
+            'change',
+            '#FileImports:file',
+            function() {
+                var input = $(this),
+                    numFiles = input.get(0).files
+                        ? input
+                        .get(0).files.length
+                        : 1,
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+
+                if (numFiles === 0) {
+                    resetForm(input);
+                    return;
+                }
+
+                // Loop through the FileList and render image files as thumbnails.
+                for (var i = 0, f; f = input.get(0).files[i]; i++) {
+                    var reader = new FileReader();
+
+                    // Closure to capture the file information.
+                    reader.onload = (function(theFile) {
+                        return function(e) {
+                            if (theFile == null) {
+                                resetForm(input);
+                                return;
+                            }
+                            var fileNameSplit = theFile.name.split(".");
+                            var fileExt = fileNameSplit[fileNameSplit.length - 1].toLowerCase();
+                            if (!arrAcceptExtFiles.includes(fileExt)) {
+                                showNotify("Lỗi",
+                                    "fa fa-ban",
+                                    "Hệ thống không hỗ trợ định dạng " + fileExt.toUpperCase(),
+                                    null,
+                                    null,
+                                    "error");
+                                resetForm(input);
+                                return;
+                            }
+                        };
+                    })(f);
+
+                    // Read in the image file as a data URL.
+                    reader.readAsDataURL(f);
+                    //$("#listFileUnsign").append();
+                }
+                $("button[id='btnSign']").removeAttr("disabled");
+                //$("#inputFile_FileImports .input-group-btn").addClass("disabled");
+                $("#inputFile_FileImports input").addClass("disabled");
+            });
+
+        function signOutSmartCA() {
+            $.ajax({
+                method: "GET",
+                url: "@Url.Action("SignoutSmartCA", "DigitalSign")",
+                async: false
+            }).done(function(response) {
+                if (response.status) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        function resetForm(el) {
+            $(el).parents('form').get(0).reset();
+            $("button[id='btnSign']").attr("disabled", "disabled");
+            //$("#inputFile_FileImports .input-group-btn").removeClass("disabled");
+            $("#inputFile_FileImports input").removeClass("disabled");
+            $('#BoxDigitalSign > div.overlay').addClass('hidden');
+        }
+
+    </script>
+
+    <script type="text/javascript">
+
+        function LoginSmartCA_OnProcessSuccess(response, formId) {
+            if (response.status != undefined) {
+                if (response.status) {
+                    $("#ModalContent #modal_" + formId).modal("hide");
+                    $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                if (response.errorCode == 1) {
+                                    signOutSmartCA();
+                                }
+                                if (response.status) {
+                                    $("#UserInfo").parents('section.content')
+                                        .find('div.col-md-5.hidden, div.col-md-7.hidden')
+                                        .removeClass('hidden');
+                                    $("#UserInfo").load("@Url.Action("UserInfo")");
+                                    $("a#LoginSmartCA").addClass("hidden");
+                                }
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    eval(response.message);
+                    response.status = undefined;
+                }
+            } else {
+                $("#ModalContent #modal_" + formId + " #bodyForm").html(response);
+            }
+        }
+
+        $('form#SignDocument').ajaxForm({
+            beforeSubmit: function() {
+                $('button[type="submit"][id="btnSign"]').attr('disabled', true);
+                $('#BoxDigitalSign > div.overlay').removeClass('hidden');
+                setTimeout(function() {
+                        $("#loader").removeClass("show pageload-loading").css("display", "none");
+                    },
+                    1000);
+                return true; //it will continue your submission.
+            },
+            success: function(response) {
+                if (response.status != undefined) {
+                    eval(response.message);
+                    if (response.status) {
+                        var a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = String.format("@Url.Action("DownloadSignedFile")?fileName={0}", response.fileName);
+                        a.class = "btn hidden";
+                        document.body.appendChild(a);
+                        a.click();
+                        response.status = undefined;
+                    }
+                    resetForm('#FileImports');
+                }
+            },
+            error : function(response) {
+                alert("Lỗi");
+            }
+        });
+
+        @*function onUpdateSignedFile(fileGuid) {
+            var eleDownload = '<a href="@Url.Action("DownloadSignedFile", new { fileName })"><i class="fa fa-cloud-download"></i></a>';
+            var statusCompleted =
+                '<small class="label label-success label-status"><i class="fa fa-check"></i> Đã ký</small>';
+            $("li#" + fileGuid).children(".LabelWaiting").remove();
+            $("li#" + fileGuid).children('.tools').append(eleDownload);
+            $("li#" + fileGuid + ' .text').after(statusCompleted);
+        }*@
+
+        $(document).ready(function() {
+            @{
+                if (string.IsNullOrEmpty(Model.AccessToken))
+                {
+                    @Html.Raw($"var a = document.createElement('a');a.style.display = 'none';a.href = '{Url.Action("LoginSmartCA")}';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
+                }
+            }
+            
+        });
+
+    </script>
+
+    @Html.RenderScripts(ScriptPosition.BodyInside)
+}

@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Edit"), AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_Infrastructure_Room_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-pencil"></i>
+}
+
+@section FormBody{
+    @using (Html.BeginForm("EditRoomType", "TypeAccommodation", new {area = ""}, FormMethod.Post, new {encType = "multipart/form-data", id = "EditRoomType", @class = "form-horizontal"}))
+    {
+        <div id="bodyForm">
+            @Html.Partial("_RoomType")
+        </div>
+    }
+    <script type="text/javascript">
+        $('form').ajaxForm({
+            success: function(response) {
+                if (response.status != undefined) {
+                    $("#ModalContent #modal_EditRoomType").modal("hide");
+                    $("#ModalContent #modal_EditRoomType").on('hidden.bs.modal',
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                _tableRoomType.ajax.reload(null, true);
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    $("#ModalContent #modal_EditRoomType" + " #bodyForm").html(response);
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,338 @@
+﻿@*<style type="text/css">
+    #DataReport table > thead > tr > th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    #DataReport #DataReporttable > tbody > tr > td {
+        vertical-align: middle !important;
+    }
+
+    #DataReport table > tbody > tr > td:nth-child(2), #DataReport table > tbody > tr > td:nth-child(3) {
+            text-align: center !important;
+        }
+</style>*@
+
+<div class="box no-footer no-border">
+<div class="box-header">
+    <h3 class="box-title text-primary text-bold" style="text-transform: uppercase"><i class="fa fa-flag-checkered"></i>&nbsp;Báo cáo Doanh nghiệp Điểm/Khu du lịch</h3>
+</div>
+<div class="box-body">
+<div class="row">
+<div class="col-md-12 table-responsive">
+<table id="DataReport" class="table table-bordered table-striped" width="100%">
+<thead>
+<tr>
+    <th width="45%">Chỉ tiêu</th>
+    <th width="10%">ĐV tính</th>
+    <th width="5%">Mã số</th>
+    <th width="13.3%">Số thực hiện kỳ trước</th>
+    <th width="13.3%">Số thực hiện kỳ báo cáo</th>
+    @*<th width="10%">Lũy kế từ đầu năm</th>*@
+    <th width="13.3%">So với cùng kỳ năm trước (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="text-center">
+    <td>A</td>
+    <td>B</td>
+    <td>C</td>
+    <td></td>
+    <td>1</td>
+    <td>2</td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_1", "1. Tổng số lượt khách phục vụ")
+        1. Tổng số lượt khách phục vụ
+    </td>
+    <td>
+        @Html.Hidden("Unit_1", "Lượt")
+        Lượt
+    </td>
+    <td>
+        @Html.Hidden("Code_1", "01")
+        01
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_1" name="PerformPreviousPeriod_1" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_1" name="PerformInPeriod_1" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_1" name="AccumulatedBeginingOfYear_1" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_1" name="CompareSamePeriodLastYear_1" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+
+<tr>
+    <td>
+        @Html.Hidden("Target_2", "2. Tổng doanh thu")
+        2. Tổng doanh thu
+    </td>
+    <td>
+        @Html.Hidden("Unit_2", "Triệu đồng")
+        Triệu đồng
+    </td>
+    <td>
+        @Html.Hidden("Code_2", "02")
+        02
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_2" name="PerformPreviousPeriod_2" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_2" name="PerformInPeriod_2" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_2" name="AccumulatedBeginingOfYear_2" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_2" name="CompareSamePeriodLastYear_2" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_3", "Doanh thu từ bán vé")
+        Doanh thu từ bán vé
+    </td>
+    <td>
+        @Html.Hidden("Unit_3", "Triệu đồng")
+        Triệu đồng
+    </td>
+    <td>
+        @Html.Hidden("Code_3", "03")
+        03
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_3" name="PerformPreviousPeriod_3" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_3" name="PerformInPeriod_3" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_3" name="AccumulatedBeginingOfYear_3" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_3" name="CompareSamePeriodLastYear_3" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_4", "Doanh thu từ dịch vụ")
+        Doanh thu từ dịch vụ
+    </td>
+    <td>
+        @Html.Hidden("Unit_4", "Triệu đồng")
+        Triệu đồng
+    </td>
+    <td>
+        @Html.Hidden("Code_4", "04")
+        04
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_4" name="PerformPreviousPeriod_4" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_4" name="PerformInPeriod_4" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_4" name="AccumulatedBeginingOfYear_4" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_4" name="CompareSamePeriodLastYear_4" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_5", "Doanh thu từ bán hàng hóa")
+        Doanh thu từ bán hàng hóa
+    </td>
+    <td>
+        @Html.Hidden("Unit_5", "Triệu đồng")
+        Triệu đồng
+    </td>
+    <td>
+        @Html.Hidden("Code_5", "05")
+        05
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_5" name="PerformPreviousPeriod_5" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_5" name="PerformInPeriod_5" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_5" name="AccumulatedBeginingOfYear_5" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_5" name="CompareSamePeriodLastYear_5" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_6", "3. Tổng số lao động")
+        3. Tổng số lao động
+    </td>
+    <td>
+        @Html.Hidden("Unit_6", "Người")
+        Người
+    </td>
+    <td>
+        @Html.Hidden("Code_6", "06")
+        06
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_6" name="PerformPreviousPeriod_6" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_6" name="PerformInPeriod_6" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_6" name="AccumulatedBeginingOfYear_6" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_6" name="CompareSamePeriodLastYear_6" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_7", "Lãnh đạo quản lý")
+        Lãnh đạo quản lý
+    </td>
+    <td>
+        @Html.Hidden("Unit_7", "Người")
+        Người
+    </td>
+    <td>
+        @Html.Hidden("Code_7", "07")
+        07
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_7" name="PerformPreviousPeriod_7" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_7" name="PerformInPeriod_7" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_7" name="AccumulatedBeginingOfYear_7" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_7" name="CompareSamePeriodLastYear_7" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_8", "Bộ phận hành chính")
+        Bộ phận hành chính
+    </td>
+    <td>
+        @Html.Hidden("Unit_8", "Người")
+        Người
+    </td>
+    <td>
+        @Html.Hidden("Code_8", "08")
+        08
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_8" name="PerformPreviousPeriod_8" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_8" name="PerformInPeriod_8" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_8" name="AccumulatedBeginingOfYear_8" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_8" name="CompareSamePeriodLastYear_8" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_9", "Hướng dẫn viên")
+        Hướng dẫn viên
+    </td>
+    <td>
+        @Html.Hidden("Unit_9", "Người")
+        Người
+    </td>
+    <td>
+        @Html.Hidden("Code_9", "09")
+        09
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_9" name="PerformPreviousPeriod_9" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_9" name="PerformInPeriod_9" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_9" name="AccumulatedBeginingOfYear_9" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_9" name="CompareSamePeriodLastYear_9" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_10", "Bộ phận dịch vụ")
+        Bộ phận dịch vụ
+    </td>
+    <td>
+        @Html.Hidden("Unit_10", "Người")
+        Người
+    </td>
+    <td>
+        @Html.Hidden("Code_10", "10")
+        10
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_10" name="PerformPreviousPeriod_10" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_10" name="PerformInPeriod_10" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_10" name="AccumulatedBeginingOfYear_10" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_10" name="CompareSamePeriodLastYear_10" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.Hidden("Target_11", "Lao động khác")
+        Lao động khác
+    </td>
+    <td>
+        @Html.Hidden("Unit_11", "Người")
+        Người
+    </td>
+    <td>
+        @Html.Hidden("Code_11", "11")
+        11
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformPreviousPeriod_11" name="PerformPreviousPeriod_11" placeholder="0" type="number" min="0">
+    </td>
+    <td>
+        <input class="form-control text-right" id="PerformInPeriod_11" name="PerformInPeriod_11" placeholder="0" type="number" min="0">
+    </td>
+    @*<td>
+                                <input class="form-control text-right" id="AccumulatedBeginingOfYear_11" name="AccumulatedBeginingOfYear_11" placeholder="0" type="number" min="0">
+                            </td>*@
+    <td>
+        <input class="form-control text-right" id="CompareSamePeriodLastYear_11" name="CompareSamePeriodLastYear_11" placeholder="0" type="number" min="0">
+    </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<script src="~/Areas/Report/Views/Import/_TouristAttractionService.js"></script>

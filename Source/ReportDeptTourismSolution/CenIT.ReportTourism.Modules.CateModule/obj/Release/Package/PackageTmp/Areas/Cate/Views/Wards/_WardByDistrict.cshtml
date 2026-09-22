@@ -1,0 +1,130 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateDistrictModel
+<div class="modal-header bg-primary">
+    <button type="button" class="close" style="padding-right: 10px;" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">Danh sách Phường thuộc Quận/Huyện/Thành phố<b>[@Model.DistrictName]</b></h4>
+</div>
+<div class="modal-body row" id="bodyForm">
+    <div class="col-md-12">
+        @Html.Button(true, "AddWards", Url.Action("Add", "Wards", new {area = "Cate", districtId = Model.DistrictId}), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new {@class = "btn btn-sm btn-success pull-right"})
+
+        @*<a data-modal="" id="AddWards" data-modal-id="AddWards" class="btn btn-sm btn-success pull-right" href="@Url.Action("Add", new {Model.DistrictId})"><i class="fa fa-plus"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Add")</a>*@
+    </div>
+    <div class="clearfix">
+        <hr/>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-12 table-responsive">
+            <table id="WardByDistrict" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_District")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_Code")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_Name")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Cancel")</button>
+</div>
+<script type="text/javascript">
+    var _DistrictActionURLs = {
+        WardByDistrict: "/Cate/Wards/GetWardByDistricts"
+    };
+
+    var _tableWardByDistrict;
+
+    $(document).ready(function() {
+        initTableDistrict();
+    });
+
+    function initTableDistrict() {
+        if (window._tableWardByDistrict != undefined) {
+            $("#WardByDistrict").dataTable().fnDestroy();
+        }
+        _tableWardByDistrict = $("#WardByDistrict").DataTable({
+            "Responsive": true,
+            //"columnDefs": [{ "className": "text-left custom-middle-align", "targets": [0] }],
+            "language": {
+                "processing":
+                    "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+            },
+            "lengthChange": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+            {
+                "url": _DistrictActionURLs.WardByDistrict,
+                "type": "POST",
+                "dataType": "JSON",
+                "data": {
+                    "DistrictId": "@Html.Raw(Model.DistrictId)"
+                }
+            },
+            "columns": [
+                {
+                    "data": "",
+                    "defaultContent": "1",
+                    "render": function(data, type, row, meta) {
+                        return meta.settings._iDisplayStart + meta.row + 1;
+                    }
+                },
+                {
+                    "data": "DistrictName",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "WardCode",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "WardName",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "WardId",
+                    "style": "width:100px;",
+                    "orderable": false,
+                    "render": function(data, type, row, meta) {
+                        var html = "";
+                        if (type === "display") {
+                            html += '<a data-modal="" data-modal-id="Edit" href="/Cate/Wards/Edit/' +
+                                data +
+                                '" class="fa fa-pencil btn btn-default btn-form"  title="Cập nhật" data-toggle="tooltip"></a>';
+                            html += '<a data-modal="" data-modal-id="Delete" href="/Cate/Wards/Delete/' +
+                                data +
+                                '" class="fa fa-trash-o btn btn-danger btn-form" title="Xoá" data-toggle="tooltip"></a>';
+                        }
+
+                        return html;
+                    }
+                }
+            ]
+        });
+    }
+
+    function App_OnProcessSuccess(response, formId) {
+        if (response.status != undefined) {
+            $("#ModalContent #modal_" + formId).modal("hide");
+            $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                function() {
+                    if (response.status != undefined) {
+                        eval(response.message);
+                        _tableWardByDistrict.ajax.reload(null, false);
+                        response.status = undefined;
+                    }
+                });
+        } else {
+            $("#ModalContent #modal_" + formId + " #bodyForm").html(response);
+        }
+
+    }
+
+</script>

@@ -1,0 +1,95 @@
+﻿<div class="form-group">
+    <div class="col-md-2">
+        <div class="radio">
+            <input type="radio" id="cronEveryYear" name="cronYear" checked="checked">
+            <label for="cronEveryYear">Any year</label>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-2">
+        <div class="radio">
+            <input type="radio" id="cronYearIncrement" name="cronYear">
+            <label for="cronYearIncrement">Every</label>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <select id="cronYearIncrementIncrement" class="col-md-8">
+            @{
+                for (var idx = 1; idx <= 83; idx++)
+                {
+                    <option value="@idx">@idx</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="control-label"> years(s) starting in </label>
+    </div>
+    <div class="col-md-2">
+        <select id="cronYearIncrementStart" class="col-md-10">
+            @{
+                for (var idx = DateTime.Now.Year; idx <= 2099; idx++)
+                {
+                    <option value="@idx">@idx</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-12">
+        <div class="radio">
+            <input type="radio" id="cronYearSpecific" name="cronYear">
+            <label for="cronYearSpecific">Specific year (choose one or many)</label>
+        </div>
+    </div>
+    <div class="col-md-12">
+        @{
+            for (var idx = DateTime.Now.Year; idx <= 2099; idx++)
+            {
+                var eleId = $"cronYear{idx}";
+
+                <div class="col-md-1">
+                    <div class="checkbox">
+                        @{
+                            <input type="checkbox" id="@eleId" name="cronYearSpecificSpecific" value="@(idx)">
+                        }
+                        <label for="@eleId">@(idx)</label>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-3">
+        <div class="radio">
+            <input type="radio" id="cronYearRange" name="cronYear">
+            <label for="cronYearRange">Every year between</label>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <select id="cronYearRangeStart" class="col-md-10">
+            @{
+                for (var idx = DateTime.Now.Year; idx <= 2099; idx++)
+                {
+                    <option value="@idx">@(idx)</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-1">
+        <label class="control-label col-md-4"> and </label>
+    </div>
+    <div class="col-md-2">
+        <select id="cronYearRangeEnd" class="col-md-10">
+            @{
+                for (var idx = DateTime.Now.Year; idx <= 2099; idx++)
+                {
+                    <option value="@idx">@(idx)</option>
+                }
+            }
+        </select>
+    </div>
+</div>

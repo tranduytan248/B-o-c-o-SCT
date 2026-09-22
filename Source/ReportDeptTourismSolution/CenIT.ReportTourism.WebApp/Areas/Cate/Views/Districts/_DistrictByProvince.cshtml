@@ -1,0 +1,132 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateProvinceModel
+<div class="modal-header bg-primary">
+    <button type="button" class="close" style="padding-right: 10px;" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">Danh sách Quận/Huyện thuộc <b>[@Model.ProvinceName]</b></h4>
+</div>
+<div class="row modal-body" id="bodyForm">
+    <div class="col-md-12">
+        @Html.Button(true, "AddDistricts", Url.Action("Add", "Districts", new { area = "Cate", provinceId = Model.ProvinceId }), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new { @class = "btn btn-sm btn-success pull-right" })
+
+        @*<a data-modal="" id="AddDistricts" data-modal-id="AddDistricts" class="btn btn-sm btn-success pull-right" href="@Url.Action("Add", new {Model.ProvinceId})"><i class="fa fa-plus"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Add")</a>*@
+    </div>
+    <div class="clearfix">
+        <hr/>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-12 table-responsive">
+            <table id="DistrictByProvince" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("District_Label_Province")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("District_Label_Code")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("District_Label_Name")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Cancel")</button>
+</div>
+<script type="text/javascript">
+
+    var _DistrictActionURLs = {
+        DistrictByProvince: "/Cate/Districts/GetDistrictByProvince"
+    };
+
+    var _tableDistrictByProvince;
+
+    $(document).ready(function() {
+        initTableDistrict();
+    });
+
+    function initTableDistrict() {
+        if (window._tableDistrictByProvince != undefined) {
+            $("#DistrictByProvince").dataTable().fnDestroy();
+        }
+        _tableDistrictByProvince = $("#DistrictByProvince").DataTable({
+            "Responsive": true,
+            //"columnDefs": [{ "className": "text-left custom-middle-align", "targets": [0] }],
+            "language": {
+                "processing":
+                    "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+            },
+            "lengthChange": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+            {
+                "url": _DistrictActionURLs.DistrictByProvince,
+                "type": "POST",
+                "dataType": "JSON",
+                "data": {
+                    "ProvinceId": "@Html.Raw(Model.ProvinceId)"
+                }
+            },
+            "columns": [
+                {
+                    "data": "",
+                    "defaultContent": "1",
+                    "render": function(data, type, row, meta) {
+                        return meta.settings._iDisplayStart + meta.row + 1;
+                    }
+                },
+                {
+                    "data": "ProvinceName",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "DistrictCode",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "DistrictName",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "DistrictId",
+                    "style": "width:100px;",
+                    "orderable": false,
+                    "render": function(data, type, row, meta) {
+                        var html = "";
+                        if (type === "display") {
+                            html += '<a data-modal="" data-modal-id="Edit" href="/Cate/Districts/Edit/' +
+                                data +
+                                '" class="fa fa-pencil btn btn-default btn-form"  title="Cập nhật" data-toggle="tooltip"></a>' +
+                                '<a data-modal="" data-width="1024" data-modal-id="ListWards" href="/Cate/Wards/WardByDistrict/' +
+                                data +
+                                '" class="fa fa-list btn btn-default btn-form" title="Danh sách Phường/Xã" data-toggle="tooltip"></a>';
+                            html += '<a data-modal="" data-modal-id="Delete" href="/Cate/Districts/Delete/' +
+                                data +
+                                '" class="fa fa-trash-o btn btn-danger btn-form" title="Xoá" data-toggle="tooltip"></a>';
+                        }
+
+                        return html;
+                    }
+                }
+            ]
+        });
+    }
+
+    function App_OnProcessSuccess(response, formId) {
+        if (response.status != undefined) {
+            $("#ModalContent #modal_" + formId).modal("hide");
+            $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                function() {
+                    if (response.status != undefined) {
+                        eval(response.message);
+                        _tableDistrictByProvince.ajax.reload(null, false);
+                        response.status = undefined;
+                    }
+                });
+        } else {
+            $("#ModalContent #modal_" + formId + " #bodyForm").html(response);
+        }
+    }
+</script>

@@ -1,0 +1,27 @@
+﻿@using TSFramework.App.Processors
+@model int
+<div class="row">
+    <div class="col-md-12">
+        @Html.Button(true, "AddBranchOffice", Url.Action("AddBranchOffice", new { area = "Cate", enterpriseId = Model }), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new { @class = "btn btn-sm btn-success pull-right", data_width = "860px" })
+    </div>
+    <div class="clearfix">
+        <hr/>
+    </div>
+    <div class="col-md-12 table-responsive">
+        <table id="DataBranchOffices" class="table table-bordered table-striped" width="100%">
+            <thead>
+            <tr>
+                <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                <th>@AppProcessor.Messagor.GetMessage("TravelingBranchOffice_Label_BranchName")</th>
+                <th>@AppProcessor.Messagor.GetMessage("TravelingBranchOffice_Label_BranchAddress")</th>
+                <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    var enterpriseId = @Model;
+</script>
+
+<script src="@Url.Content("~/Areas/Cate/Views/TypeTraveling/BranchOffice.js")"></script>

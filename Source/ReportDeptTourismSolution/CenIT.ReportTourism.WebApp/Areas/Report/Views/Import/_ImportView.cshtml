@@ -1,0 +1,577 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Report.ReportDataImportModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.EnableSignDigitalDoc)
+
+<div id="DataImport">
+    @{
+        if (DateTime.Now.Day > Model.DayDeadlineSendReport && DateTime.Now.Day <= Model.DayDeadlineSendReportLate)
+        {
+            <div class="alert alert-danger alert-dismissible" style="border-radius: unset;">
+                <h4><i class="icon fa fa-bullhorn"></i> Quá hạn nộp báo cáo tháng @DateTime.Now.ToString("MM/yyyy")!</h4>
+                <p>Đã qua hạn nộp báo cáo lúc <b>24h00 ngày @Model.DayDeadlineSendReport</b> hàng tháng. Báo cáo nộp sau ngày <b>@Model.DayDeadlineSendReport</b> sẽ được xem là trễ hạn.</p>
+            </div>
+            <hr/>
+        }
+        var visibleInfoSmartCA = string.IsNullOrEmpty(Model.AccessToken) || !Model.EnableSignDigitalDoc ? "hidden" : "";
+        //var visibleSmartCA = string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc ? "" : "hidden";
+        //var visibleFormUpload = !(string.IsNullOrEmpty(Model.AccessToken) || !Model.EnableSignDigitalDoc);
+
+        <div class="row" id="ButtonLoginSmartCA">
+            <div class="col-md-2"></div>
+            <div class="radio col-md-3">
+                @Html.RadioButtonFor(model => model.TypeSignature, 2, new { onchange = "OnTypeSignature(this);", id = "TokenSign" })
+                <label for="TokenSign" data-toggle="tooltip" data-placement="top" title="Dùng cho doanh nghiệp sử dụng VNPT Token">Dùng Token ký số</label>
+            </div>
+            <div class="radio col-md-3">
+                @Html.RadioButtonFor(model => model.TypeSignature, 1, new { onchange = "OnTypeSignature(this);", id = "DigitalSign" })
+                <label for="DigitalSign" data-toggle="tooltip" data-placement="top" title="Dùng cho doanh nghiệp sử dụng VNPT SmartCA">Dùng tài khoản ký số</label>
+            </div>
+            <div class="radio col-md-3">
+                @Html.RadioButtonFor(model => model.TypeSignature, 0, new { onchange = "OnTypeSignature(this);", id = "SignatureFile" })
+                <label for="SignatureFile" data-toggle="tooltip" data-placement="top" title="Dùng cho doanh nghiệp sử dụng các phương thức ký số khác">Tải mẫu đã ký số</label>
+            </div>
+        </div>
+        <hr/>
+
+        <div class="row">
+            <div class="col-md-offset-3 col-md-9">
+                <p>
+                    <a id="LoginSmartCA" href="@Url.Action("LoginSmartCA")" data-modal="true" data-modal-id="LoginSmartCA" class="btn bg-navy margin pull-right hidden">
+                        <i class="fa fa-key"></i>&nbsp;Đăng nhập ký số
+                    </a>
+                </p>
+            </div>
+        </div>
+    }
+
+    <div id="FormUpload" class="hidden box box-body no-border no-header no-shadow">
+
+        <div class="overlay hidden" id="loading">
+            <i class="fa fa-refresh fa-spin"></i>
+            <p id="message" class="text-center text-bold text-danger">...</p>
+        </div>
+
+        <div class="box box-primary no-footer @visibleInfoSmartCA" id="BoxUserInfo">
+            <div class="box-header">
+                <h3 class="box-title text-bold">Thông tin tài khoản Smart CA</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body" id="UserInfo">
+                @{
+                    if (!string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)
+                    {
+                        Html.RenderAction("UserInfo");
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ForMonth, new { @class = "control-label col-md-3" })
+            <div class="col-md-4">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @class = "col-md-5", placeholder = "MM/yyyy" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseId, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), new { @class = "col-md-9" })
+                @Html.ValidationMessageFor(model => model.EnterpriseId, "", new { @class = "text-danger" })
+            </div>
+            @Html.HiddenFor(model => model.EnterpriseName)
+        </div>
+
+        @Html.HiddenFor(model => model.TypeSignature)
+
+        <div id="InputFileImport">
+            @{
+                if (Model.TypeSignature == 2)
+                {
+                    @Html.Partial("_UploadBaseFile")
+                }
+                else if (Model.TypeSignature == 0)
+                {
+                    @Html.Partial("_UploadSignedFile")
+                }
+            }
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new { rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+                @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group hidden" id="TableDataImport">
+            <hr/>
+            <div class="col-md-6">
+                <h3 class="text-danger">
+                    Dữ liệu báo cáo
+                </h3>
+            </div>
+
+            <div class="col-md-12 table-responsive">
+                <table id="DataImportsFromFile" class="table table-bordered table-striped" width="100%" style="padding-top: 50px;">
+                    <thead>
+                    <tr>
+                        <th>Chỉ tiêu</th>
+                        <th>Đơn vị tính</th>
+                        <th>Mã số</th>
+                        <th>Số thực hiện kỳ trước</th>
+                        <th>Số thực hiện kỳ báo cáo</th>
+                        <th>So với cùng kỳ năm trước (%)</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    debugger;
+    $(document).ready(function() {
+
+        $('select#EnterpriseId').trigger('change');
+        $("#DataImport #ForMonth").datepicker("remove");
+        $("#DataImport #ForMonth").datepicker({
+            format: "mm/yyyy",
+            viewMode: "months",
+            minViewMode: "months",
+            autoclose: true,
+            startDate: new Date(),
+            endDate: new Date()
+        });
+        $("#DataImport #ForMonth").datepicker().trigger("update");
+        @{
+            if (string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)
+            {
+                @*@Html.Raw($"var a = document.createElement('a');a.style.display = 'none';a.href = '{Url.Action("LoginSmartCA")}';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")*@
+                @Html.Raw("$('#modal_ImportData button[type=\"submit\"]').prop('disabled', true);")
+                ;
+            }
+        }
+        OnViewFormUpload(@Model.TypeSignature);
+    });
+
+    function OnTypeSignature(chk) {
+        $('#FormUpload #loading').addClass("hidden");
+        $('#FormUpload #message').text('');
+
+        OnViewFormUpload($(chk).val());
+        $("input[type='hidden'][id='TypeSignature']").val($(chk).val());
+        if ($(chk).val() == "0") {
+            $("#DataImport #InputFileImport").load('@Url.Action("UploadSignedFile")');
+
+            var $btnSubmit = $('#modal_ImportData button[type="submit"]');
+            $btnSubmit.removeClass("hidden");
+            $btnSubmit.parent().children("#btnSign").remove();
+
+        } else if ($(chk).val() == "2") {
+            $("#DataImport #InputFileImport").load('@Url.Action("UploadBaseFile")');
+
+            var $btnSubmit = $('#modal_ImportData button[type="submit"]');
+            var $btnSubmitParent = $btnSubmit.parent();
+            var $btnSign = $('<button type="button" id="btnSign" class="btn btn-primary" disabled onclick="sign();"><i class="fa fa-save"></i>&nbsp;Lưu</button>');
+            $btnSubmit.addClass("hidden");
+            $btnSubmitParent.prepend($btnSign);
+        }
+    }
+
+    function OnViewFormUpload(typeForm) {
+        if (typeForm == 1) {
+            var needLoginSmartCA = @(Model.EnableSignDigitalDoc ? 1 : 0);
+            var hasLoginSmartCA = @(!string.IsNullOrEmpty(Model.AccessToken) ? 1 : 0);
+            $("#FormUpload").addClass('hidden');
+            if (needLoginSmartCA == 1) {
+                if (hasLoginSmartCA == 1) {
+                    $("#BoxUserInfo").removeClass('hidden');
+                    $("#FormUpload").removeClass('hidden');
+                } else {
+                    $("#LoginSmartCA").removeClass('hidden');
+                    var a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = '@Url.Action("LoginSmartCA")';
+                    a.class = 'btn hidden';
+                    a.setAttribute('data-modal', 'true');
+                    a.setAttribute('data-modal-id', 'LoginSmartCA');
+                    document.body.appendChild(a);
+                    a.click();
+                }
+            }
+        } else {
+            signOutSmartCA();
+            $("#FormUpload").removeClass('hidden');
+            $("#LoginSmartCA").addClass('hidden');
+        }
+        $("#DataImport select#EnterpriseId").select2();
+    }
+
+    $(function() {
+        $("#modal_ImportData").on("shown.bs.modal",
+            function() {
+
+                $('#DataImport select#EnterpriseId').on("change",
+                    function() {
+                        $('#DataImport #EnterpriseName').val($(this).children("option:selected").text());
+                        $('#inputFile_FileImport button.btn-reset').click();
+                    });
+
+                $('input[type="file"][id="FileImport"]').on("change",
+                    function() {
+                        var enterpriseId = $("#DataImport #EnterpriseId").val();
+                        var typeSignature = $("#DataImport #TypeSignature").val();
+
+                        var formdata = new FormData();
+                        formdata.append("EnterpriseId", enterpriseId);
+                        formdata.append("TypeSignature", typeSignature);
+
+                        for (var i = 0; i < this.files.length; i++) {
+                            formdata.append("FileImport", this.files[i]);
+                        }
+
+                        $.ajax({
+                            url: '@Url.Action("UploadFile")',
+                            type: "POST",
+                            contentType: false, // Not to set any content header
+                            processData: false, // Not to process data
+                            data: formdata,
+                            success: function(result) {
+                                if (!result.status) {
+                                    if (result.message.length > 0) {
+                                        eval(result.message);
+                                        $("#inputFile_FileImport").find('button.btn.btn-reset').click();
+                                    }
+                                    if (!$("#TableDataImport").hasClass("hidden")) {
+                                        $("#TableDataImport").addClass("hidden");
+                                    }
+                                } else {
+                                    initTableDataImportsFromFile(result.dataImport, result.typeReport);
+                                    $("#TableDataImport").removeClass("hidden");
+                                }
+                            },
+                            error: function(err) {}
+                        });
+                    });
+            });
+    });
+
+    String.format = function() {
+        var s = arguments[0];
+        for (var i = 0; i < arguments.length - 1; i++) {
+            var reg = new RegExp("\\{" + i + "\\}", "gm");
+            s = s.replace(reg, arguments[i + 1]);
+        }
+        return s;
+    };
+
+    function signOutSmartCA() {
+        $.ajax({
+            method: "GET",
+            url: "@Url.Action("SignOutSmartCA", "Import")",
+            async: false
+        }).done(function(response) {
+            if (response.status) {
+                $("#BoxUserInfo").addClass('hidden');
+                $("#LoginSmartCA").removeClass('hidden');
+                $("#UserInfo").empty();
+                $("#FormUpload").addClass('hidden');
+                $('#modal_ImportData button[type="submit"]').prop('disabled', true);
+            }
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
+    function LoginSmartCA_OnProcessSuccess(response, formId) {
+        if (response.status != undefined) {
+            if (response.status) {
+                $("#ModalContent #modal_" + formId).modal("hide");
+                $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                    function() {
+                        if (response.status != undefined) {
+                            eval(response.message);
+                            if (response.errorCode == 1) {
+                                signOutSmartCA();
+                            }
+                            if (response.status) {
+                                $("#UserInfo").parents('section.content')
+                                    .find('div.col-md-5.hidden, div.col-md-7.hidden')
+                                    .removeClass('hidden');
+                                $("#BoxUserInfo").removeClass('hidden');
+                                $("#LoginSmartCA").addClass('hidden');
+                                $("#UserInfo").load("@Url.Action("UserInfo")");
+                                $("#FormUpload").removeClass('hidden');
+                                $("#DataImport select#EnterpriseId").select2();
+                            }
+                            response.status = undefined;
+                        }
+                    });
+            } else {
+                eval(response.message);
+                response.status = undefined;
+            }
+        } else {
+            $("#ModalContent #modal_" + formId + " #ContentLogin").html(response);
+        }
+    }
+
+</script>
+
+<script src="~/Areas/Report/Views/Import/_ReportBody.js"></script>
+
+<script type="text/javascript">
+
+    var _tableDataImportsFromFile;
+
+    function ValidForm_TravelingService() {
+        var isValid =
+            ValidMinValue("#PerformPreviousPeriod", "17;18;19;20", 1, true) &
+                ValidMinValue("#PerformInPeriod", "17;18;19;20", 1, true) &
+                ValidMinValue("#CompareSamePeriodLastYear", "17;18;19;20", 1, true) &
+                ValidTotalWithChild("#PerformPreviousPeriod", "1", "2;3;4") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "5", "6;7;8;9;10") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "11", "12;13;14;15;16") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "17", "18;19;20") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "21", "22;23;24;25;26;27") &
+                ValidTotalWithChild("#PerformInPeriod", "1", "2;3;4") &
+                ValidTotalWithChild("#PerformInPeriod", "5", "6;7;8;9;10") &
+                ValidTotalWithChild("#PerformInPeriod", "11", "12;13;14;15;16") &
+                ValidTotalWithChild("#PerformInPeriod", "17", "18;19;20") &
+                ValidTotalWithChild("#PerformInPeriod", "21", "22;23;24;25;26;27") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "1", "2;3;4") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "5", "6;7;8;9;10") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "11", "12;13;14;15;16") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "17", "18;19;20") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "21", "22;23;24;25;26;27");
+        return isValid;
+    }
+
+    function ValidForm_TouristAttractionService() {
+        var isValid =
+            ValidMinValue("#PerformPreviousPeriod", "2;3;4;5", 1, true) &
+                ValidMinValue("#PerformInPeriod", "2;3;4;5", 1, true) &
+                ValidMinValue("#CompareSamePeriodLastYear", "2;3;4;5", 1, true) &
+                ValidTotalWithChild("#PerformPreviousPeriod", "2", "3;4;5") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "6", "7;8;9;10;11") &
+                ValidTotalWithChild("#PerformInPeriod", "2", "3;4;5") &
+                ValidTotalWithChild("#PerformInPeriod", "6", "7;8;9;10;11") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "2", "3;4;5") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "6", "7;8;9;10;11");
+        return isValid;
+    }
+
+    function ValidForm_AccommodationService() {
+        var isValid =
+            ValidMinValue("#PerformPreviousPeriod", "11;12;13;14", 0, true) &
+                ValidMinValue("#PerformInPeriod", "11;12;13;14", 0, true) &
+                ValidMinValue("#CompareSamePeriodLastYear", "11;12;13;14", 0, true) &
+                ValidTotalWithChild("#PerformPreviousPeriod", "5", "6;7") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "8", "9;10") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "11", "12;13;14") &
+                ValidTotalWithChild("#PerformPreviousPeriod", "15", "16;17;18;19;20") &
+                ValidTotalWithChild("#PerformInPeriod", "5", "6;7") &
+                ValidTotalWithChild("#PerformInPeriod", "8", "9;10") &
+                ValidTotalWithChild("#PerformInPeriod", "11", "12;13;14") &
+                ValidTotalWithChild("#PerformInPeriod", "15", "16;17;18;19;20") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "5", "6;7") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "8", "9;10") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "11", "12;13;14") &
+                ValidTotalWithChild("#CompareSamePeriodLastYear", "15", "16;17;18;19;20");
+        return isValid;
+    }
+
+    function ValidForm(typeReport) {
+        var typeTemplate = 1;
+
+        switch (typeReport) {
+        case 1: // _AccommodationService
+            typeTemplate = 1;
+            break;
+        case 2:
+        case 3: // _TravelingService
+            typeTemplate = 2;
+            break;
+        case 4:
+        case 5: // _TouristAttractionService
+            typeTemplate = 3;
+            break;
+        default:
+            typeTemplate = 1;
+        }
+        switch (typeTemplate) {
+        case 1:
+            return ValidForm_AccommodationService();
+        case 2:
+            return ValidForm_TravelingService();
+        case 3:
+            return ValidForm_TouristAttractionService();
+        }
+        return false;
+    }
+
+    function initTableDataImportsFromFile(arrData, typeReport) {
+        var typeTemplate = 1;
+
+        switch (typeReport) {
+        case 1: // _AccommodationService
+            typeTemplate = 1;
+            break;
+        case 2:
+        case 3: // _TravelingService
+            typeTemplate = 2;
+            break;
+        case 4:
+        case 5: // _TouristAttractionService
+            typeTemplate = 3;
+            break;
+        default:
+            typeTemplate = 1;
+        }
+
+        if ($.fn.DataTable.isDataTable('#DataImportsFromFile')) {
+            $('#DataImportsFromFile').DataTable().destroy();
+        }
+        _tableDataImportsFromFile = $("#DataImportsFromFile").DataTable({
+            "Responsive": true,
+            "language": {
+                "processing":
+                    "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+            },
+            "order": [],
+            "lengthChange": false,
+            "processing": true,
+            "serverSide": false,
+            "pageLength": 50,
+            "info": false,
+            "searching": false,
+            "paging": false,
+            "data": arrData,
+            "columnDefs": [
+                { "width": "120px", "targets": 0 },
+                { "width": "10px", "targets": [1, 2] },
+                { "width": "80px", "targets": [3, 4, 5] }
+            ],
+            "columns": [
+                {
+                    "data": "Targets",
+                    "ordering": false,
+                    "defaultContent": "",
+                    "render": function(data, type, row, meta) {
+                        var rowIdx = meta.row + 1;
+                        var htmlInput = '<input id="Target_{0}" name="Target_{0}" type="hidden" value="{1}">{1}'.format(rowIdx, data);
+                        return htmlInput;
+                    }
+                },
+                {
+                    "data": "Unit",
+                    "ordering": false,
+                    "class": "text-center",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "Code",
+                    "ordering": false,
+                    "class": "text-center",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "PerformPreviousPeriod",
+                    "ordering": false,
+                    "defaultContent": "",
+                    "render": function(data, type, row, meta) {
+                        if (row.Code == null) return "";
+                        //var viewData = (data != null ? data : 0).toLocaleString("he-IL");
+                        var rowIdx = meta.row + 1;
+                        var htmlInput = '<input class="form-control text-right" style="width:100px;" readonly id="PerformPreviousPeriod_{0}" name="PerformPreviousPeriod_{0}" placeholder="0" type="number" min="0" value="{1}">'.format(rowIdx, data);
+                        return htmlInput;
+                    }
+                },
+                {
+                    "data": "PerformInPeriod",
+                    "ordering": false,
+                    "defaultContent": "",
+                    "render": function(data, type, row, meta) {
+                        if (row.Code == null) return "";
+                        //var viewData = (data != null ? data : 0).toLocaleString("he-IL");
+                        var rowIdx = meta.row + 1;
+                        var htmlInput = '<input class="form-control text-right" style="width:100px;" readonly id="PerformInPeriod_{0}" name="PerformInPeriod_{0}" placeholder="0" type="number" min="0" value="{1}">'.format(rowIdx, data);
+                        return htmlInput;
+                    }
+                },
+                {
+                    "data": "ComparedSamePeriodLastYear",
+                    "ordering": false,
+                    "defaultContent": "",
+                    "render": function(data, type, row, meta) {
+                        if (row.Code == null) return "";
+                        //var viewData = (data != null ? data : 0).toLocaleString("en-us", { style: "percent", maximumSignificantDigits: 4 });
+                        var rowIdx = meta.row + 1;
+                        var htmlInput = '<input class="form-control text-right" style="width:100px;" readonly id="CompareSamePeriodLastYear_{0}" name="CompareSamePeriodLastYear_{0}" placeholder="0" type="number" min="0" value="{1}">'.format(rowIdx, data);
+                        return htmlInput;
+                    }
+                }
+            ],
+            "drawCallback": function(settings) {
+                var isValid = ValidForm(typeReport);
+                if (!isValid) {
+                    $('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').prop('disabled', true);
+                    $('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').css('pointer-events', 'none');
+                    //$('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').attr("title", "Dữ liệu lỗi. Vui lòng kiểm tra lại dữ liệu.");
+                    //$('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').data("bs.tooltip", false).tooltip();
+
+                    var parentBtnSubmit = $('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').parent();
+                    var spanTooltip = $('<span class="d-inline-block" tabindex="0" title="Dữ liệu lỗi hoặc không có dữ liệu. Vui lòng kiểm tra lại."></span>');
+                    spanTooltip.append($('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]'));
+                    spanTooltip.tooltip();
+                    parentBtnSubmit.prepend(spanTooltip);
+
+                } else {
+                    $('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').removeAttrs('disabled');
+                    if ($('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').parent('span').length > 0) {
+                        var parentSpan = $('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').parent('span');
+                        var parentFooter = parentSpan.parent();
+                        parentFooter.prepend($('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]'));
+                        parentSpan.remove();
+                        $('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').css('pointer-events', '');
+                    }
+                    //$('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').removeAttrs('title');
+                    //$('#modal_ImportData button[type="submit"], #modal_ImportData button[id="btnSign"]').tooltip("destroy");
+                }
+            },
+            "createdRow": function(row, data, dataIndex) {
+                if (typeTemplate == 1) {
+                    if ((data.Unit == null || typeof data.Unit == "undefined" || data.Unit.length == 0) &&
+                        (data.Code == null || typeof data.Code == "undefined" || data.Code.length == 0)) {
+                        $('td:eq(0)', row).attr('colspan', 6);
+
+                        // Hide required number of columns
+                        // next to the cell with COLSPAN attribute
+                        $('td:eq(5)', row).remove();
+                        $('td:eq(4)', row).remove();
+                        $('td:eq(3)', row).remove();
+                        $('td:eq(2)', row).remove();
+                        $('td:eq(1)', row).remove();
+
+                    }
+                }
+            },
+        });
+    }
+
+</script>

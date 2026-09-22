@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@model string
+@{
+    ViewBag.Title = $"{AppProcessor.Messagor.GetMessage("Button_Register")} Thành công";
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-green
+}
+
+@section FormIcon{
+    <i class="fa fa-check"></i>
+}
+
+@section FormBody{
+    <blockquote>
+        <p class="text-bold text-blue">Đăng ký thông tin doanh nghiệp thành công</p>
+        <p>Thông tin đăng nhập đã được gửi tới <a href="mailto:@Model">@Model</a> </p>
+        <p>Vui lòng kiểm tra Hộp thư chính hoặc Hộp thư rác (Spam)</p>
+        <small>Sở du lịch Tỉnh Khánh Hoà</small>
+    </blockquote>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#ModalContent #modal_RegisterSuccess").on('hidden.bs.modal',
+                function () {
+                    $("#ModalContent #modal_Register").modal("hide");
+                });
+        });
+
+    </script>
+}
+
+@section SubmitControl{
+
+}
+
+
+

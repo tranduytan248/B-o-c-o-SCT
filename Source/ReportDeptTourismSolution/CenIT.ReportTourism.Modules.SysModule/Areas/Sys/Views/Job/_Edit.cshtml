@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Edit"), AppProcessor.Messagor.GetMessage("SysJob_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-pencil"></i>
+}
+
+@section FormBody{
+    @using (Html.BeginForm("Edit", "Job", new { area = "Sys" }, FormMethod.Post, new { encType = "multipart/form-data", id = "EditJob", @class = "form-horizontal" }))
+    {
+        <div id="bodyForm">
+            @Html.Partial("_SysJob")
+        </div>
+    }
+    <script type="text/javascript">
+        $('form').ajaxForm({
+            success: function(response) {
+                if (response.status != undefined) {
+                    $("#ModalContent #modal_EditJob").modal("hide");
+                    $("#ModalContent #modal_EditJob").on('hidden.bs.modal',
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                _tableJob.ajax.reload(null, true);
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    $("#ModalContent #modal_EditJob" + " #bodyForm").html(response);
+                }
+            }
+        });
+    </script>
+}

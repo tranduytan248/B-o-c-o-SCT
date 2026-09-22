@@ -1,0 +1,308 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models.DigitalSignModel
+
+<style type="text/css">
+    .main-header .navbar { background-color: #f8f9fa; }
+
+    .page-title {
+        color: #0066b3;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .content {
+        background-image: url("/Contents/imgs/vnpt-smart-ca-bg.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+</style>
+
+<div class="widget-box" id="SmartCA" style="margin: 0">
+    <div class="wrapper" id="main_layout" style="height: auto; overflow: hidden;">
+        <header class="main-header">
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top no-margin no-padding">
+                <!-- Sidebar toggle button-->
+
+                <a href="https://smartca.vnpt.vn/" class="logo">
+                    <span class="logo-mini" style="min-height: 70px;">
+                        <img src="/Contents/imgs/VNPT SmartCA_sm.png" height="auto" width="auto" alt="" style="max-width: 50px;">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="/Contents/imgs/VNPT SmartCA.png" height="auto" width="64%" alt="" style="display: block; margin: auto;">
+                    </span>
+                </a>
+                <h3 class="page-title">
+                    Dịch vụ ký số từ xa VNPT SmartCA
+                </h3>
+                <h4 class="page-title">
+                    Tập đoàn Bưu chính Viễn thông Việt Nam - VNPT
+                </h4>
+            </nav>
+        </header>
+        <div class="content-wrapper no-margin" id="tab_content">
+            <section class="content" style="margin: 0 8px; min-height: calc(100vh - 151px);">
+
+                <div class="box no-footer no-header no-border" style="background: transparent;">
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <a class="btn bg-olive btn-sm pull-right margin-r-5" data-toggle="tooltip" title="Trở lại Đăng nhập" href="#" data-target="#LoginBox">
+                                Quay lại Đăng nhập&nbsp;<i class="fa fa-sign-out"></i>
+                            </a>
+                            <a id="LoginSmartCA" data-toggle="tooltip" title="Đăng nhập Smart CA" href="@Url.Action("LoginSmartCA")" data-modal="true" data-modal-id="LoginSmartCA" class="pull-right btn btn-sm btn-primary margin-r-5">
+                                <i class="fa fa-key"></i>&nbsp;Đăng Nhập Smart CA
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @{
+                    var hidden = string.IsNullOrEmpty(Model.AccessToken) ? "hidden" : "";
+                }
+                <div class="box no-footer no-header no-border @hidden" id="InfoSmartCA">
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            @{
+                                <div class="col-md-5">
+                                    <div class="box box-primary no-footer">
+                                        <div class="box-header">
+                                            <h3 class="box-title text-bold">Thông tin tài khoản Smart CA</h3>
+                                        </div>
+                                        <div class="box-body" id="UserInfo">
+                                            @{
+                                                if (!string.IsNullOrEmpty(Model.AccessToken))
+                                                {
+                                                    Html.RenderAction("UserInfo");
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="col-md-7">
+                                <div class="box box-body no-footer no-border no-shadow" id="BoxDigitalSign">
+                                    <div class="overlay hidden text-center">
+                                        <i class="fa fa-refresh fa-spin"></i>
+                                        <span class="text-danger text-bold" style="font-size: x-large">Vui lòng xác nhận ký số trên ứng dụng</span>
+                                    </div>
+                                    @using (Html.BeginForm("Sign", "Account", new {area = ""}, FormMethod.Post, new {encType = "multipart/form-data", id = "SignDocument", @class = "form-horizontal"}))
+                                    {
+                                        @Html.HiddenFor(model => model.AccessToken)
+                                        @Html.HiddenFor(model => model.FileGuids)
+
+                                        <div id="bodyForm" class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">@AppProcessor.Messagor.GetMessage("DataImport_Label_FileImport")</label>
+                                                <div class="col-md-10">
+                                                    @Html.FileFor(model => model.FileImports, ".pdf, .docx, .xlsx, .pptx, .xml", true, new {@class = "col-md-10"})
+                                                    @Html.ValidationMessageFor(model => model.FileImports, "", new {@class = "text-danger"})
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-2">
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <button type="submit" id="btnSign" class="btn btn-primary" disabled="disabled"><i class="fa fa-pencil-square-o"></i>&nbsp;Ký dữ liệu</button>
+                                                    <button type="button" id="btnReset" class="btn btn-default" onclick="resetForm('#FileImports')"><i class="fa fa-refresh"></i>&nbsp;Reset</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <footer class="main-footer  no-margin">
+            <div class="pull-right hidden-xs">
+                <b>Phiên bản</b> 2022.3.0.1
+            </div>
+            <strong>© 2022-2025 <a href="http://khanhhoa.vnpt.vn/">VNPT Khánh Hoà</a>, Phát triển bởi <a href="http://cenit.vn/">Trung tâm Công nghệ Thông tin - CenIT</a></strong>
+        </footer>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var arrAcceptExtFiles = ["pdf", "docx", "xlsx", "pptx", "xml"];
+    var arrIconFiles = {
+        "pdf": "pdf",
+        "docx": "word",
+        "xlsx": "excel",
+        "pptx": "powerpoint",
+        "xml": "code"
+    };
+    var arrColorFiles = {
+        "pdf": "danger",
+        "docx": "blue",
+        "xlsx": "green",
+        "pptx": "yellow",
+        "xml": "aqua"
+    };
+    var fileTemplate =
+        '<li><span class="handle"><i class="fa fa-ellipsis-v"></i><i class="fa fa-ellipsis-v"></i></span><i class="fa fa-file-{0}-o text-{1}"></i><span class="text">Design a nice theme</span><small class="label label-info"><i class="fa fa-clock-o"></i> Chờ ký số</small><div class="tools"><i class="fa fa-edit"></i></div></li>';
+
+    String.format = function() {
+        var s = arguments[0];
+        for (var i = 0; i < arguments.length - 1; i++) {
+            var reg = new RegExp("\\{" + i + "\\}", "gm");
+            s = s.replace(reg, arguments[i + 1]);
+        }
+        return s;
+    };
+
+    $(document).on(
+        'change',
+        '#FileImports:file',
+        function() {
+            var input = $(this),
+                numFiles = input.get(0).files
+                    ? input
+                    .get(0).files.length
+                    : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+
+            if (numFiles === 0) {
+                resetForm(input);
+                return;
+            }
+
+            // Loop through the FileList and render image files as thumbnails.
+            for (var i = 0, f; f = input.get(0).files[i]; i++) {
+                var reader = new FileReader();
+
+                // Closure to capture the file information.
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        if (theFile == null) {
+                            resetForm(input);
+                            return;
+                        }
+                        var fileNameSplit = theFile.name.split(".");
+                        var fileExt = fileNameSplit[fileNameSplit.length - 1].toLowerCase();
+                        if (!arrAcceptExtFiles.includes(fileExt)) {
+                            showNotify("Lỗi",
+                                "fa fa-ban",
+                                "Hệ thống không hỗ trợ định dạng " + fileExt.toUpperCase(),
+                                null,
+                                null,
+                                "error");
+                            resetForm(input);
+                            return;
+                        }
+                    };
+                })(f);
+
+                // Read in the image file as a data URL.
+                reader.readAsDataURL(f);
+                //$("#listFileUnsign").append();
+            }
+            $("button[id='btnSign']").removeAttr("disabled");
+            //$("#inputFile_FileImports .input-group-btn").addClass("disabled");
+            $("#inputFile_FileImports input").addClass("disabled");
+        });
+
+    function signOutSmartCA() {
+        $.ajax({
+            method: "GET",
+            url: "@Url.Action("SignoutSmartCA", "Account")",
+            async: false
+        }).done(function(response) {
+            if (response.status) {
+                //window.location.reload();
+                accessToken = "";
+                $("#InfoSmartCA").addClass("hidden");
+                $("a#LoginSmartCA").removeClass("hidden");
+                btnLoginCA.click();
+            }
+        });
+    }
+
+    function resetForm(el) {
+        $(el).parents('form').get(0).reset();
+        $("button[id='btnSign']").attr("disabled", "disabled");
+        //$("#inputFile_FileImports .input-group-btn").removeClass("disabled");
+        $("#inputFile_FileImports input").removeClass("disabled");
+        $('#BoxDigitalSign > div.overlay').addClass('hidden');
+    }
+
+</script>
+
+<script type="text/javascript">
+    function LoginSmartCA_OnProcessSuccess(response, formId) {
+        if (response.status != undefined) {
+            if (response.status) {
+                $("#ModalContent #modal_" + formId).modal("hide");
+                $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                    function() {
+                        if (response.status != undefined) {
+                            eval(response.message);
+                            if (response.errorCode == 1) {
+                                signOutSmartCA();
+                            }
+                            if (response.status) {
+                                $("#UserInfo").parents('section.content')
+                                    .find('div.col-md-5.hidden, div.col-md-7.hidden')
+                                    .removeClass('hidden');
+                                $("#UserInfo").load("@Url.Action("UserInfo")");
+                                $("a#LoginSmartCA").addClass("hidden");
+                                $("#InfoSmartCA").removeClass("hidden");
+                                accessToken = response.accessToken;
+                            }
+                            response.status = undefined;
+                        }
+                    });
+            } else {
+                eval(response.message);
+                response.status = undefined;
+            }
+        } else {
+            $("#ModalContent #modal_" + formId + " #bodyForm").html(response);
+        }
+    }
+
+    $('form#SignDocument').ajaxForm({
+        beforeSubmit: function() {
+            $('button[type="submit"][id="btnSign"]').attr('disabled', true);
+            $('#BoxDigitalSign > div.overlay').removeClass('hidden');
+            setTimeout(function() {
+                    $("#loader").removeClass("show pageload-loading").css("display", "none");
+                },
+                1000);
+            return true; //it will continue your submission.
+        },
+        success: function(response) {
+            if (response.status != undefined) {
+                eval(response.message);
+                if (response.status) {
+                    var a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = String.format("@Url.Action("DownloadSignedFile")?fileName={0}", response.fileName);
+                    a.class = "btn hidden";
+                    document.body.appendChild(a);
+                    a.click();
+                    response.status = undefined;
+                }
+                resetForm('#FileImports');
+            }
+        },
+        error: function(response) {
+            alert("Lỗi");
+        }
+    });
+
+    $(document).ready(function() {
+        accessToken = '@Model.AccessToken';
+        @*@{
+                if (string.IsNullOrEmpty(Model.AccessToken))
+                {
+                    @Html.Raw($"var btnLoginCA = document.createElement('a');btnLoginCA.style.display = 'none';btnLoginCA.href = '{Url.Action("LoginSmartCA")}';btnLoginCA.class = 'btn hidden';btnLoginCA.setAttribute('data-modal', 'true');btnLoginCA.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(btnLoginCA);")
+                }
+            }*@
+
+    });
+
+</script>
+
+@Html.RenderScripts(ScriptPosition.BodyInside)

@@ -1,0 +1,143 @@
+﻿@using TSFramework.App.Processors
+<style type="text/css">
+    .navbar-custom-menu > ul.navbar-nav > li > a {
+        height: 70px;
+        padding-top: 25px;
+    }
+
+    .skin-green .main-header .logo {
+        background-color: #f4f4f4;
+        border-bottom: 0 solid transparent;
+        color: #ffffff;
+    }
+
+        .skin-green .main-header .logo:hover {
+            background-color: #f4f4f4;
+        }
+
+    .main-header .logo .logo-lg img {
+        margin: unset;
+        width: 32%;
+    }
+
+    @@media (max-width: 767px) {
+        .fixed .content-wrapper,
+        .fixed .right-side {
+            padding-top: 200px;
+        }
+    }
+</style>
+<header class="main-header">
+    <!-- Logo -->
+    <a href="/" class="logo">
+        <!-- mini logo for sidebar mini 50x50 pixels -->
+        <span class="logo-mini text-sm">
+            @*<small>VNPT</small>*@
+            <img src="~/Contents/imgs/logo-sdl.png" height="auto" width="100%" alt="" style="margin: auto;" />
+        </span>
+        <!-- logo for regular state and mobile devices -->
+        <span class="logo-lg">
+            <img src="~/Contents/imgs/logo-sdl.png" height="auto" width="70%" alt="" />
+        </span>
+    </a>
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top text-center">
+        <!-- Sidebar toggle button-->
+        <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button" style="line-height: 40px;">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+        <span class="header-title text-bold hidden-xs">
+            <img alt="" width="69px" src="~/Contents/imgs/sodulich-logo.png" />&nbsp;@AppProcessor.Messagor.GetMessage("App_Title").ToUpper()
+        </span>
+        <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+                @{
+                    if (AppProcessor.Author.IsAllow(User.UserName, "Sys", "SysConfigs", "Edit"))
+                    {
+                        <li>
+                            @Html.Button(false, "ClearCache", Url.Action("ClearCache", "SysConfigs", new { area = "Sys", returnUrl = HttpContext.Current.Request.Url.PathAndQuery }), "<i class='fa fa-refresh'></i>", "", new { data_toggle = "tooltip", title = "Xoá cache" })
+                        </li>
+                    }
+                    if (AppProcessor.Author.IsAllow(User.UserName, "Sys", "SysConfigs", "Edit"))
+                    {
+                        <li>
+                            @Html.Button(true, "TestUser", Url.Action("TestUser", "SysConfigs", new { area = "Sys" }), "<i class='fa fa-user-circle-o'></i>", "", new { data_toggle = "tooltip", title = "Giả lập tài khoản" })
+                        </li>
+                    }
+                    if (AppProcessor.Author.IsAllow(User.UserName, null, "Notification", "View"))
+                    {
+                        <li class="dropdown notifications-menu" id="NotificationEnterprise">
+                            @{ Html.RenderAction("Index", "Notification", new { area = "" }); }
+                        </li>
+                                }
+                }
+
+                <!-- Messages: style can be found in dropdown.less-->
+                @*<li class="dropdown messages-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-envelope-o"></i>
+                            <span class="label label-success"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="header">Bạn có 0 tin nhắn</li>
+                            <li>
+                                <ul class="menu"></ul>
+                            </li>
+                            <li class="footer">
+                                <a href="#">Xem tất cả</a>
+                            </li>
+                        </ul>
+                    </li>*@
+                <!-- Notifications: style can be found in dropdown.less -->
+                <!-- Tasks: style can be found in dropdown.less -->
+                @*<li class="dropdown tasks-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-flag-o"></i>
+                            <span class="label label-danger"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="header">Bạn có 0 công việc</li>
+                            <li>
+                                <ul class="menu"></ul>
+                            </li>
+                            <li class="footer">
+                                <a href="#">Xem tất cả</a>
+                            </li>
+                        </ul>
+                    </li>*@
+                <!-- User Account: style can be found in dropdown.less -->
+                <li class="dropdown user user-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="https://ui-avatars.com/api/?size=160&name=@(User?.FullName)" class="user-image" alt="@(User?.FullName)">
+                        <span class="hidden-xs">@(User?.FullName)</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <!-- User image -->
+                        <li class="user-header">
+                            <img src="https://ui-avatars.com/api/?size=160&name=@(User?.FullName)" class="img-circle" alt="@(User?.FullName)">
+                            <p>
+                                @(User?.FullName)
+                                <small>Thành viên từ @(User?.CreatedDate.GetValueOrDefault(DateTime.Now).ToString("MM/yyyy"))</small>
+                            </p>
+                        </li>
+                        <!-- Menu Body -->
+                        <li class="user-body">
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a data-modal="true" data-modal-id="ChangePassword" href="@Url.Action("ChangePassword", "Account", new {area = "", userName = User?.UserName})" class="btn btn-default btn-sm"><i class="fa fa-key"></i>&nbsp;Đổi mật khẩu</a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="@Url.Action("Logout", "Account", new {area = ""})" class="btn btn-danger btn-sm"><i class="fa fa-sign-out"></i>&nbsp;Đăng xuất</a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

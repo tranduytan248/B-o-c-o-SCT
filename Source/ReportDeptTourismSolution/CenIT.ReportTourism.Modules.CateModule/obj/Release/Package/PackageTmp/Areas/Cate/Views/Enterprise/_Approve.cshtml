@@ -1,0 +1,23 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateEnterpriseModel
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Confirm"), AppProcessor.Messagor.GetMessage("Enterprise_Title"));
+    Layout = "~/Views/Shared/_FormConfirm.cshtml";
+}
+
+@section FormBody{
+    @using (Ajax.BeginForm("Approve", "Enterprise", new {area = "Cate"}, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "Enterprise_OnProcessSuccess(data, 'ApproveEnterprise')"
+    }, new {@class = "form-horizontal"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.EnterpriseId)
+        @Html.HiddenFor(model => model.OwnerEnterpriseName)
+        @Html.HiddenFor(model => model.BusinessName)
+        @Html.HiddenFor(model => model.TypeBusiness)
+        @Html.HiddenFor(model => model.TypeBusinessName)
+        <h4> @Html.Raw(ViewBag.ConfirmMessage)</h4>
+    }
+}

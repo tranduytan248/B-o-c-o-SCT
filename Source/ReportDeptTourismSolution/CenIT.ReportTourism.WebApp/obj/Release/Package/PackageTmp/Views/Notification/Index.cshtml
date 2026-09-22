@@ -1,0 +1,35 @@
+﻿@model List<CenIT.ReportTourism.Models.Cate.CateEnterpriseRegisterNotifyModel>
+@{
+    var totalNotifies = Model.Count;
+}
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <i class="fa fa-bell-o"></i>
+    @{
+        if (totalNotifies > 0)
+        {
+            <span class="label label-warning" style="top: 20px;">@totalNotifies</span>
+        }
+        else
+        {
+            <span class="label label-warning"></span>
+        }
+    }
+</a>
+<ul class="dropdown-menu" style="width: 380px;">
+    <li class="header">Bạn có @totalNotifies thông báo</li>
+    <li>
+        <ul class="menu">
+            @{
+                foreach (var notify in Model)
+                {
+                    <li>
+                        <a href="@Url.Action("Review", "Enterprise", new {area = "Cate", id = notify.EnterpriseID})" data-modal="true" data-modal-id="ReviewEnterprise" data-width="1024px">
+                            <i class="fa fa-bank text-blue"></i> &nbsp;Doanh nghiệp <label class="text-danger text-bold">@notify.BusinessName</label> vừa mới đăng ký
+                        </a>
+                    </li>
+                }
+            }
+
+        </ul>
+    </li>
+</ul>

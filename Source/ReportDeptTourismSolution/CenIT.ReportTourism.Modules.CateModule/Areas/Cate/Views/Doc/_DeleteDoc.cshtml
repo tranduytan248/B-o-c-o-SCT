@@ -1,0 +1,32 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateDocModel
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Delete"), AppProcessor.Messagor.GetMessage("CateDoc_Title"));
+    Layout = "~/Views/Shared/_FormDel.cshtml";
+}
+
+@section FormBody{
+    @using (Ajax.BeginForm("DeleteDoc", "Doc", new { area = "Cate" }, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "CateDoc_OnProcessSuccess(data, 'DeleteDoc')"
+    }, new { @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.FileId)
+        @Html.HiddenFor(model => model.FileName)
+        @Html.HiddenFor(model => model.FileExt)
+        @Html.HiddenFor(model => model.FilePath)
+        @Html.HiddenFor(model => model.ActivityId)
+        @Html.HiddenFor(model => model.ActivityName)
+        @Html.HiddenFor(model => model.TypeActivity)
+        <h4> @Html.Raw(ViewBag.ConfirmMessage)</h4>
+        <hr/>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new { rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+            </div>
+        </div>
+    }
+}

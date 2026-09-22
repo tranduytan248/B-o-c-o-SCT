@@ -1,0 +1,1 @@
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="CenIT.ReportTourism.Modules.SysModule.MvcApplication" Language="C#" %>

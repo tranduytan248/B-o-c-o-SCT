@@ -1,0 +1,25 @@
+﻿@using TSFramework.App.Processors
+<div class="modal-header @RenderSection("FormType", false)">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Đóng">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">@RenderSection("FormIcon", false)&nbsp;@Html.Raw(ViewBag.Title)</h4>
+</div>
+<div class="modal-body">
+    <div class="form-horizontal">
+        @RenderSection("FormBody", true)
+        @*@Html.RenderScripts(ScriptPosition.BodyInside)*@
+        @*@Html.RenderScripts(ScriptPosition.BodyEnd)*@
+    </div>
+</div>
+<div class="modal-footer">
+    @RenderSection("SubmitControl", false)
+    @if (!IsSectionDefined("SubmitControl"))
+    {
+        <button type="submit" id="btnSave" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Save")</button>
+    }
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Cancel")</button>
+</div>
+
+@section CustomJS{
+}

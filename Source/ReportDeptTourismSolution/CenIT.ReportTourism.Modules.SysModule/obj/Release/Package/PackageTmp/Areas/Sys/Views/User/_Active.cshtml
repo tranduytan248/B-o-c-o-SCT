@@ -1,0 +1,35 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Sys.SysUserModel
+
+@{
+    ViewBag.Title = $"Kích hoạt lại người dùng - [{Model.FullName} - {Model.UserName}]";
+    Layout = "~/Views/Shared/_FormConfirm.cshtml";
+}
+
+@section ModalType{
+    bg-primary
+}
+
+@section FormBody{
+
+    @using (Ajax.BeginForm("Active", "User", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "User_OnProcessSuccess(data, 'ActiveUser')"
+    }, new {@class = "form-horizontal"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.UserId)
+        @Html.HiddenFor(model => model.UserName)
+        @Html.HiddenFor(model => model.FullName)
+        <h4> @Html.Raw(ViewBag.ConfirmMessage)</h4>
+        <hr/>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new {rows = "3", @class = "col-md-7", placeholder = AppProcessor.Messagor.GetMessage("Reason_Label")})
+                @Html.ValidationMessageFor(model => model.Reason, "", new {@class = "text-danger"})
+            </div>
+        </div>
+    }
+}

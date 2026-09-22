@@ -1,0 +1,54 @@
+﻿@model CenIT.ReportTourism.Models.Report.ReportStatisticEnterpriseModel
+
+<div class="box box-body no-footer no-header no-border">
+    <div class="row">
+        <div class="col-md-3 col-xs-6">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>@Model.TotalEnterprise</h3>
+                    <p>Tổng số Doanh nghiệp </p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-bank"></i>
+                </div>
+                <a href="#" class="small-box-footer">&nbsp;</a>
+            </div>
+        </div>
+        <div class="col-md-3 col-xs-6">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>@Model.TotalReportSubmited</h3>
+                    <p>Tổng số báo cáo</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-file-o"></i>
+                </div>
+                <a href="#" class="small-box-footer">&nbsp;</a>
+            </div>
+        </div>
+        <div class="col-md-3 col-xs-6">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>@Model.TotalEnterpriseSubmitReportLate</h3>
+                    <p>Doanh nghiệp trễ hạn báo cáo</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-clock-o"></i>
+                </div>
+                <a href="#" class="small-box-footer">&nbsp;</a>
+            </div>
+        </div>
+        <div class="col-md-3 col-xs-6">
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3>@Model.TotalEnterpriseNotSubmitReportYet</h3>
+                    <p>Doanh nghiệp chưa nộp báo cáo</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-close"></i>
+                </div>
+                <a href="@Url.Action("EnterpiseNotSendReportYet", "Dashboard", new { forMonth = Model.OnMonth.ToString("yyyy-MM-dd") })" class="small-box-footer">Chi tiết <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>

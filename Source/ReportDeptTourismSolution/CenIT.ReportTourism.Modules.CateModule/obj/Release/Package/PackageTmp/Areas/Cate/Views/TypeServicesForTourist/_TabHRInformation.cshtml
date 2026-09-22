@@ -1,0 +1,82 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.ServicesForTourist.CateServicesForTouristHRInformationModel
+@Html.AntiForgeryToken()
+
+@using (Html.BeginForm("SaveHRInformation", "TypeServicesForTourist", new {area = "Cate"}, FormMethod.Post, new {encType = "multipart/form-data", id = "SaveHRInformation", @class = "form-horizontal"}))
+{
+    @Html.HiddenFor(model => model.EnterpriseId)
+
+    <div class="box-body" id="bodyForm">
+        <div class="form-group">
+            @Html.TitleFor(model => model.TotalStaff, new {@class = "control-label col-md-4"})
+            <div class="col-md-2">
+                @Html.TextBoxFor(model => model.TotalStaff, new {type = "number", @class = "col-md-8", min = 0, placeholder = "0"})
+                @Html.ValidationMessageFor(model => model.TotalStaff, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <hr/>
+        <div class="box box-body no-border no-footer">
+            <h4 class="box-title">Trình độ</h4>
+            <div class="form-group">
+                @Html.TitleFor(model => model.StaffOnLiteracyOnCollege, new {@class = "control-label col-md-4"})
+                <div class="col-md-2">
+                    @Html.TextBoxFor(model => model.StaffOnLiteracyOnCollege, new {type = "number", @class = "col-md-8", min = 0, placeholder = "0"})
+                    @Html.ValidationMessageFor(model => model.StaffOnLiteracyOnCollege, "", new {@class = "text-danger"})
+                </div>
+
+                @Html.TitleFor(model => model.StaffOnUniversity, new {@class = "control-label col-md-4"})
+                <div class="col-md-2">
+                    @Html.TextBoxFor(model => model.StaffOnUniversity, new {type = "number", @class = "col-md-8", min = 0, placeholder = "0"})
+                    @Html.ValidationMessageFor(model => model.StaffOnUniversity, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.TitleFor(model => model.StaffOnCollege, new {@class = "control-label col-md-4"})
+                <div class="col-md-2">
+                    @Html.TextBoxFor(model => model.StaffOnCollege, new {type = "number", @class = "col-md-8", min = 0, placeholder = "0"})
+                    @Html.ValidationMessageFor(model => model.StaffOnCollege, "", new {@class = "text-danger"})
+                </div>
+
+                @Html.TitleFor(model => model.StaffOnIntermediate, new {@class = "control-label col-md-4"})
+                <div class="col-md-2">
+                    @Html.TextBoxFor(model => model.StaffOnIntermediate, new {type = "number", @class = "col-md-8", min = 0, placeholder = "0"})
+                    @Html.ValidationMessageFor(model => model.StaffOnIntermediate, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.TitleFor(model => model.StaffOnHighSchool, new {@class = "control-label col-md-4"})
+                <div class="col-md-2">
+                    @Html.TextBoxFor(model => model.StaffOnHighSchool, new {type = "number", @class = "col-md-8", min = 0, placeholder = "0"})
+                    @Html.ValidationMessageFor(model => model.StaffOnHighSchool, "", new {@class = "text-danger"})
+                </div>
+            </div>
+        </div>
+
+        <hr/>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new {rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title")})
+                @Html.ValidationMessageFor(model => model.Reason, "", new {@class = "text-danger"})
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <button type="button" class="btn btn-primary pull-right" onclick="$('form#SaveHRInformation').submit();"><i class="fa fa-save"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Save")</button>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $('form#SaveHRInformation').ajaxForm({
+        success: function(response) {
+            if (response.status != undefined) {
+                eval(response.message);
+                $("#HRInformation").load('@Url.Action("HRInformation", new {enterpriseId = Model.EnterpriseId})');
+                response.status = undefined;
+            } else {
+                $("#HRInformation").html(response);
+            }
+        }
+    });
+</script>

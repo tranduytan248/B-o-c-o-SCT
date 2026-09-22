@@ -1,0 +1,38 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Models.MyWardsSearchModel
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">@AppProcessor.Messagor.GetMessage("Condition_Title")</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-body with-border">
+        <div class="row form-horizontal" id="Search">
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.TitleFor(model => model.ListProvinceId, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DropDownListFor(model => model.ListProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { multiple = true, @class = "col-md-5 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.TitleFor(model => model.ListDistrictId, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DropDownListFor(model => model.ListDistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { multiple = true, @class = "col-md-6 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-footer">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-primary" onclick="_tableNatinal.ajax.reload(null, false);"><i class="fa fa-search-plus"></i>&nbsp;Tìm kiếm</button>
+            </div>
+        </div>
+    </div>
+</div>

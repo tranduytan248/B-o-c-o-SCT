@@ -1,0 +1,22 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceInfrastructureRoomModel
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Delete"), AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_Infrastructure_Room_Title"));
+    Layout = "~/Views/Shared/_FormDel.cshtml";
+}
+
+@section FormBody{
+    @using (Ajax.BeginForm("DeleteRoomType", "TypeAccommodation", new {area = "Cate"}, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "InfrastructureRooms_OnProcessSuccess(data, 'DeleteRoomType')"
+    }, new {@class = "form-horizontal"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.InfrastructureRoomId)
+        @Html.HiddenFor(model => model.EnterpriseId)
+        @Html.HiddenFor(model => model.RoomType)
+        @Html.HiddenFor(model => model.RoomTypeName)
+        <h4> @Html.Raw(ViewBag.ConfirmMessage)</h4>
+    }
+}

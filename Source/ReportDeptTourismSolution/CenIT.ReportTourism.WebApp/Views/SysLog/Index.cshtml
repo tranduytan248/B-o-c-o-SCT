@@ -1,0 +1,62 @@
+﻿
+@{
+    ViewBag.Title = "Log Hệ Thống";
+}
+
+@section Title
+{
+    <h3>@ViewBag.Title</h3>
+}
+
+@section Action
+{
+    <a data-modal="" data-modal-id="DeleteOldFile" class="btn btn-sm btn-danger pull-right" href="@Url.Action("DeleteOldFile")"><i class="fa fa-trash-o"></i>&nbsp;Xoá file cũ</a>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        @Html.Partial("_Search")
+    </div>
+    <div class="col-md-12">
+        <!-- Custom Tabs -->
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_ErrLog" data-toggle="tab">Log Lỗi</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_ErrLog">
+                    <div class="box box-primary">
+                        <div class="box-header">
+                            <h3 class="box-title">Danh sách file</h3>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            @Html.Partial("_ListErrFile")
+                        </div>
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+        </div>
+        <!-- nav-tabs-custom -->
+    </div>
+</div>
+@section CustomJS
+{
+    <script src="@Url.Content("~/Views/SysLog/SysLog.js")"></script>
+    <script type="text/javascript">
+        $("#FromMonth, #ToMonth").datepicker("remove");
+        $("#FromMonth, #ToMonth").inputmask("mm/yyyy", { "placeholder": "mm/yyyy" });
+        $("#FromMonth, #ToMonth").datepicker({
+            format: "mm/yyyy",
+            viewMode: "months",
+            minViewMode: "months",
+            autoclose: true
+        });
+        $("#FromMonth, #ToMonth").datepicker().trigger("update");
+    </script>
+}

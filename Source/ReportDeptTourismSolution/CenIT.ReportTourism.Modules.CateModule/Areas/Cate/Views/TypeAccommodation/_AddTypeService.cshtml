@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Add"), AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_TypeService_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-plus"></i>
+}
+
+@section FormBody{
+    @using (Html.BeginForm("AddTypeService", "TypeAccommodation", new { area = "Cate" }, FormMethod.Post, new { encType = "multipart/form-data", id = "AddTypeService", @class = "form-horizontal" }))
+    {
+        <div id="bodyForm">
+            @Html.Partial("_TypeService")
+        </div>
+    }
+    <script type="text/javascript">
+        $('form').ajaxForm({
+            success: function(response) {
+                if (response.status != undefined) {
+                    $("#ModalContent #modal_AddTypeService").modal("hide");
+                    $("#ModalContent #modal_AddTypeService").on('hidden.bs.modal',
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                _tableTypeService.ajax.reload(null, false);
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    $("#ModalContent #modal_AddTypeService" + " #bodyForm").html(response);
+                }
+            }
+        });
+    </script>
+}

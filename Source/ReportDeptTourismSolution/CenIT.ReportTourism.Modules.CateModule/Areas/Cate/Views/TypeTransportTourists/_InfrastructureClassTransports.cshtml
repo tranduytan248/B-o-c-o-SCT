@@ -1,0 +1,29 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.TransportTourists.CateTransportTouristsServiceInfrastructureModel
+
+<div class="row">
+    <div class="col-md-12">
+        @Html.Button(true, "AddClassTransport", Url.Action("AddClassTransport", new { area = "Cate", enterpriseId = Model.EnterpriseId }), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new { @class = "btn btn-sm btn-success pull-right", data_width = "800px" })
+    </div>
+    <div class="clearfix">
+        <hr/>
+    </div>
+    <div class="col-md-12 table-responsive">
+        <table id="InfrastructureClassTransports" class="table table-bordered table-striped" width="100%">
+            <thead>
+            <tr>
+                <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                <th>@AppProcessor.Messagor.GetMessage("TransportTouristsInfrastructure_Label_TypeTransport")</th>
+                <th>@AppProcessor.Messagor.GetMessage("TransportTouristsInfrastructure_Label_ClassTransport")</th>
+                <th>@AppProcessor.Messagor.GetMessage("TransportTouristsInfrastructure_Label_TotalTransport")</th>
+                <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    var enterpriseId = @Model.EnterpriseId;
+</script>
+
+<script src="@Url.Content("~/Areas/Cate/Views/TypeTransportTourists/InfrastructureClassTransports.js")"></script>

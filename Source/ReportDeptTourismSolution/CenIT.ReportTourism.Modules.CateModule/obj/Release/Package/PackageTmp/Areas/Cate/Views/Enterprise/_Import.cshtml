@@ -1,0 +1,42 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Import"), AppProcessor.Messagor.GetMessage("Enterprise_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-cloud-upload"></i>
+}
+
+@section FormBody{
+    @using (Html.BeginForm("Import", "Enterprise", new {area = "Cate"}, FormMethod.Post, new {encType = "multipart/form-data", id = "ImportEnterprise", @class = "form-horizontal"}))
+    {
+        <div id="bodyForm">
+            @Html.Partial("_ImportView")
+        </div>
+    }
+
+    <script type="text/javascript">
+        $('form#ImportEnterprise').ajaxForm({
+            success: function(response) {
+                if (response.status != undefined) {
+                    $("#ModalContent #modal_ImportEnterprise").modal("hide");
+                    $("#ModalContent #modal_ImportEnterprise").on('hidden.bs.modal',
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                _tableEnterprise.ajax.reload(null, false);
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    $("#ModalContent #modal_ImportEnterprise" + " #bodyForm").html(response);
+                }
+            }
+        });
+    </script>
+}

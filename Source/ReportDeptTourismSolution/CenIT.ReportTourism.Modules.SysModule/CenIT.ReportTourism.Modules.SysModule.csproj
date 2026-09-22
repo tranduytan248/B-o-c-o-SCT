@@ -1,0 +1,383 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A50A69A0-BBB6-4CE3-B524-C8934E97E7E1}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CenIT.ReportTourism.Modules.SysModule</RootNamespace>
+    <AssemblyName>CenIT.ReportTourism.Modules.SysModule</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FastMember, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FastMember.1.3.0\lib\net45\FastMember.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Threading.Tasks" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="VnptHashSignatures, Version=1.0.2.23, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\libs\VNPT SmartCA\VnptHashSignatures.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\Modules\System_StoredProcedures.xml" />
+    <Content Include="Areas\Sys\Views\AppConfig\AppConfig.js" />
+    <Content Include="Areas\Sys\Views\AppLayout\AppLayout.js" />
+    <Content Include="Areas\Sys\Views\Function\Function.js" />
+    <Content Include="Areas\Sys\Views\Job\Job.js" />
+    <Content Include="Areas\Sys\Views\Menu\Menu.js" />
+    <Content Include="Areas\Sys\Views\Message\Message.js" />
+    <Content Include="Areas\Sys\Views\Modules\Module.js" />
+    <Content Include="Areas\Sys\Views\Role\Role.js" />
+    <Content Include="Areas\Sys\Views\SysConfigs\SysConfig.js" />
+    <Content Include="Areas\Sys\Views\User\PasswordValid.js" />
+    <Content Include="Areas\Sys\Views\User\User.js" />
+    <Content Include="Contents\Modules\Sys\plugins\bootstrap-multiselect\css\bootstrap-multiselect.css" />
+    <Content Include="Contents\Modules\Sys\plugins\bootstrap-multiselect\js\bootstrap-multiselect.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cronBuilder\jquery-cron-quartz.css" />
+    <Content Include="Contents\Modules\Sys\plugins\cronBuilder\jquery-cron-quartz.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cronBuilder\jquery-cron-quartz.min.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue\cronstrue.min.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue\require.min.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronstrue-i18n.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronstrue-i18n.min.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronstrue.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronstrue.min.js" />
+    <Content Include="Contents\Modules\Sys\plugins\cRonstrue.new\require.min.js" />
+    <Content Include="Global.asax" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Areas\Sys\Controllers\AppConfigController.cs" />
+    <Compile Include="Areas\Sys\Controllers\AppLayoutController.cs" />
+    <Compile Include="Areas\Sys\Controllers\DownloadController.cs" />
+    <Compile Include="Areas\Sys\Controllers\FunctionController.cs" />
+    <Compile Include="Areas\Sys\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Sys\Controllers\JobController.cs" />
+    <Compile Include="Areas\Sys\Controllers\MenuController.cs" />
+    <Compile Include="Areas\Sys\Controllers\MessageController.cs" />
+    <Compile Include="Areas\Sys\Controllers\ModulesController.cs" />
+    <Compile Include="Areas\Sys\Controllers\RoleController.cs" />
+    <Compile Include="Areas\Sys\Controllers\SysConfigsController.cs" />
+    <Compile Include="Areas\Sys\Controllers\UserController.cs" />
+    <Compile Include="Areas\Sys\Models\AppConfigModel.cs" />
+    <Compile Include="Areas\Sys\Models\EnterpriseUserModel.cs" />
+    <Compile Include="Areas\Sys\Models\DigitalSignModel.cs" />
+    <Compile Include="Areas\Sys\Models\LoginSmartCAModel.cs" />
+    <Compile Include="Areas\Sys\Models\ResetPasswordModel.cs" />
+    <Compile Include="Areas\Sys\Models\SignedDataModel.cs" />
+    <Compile Include="Areas\Sys\SysAreaRegistration.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\web.config" />
+    <Content Include="Areas\Sys\Views\web.config" />
+    <Content Include="Areas\Sys\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Sys\Views\AppLayout\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\AppLayout\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\AppLayout\_AppLayout.cshtml" />
+    <Content Include="Areas\Sys\Views\AppLayout\_ChangeActive.cshtml" />
+    <Content Include="Areas\Sys\Views\AppLayout\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\AppLayout\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Function\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Function\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\Function\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\Function\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Function\_Function.cshtml" />
+    <Content Include="Areas\Sys\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Menu\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Menu\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\Menu\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\Menu\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Menu\_MenuView.cshtml" />
+    <Content Include="Areas\Sys\Views\Message\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Message\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\Message\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\Message\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Message\_Message.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_DelModulePanel.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_Install.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_Module.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_PanelModule.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_Permission.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_PermissionModule.cshtml" />
+    <Content Include="Areas\Sys\Views\Modules\_UpdatePanelModule.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\_FunctionAction.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\_Permission.cshtml" />
+    <Content Include="Areas\Sys\Views\Role\_Role.cshtml" />
+    <Content Include="Areas\Sys\Views\User\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_Active.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_DeActive.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_Password.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_ResetPassword.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_User.cshtml" />
+    <Content Include="Areas\Sys\Views\AppConfig\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\AppConfig\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\AppConfig\_AppConfig.cshtml" />
+    <Content Include="Areas\Sys\Views\AppConfig\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\AppConfig\_Delete.cshtml" />
+    <Content Include="Configs\Modules\System.config" />
+    <Content Include="Contents\Modules\Sys\EmailTemplates\_TemplateNewUser.cshtml" />
+    <Content Include="Areas\Sys\Views\SysConfigs\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\SysConfigs\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\SysConfigs\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\SysConfigs\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\SysConfigs\_SysConfig.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_ConfirmSendMail.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_EnterprisePermissions.cshtml" />
+    <Content Include="Areas\Sys\Views\User\_EnterpriseUser.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_Add.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_Delete.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_Edit.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_SysJob.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\Index.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_CronExpression.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_ChangeStatus.cshtml" />
+    <Content Include="Contents\Modules\Sys\EmailTemplates\_TemplateResetPassword.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_TabSecond.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_TabMinute.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_TabHour.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_TabDay.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_TabMonth.cshtml" />
+    <Content Include="Areas\Sys\Views\Job\_TabYear.cshtml" />
+    <Content Include="packages.config" />
+    <Content Include="Contents\Modules\Sys\plugins\bootstrap-multiselect\less\bootstrap-multiselect.less" />
+    <Content Include="Areas\Sys\Views\SysConfigs\_TestUser.cshtml" />
+    <None Include="Properties\PublishProfiles\ReportTourism.SysModule.pubxml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas\Sys\Views\Download\" />
+    <Folder Include="Areas\Sys\Views\Shared\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CenIT.Libs.VNPTSmartCA\CenIT.Libs.VNPTSmartCA.csproj">
+      <Project>{2BEFDA80-7083-4A2A-8092-6F7AE38A5675}</Project>
+      <Name>CenIT.Libs.VNPTSmartCA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CenIT.ReportTourism.Caches\CenIT.ReportTourism.Caches.csproj">
+      <Project>{44F493FC-AF88-45BB-A5C0-1E23EA5B6C8A}</Project>
+      <Name>CenIT.ReportTourism.Caches</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CenIT.ReportTourism.Core\CenIT.ReportTourism.Core.csproj">
+      <Project>{FE2264AD-CA4B-42D3-9872-EB96C748A742}</Project>
+      <Name>CenIT.ReportTourism.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CenIT.ReportTourism.Models\CenIT.ReportTourism.Models.csproj">
+      <Project>{83FE85EF-EB13-4D47-9663-EC6C76641CE6}</Project>
+      <Name>CenIT.ReportTourism.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TSFramework.App\TSFramework.App.csproj">
+      <Project>{0577f056-6b2c-4cda-b85b-4e47aa37ddb4}</Project>
+      <Name>TSFramework.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TSFramework.Core\TSFramework.Core.csproj">
+      <Project>{04290b90-cb09-4c09-8f26-1be6728ed3f7}</Project>
+      <Name>TSFramework.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TSFramework.Plugable\TSFramework.Plugable.csproj">
+      <Project>{72873826-1ecf-4204-ba56-c3842399bb54}</Project>
+      <Name>TSFramework.Plugable</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronParser.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronstrue-i18n.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\cronstrue.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\expressionDescriptor.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\allLocales.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\allLocalesLoader.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\enLocaleLoader.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locale.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\localeLoader.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\ca.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\cs.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\da.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\de.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\en.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\es.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\fa.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\fi.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\fr.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\he.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\id.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\it.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\ja.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\ko.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\nb.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\nl.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\pl.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\pt_BR.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\ro.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\ru.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\sk.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\sl.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\sv.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\sw.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\tr.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\uk.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\zh_CN.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\i18n\locales\zh_TW.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\options.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\rangeValidator.d.ts" />
+    <TypeScriptCompile Include="Contents\Modules\Sys\plugins\cRonstrue.new\stringUtilities.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>50883</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:50883/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>Robocopy $(ProjectDir)App_Data\Modules $(SolutionDir)\CenIT.ReportTourism.WebApp\App_Data\Modules /s
+Robocopy $(ProjectDir)Configs\Modules $(SolutionDir)\CenIT.ReportTourism.WebApp\Configs\Modules /s
+Robocopy $(ProjectDir)Areas\Sys\Views $(SolutionDir)\CenIT.ReportTourism.WebApp\Areas\Sys\Views /s
+Robocopy $(ProjectDir)Contents\Modules $(SolutionDir)\CenIT.ReportTourism.WebApp\Contents\Modules /s
+xcopy /Y "$(ProjectName).dll" "$(SolutionDir)\CenIT.ReportTourism.WebApp\bin"</PostBuildEvent>
+  </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

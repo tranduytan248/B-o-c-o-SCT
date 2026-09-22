@@ -1,0 +1,88 @@
+﻿@using Newtonsoft.Json
+@model CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models.StatisticIncomeViewModel
+<!-- AREA CHART -->
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title" id="BoxTitle">@Model.Title</h3>
+
+        <div class="box-tools pull-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li class="@(Model.TypeStatistic == 1 ? "active" : "")">
+                        <a href="javascript:void(0)" onclick="OnChangeTypeStatistic('@Url.Action("StatisticIncome", new { forMonth = Model.OnMonth.ToString("yyyy-MM-dd"), typeStatistic = 1 })');">Doanh thu Lưu trú</a>
+                    </li>
+                    <li class="@(Model.TypeStatistic == 2 ? "active" : "")">
+                        <a href="javascript:void(0)" onclick="OnChangeTypeStatistic('@Url.Action("StatisticIncome", new { forMonth = Model.OnMonth.ToString("yyyy-MM-dd"), typeStatistic = 2 })');">Doanh thu theo thị trường khách</a>
+                    </li>
+                    <li class="@(Model.TypeStatistic == 3 ? "active" : "")">
+                        <a href="javascript:void(0)" onclick="OnChangeTypeStatistic('@Url.Action("StatisticIncome", new { forMonth = Model.OnMonth.ToString("yyyy-MM-dd"), typeStatistic = 3 })');">Doanh thu theo loại hình dịch vụ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="box-body chart-responsive">
+        <div class="chart" id="revenue-chart" style="height: 300px;"></div>
+    </div>
+    <!-- /.box-body -->
+    <div class="overlay hidden">
+        <i class="fa fa-refresh fa-spin"></i>
+    </div>
+</div>
+<!-- /.box -->
+<!-- Morris.js charts -->
+<script src="@Url.Content("~/Contents/plugins/jQuery/jquery-2.2.3.min.js")">
+</script>
+<script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
+<script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
+
+<script type="text/javascript">
+    $(function() {
+        @{ var dataStatisticIncome = Model.DataStatisticIncome.Select(d => new { month = d.OnMonth.ToString("yyyy-MM"), periodMonth = d.OnPeriodMonth.ToString("yyyy-MM"), Period = d.TotalIncomePeriod, OnMonth = d.TotalIncome }).ToArray(); }
+        var dataLine = $.parseJSON('@Html.Raw(JsonConvert.SerializeObject(dataStatisticIncome))');
+
+        "use strict";
+        // AREA CHART
+        var area = new Morris.Area({
+            element: 'revenue-chart',
+            resize: true,
+            postUnits: " triệu đ",
+            data: dataLine,
+            xkey: 'month',
+            xLabelFormat: function(x) { return moment(x).format("MM/YYYY"); },
+            ykeys: ['Period', 'OnMonth'],
+            labels: [moment(new Date()).add(-1, 'Y').format("YYYY"), moment(new Date()).format("YYYY")],
+            lineColors: ['#DA7C82', '#3C8DBC'],
+            hideHover: 'auto',
+            hoverCallback: function(index, options, content, row) {
+                return '<div class="morris-hover-row-label">Doanh thu tháng ' +
+                    moment(row.month).format("MM") +
+                    '</div><div class="morris-hover-point" style="color: #DA7C82">' +
+                    moment(row.periodMonth).format("YYYY") +
+                    ':' +
+                    //row.Period.toLocaleString("he-IL", { style: 'currency', currency: 'VND' }) +
+                    row.Period.toLocaleString("he-IL") +
+                    '</div><div class="morris-hover-point" style="color: #3C8DBC">' +
+                    moment(row.month).format("YYYY") +
+                    ':' +
+                    //row.OnMonth.toLocaleString("he-IL", { style: 'currency', currency: 'VND' }) +
+                    row.OnMonth.toLocaleString("he-IL") +
+                    '</div>';
+            }
+
+        });
+
+    });
+
+    function OnChangeTypeStatistic(href, title) {
+        $("#statisticOnMonth #StatisticIncomeArea").children('.box').children('div.overlay').removeClass('hidden');
+
+        $("#statisticOnMonth #StatisticIncomeArea").load(href,
+            function(data, textStatus, xhr) {
+                $(this).children('.box').children('div.overlay').addClass('hidden');
+            });
+    }
+</script>

@@ -1,0 +1,35 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateProvinceModel
+
+@Html.AntiForgeryToken()
+
+@Html.HiddenFor(model => model.ProvinceId)
+@{
+    if (Model.ProvinceId > 0)
+    {
+        <div class="form-group">
+            @Html.TitleFor(model => model.ProvinceCode, new {@class = "control-label col-md-4"})
+            <div class="col-md-8">
+                @Html.TextBoxFor(model => model.ProvinceCode, new {@class = "mytheme-short-text", @readonly = "readonly"})
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="form-group" style="display: none">
+            @Html.TitleFor(model => model.ProvinceCode, new {@class = "control-label col-md-4"})
+            <div class="col-md-8">
+                @Html.TextBoxFor(model => model.ProvinceCode, new {@class = "mytheme-short-text"})
+
+            </div>
+        </div>
+    }
+}
+<div class="form-group">
+    @Html.TitleFor(model => model.ProvinceName, new {@class = "control-label col-md-4"})
+    <div class="col-md-8">
+        @Html.TextBoxFor(model => model.ProvinceName, new {@class = "col-md-8", placeholder = AppProcessor.Messagor.GetMessage("Province_Label_Name")})
+        @Html.ValidationMessageFor(model => model.ProvinceName, "", new {@class = "text-danger"})
+    </div>
+</div>

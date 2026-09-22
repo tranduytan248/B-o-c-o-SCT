@@ -1,0 +1,30 @@
+﻿@model CenIT.Libs.VNPTSmartCA.Models.Responses.UserInfoModel
+
+<div class="table-responsive">
+    <table class="table">
+        <tbody>
+        <tr>
+            <th class="text-blue" style="width: 30%">Họ tên:</th>
+            <td class="text-danger text-bold">@Model.FullName</td>
+        </tr>
+        <tr>
+            <th class="text-blue">Email</th>
+            <td class="text-danger text-bold">@Model.Email</td>
+        </tr>
+        <tr>
+            <th class="text-blue">Số điện thoại:</th>
+            <td class="text-danger text-bold">@Model.Phone</td>
+        </tr>
+        <tr>
+            <th class="text-blue">Địa chỉ</th>
+            <td class="text-danger text-bold">@Model.Address</td>
+        </tr>
+        <tr>
+            <th class="pull-left">
+                <button type="button" onclick="signOutSmartCA()" class="btn btn-sm btn-success"><i class="fa fa-sign-out"></i>&nbsp;Thoát</button>
+            </th>
+            <td class="text-danger text-bold"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

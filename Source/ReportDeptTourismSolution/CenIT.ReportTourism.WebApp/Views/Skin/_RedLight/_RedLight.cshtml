@@ -1,0 +1,163 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section HeadJs{
+    @RenderSection("HeadJs", false)
+    @Html.RenderScripts(ScriptPosition.HeadEnd)
+}
+
+@section HeadCss{
+    @RenderSection("HeadCss", false)
+}
+
+<body class="sidebar-mini layout-boxed sidebar-collapse skin-red-light" style="height: auto;">
+@Html.RenderScripts(ScriptPosition.BodyStart)
+@RenderBody()
+<!-- jQuery 2.2.3 -->
+<script src="~/Contents/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- Validate -->
+<script src="~/Contents/plugins/validate/jquery.validate.js"></script>
+<script src="~/Contents/plugins/validate/jquery.validate.unobtrusive.js"></script>
+<script src="~/Contents/plugins/validate/jquery.unobtrusive-ajax.js"></script>
+<!-- modernizr -->
+<script src="~/Contents/plugins/moment/modernizr-2.6.2.js"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="~/Contents/plugins/bootstrap/js/bootstrap.js"></script>
+<script src="~/Contents/plugins/Respond/respond.js"></script>
+<!-- Moment -->
+<script src="~/Contents/plugins/moment/moment.js"></script>
+<script src="~/Contents/plugins/moment/moment-with-locales.js"></script>
+<!-- Inputmask -->
+<script src="~/Contents/plugins/input-mask/jquery.inputmask.js"></script>
+<script src="~/Contents/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="~/Contents/plugins/input-mask/jquery.inputmask.extensions.js"></script>
+<!-- SlimScroll -->
+<script src="~/Contents/plugins/slimScroll/jquery.slimscroll.js"></script>
+<!-- FastClick -->
+<script src="~/Contents/plugins/fastclick/fastclick.js"></script>
+<!-- AdminLTE App -->
+<script src="~/Contents/plugins/AdminLTE-2.3.11/js/app.js"></script>
+<!-- AdminLTE for demo purposes -->
+@*<script src="~/Contents/plugins/AdminLTE-2.3.11/js/demo.js"></script>*@
+<!-- Vegas  -->
+<script src="~/Contents/plugins/vegas/vegas.js"></script>
+<script src="~/Contents/plugins/vegas/zepto.min.js"></script>
+<!-- Validate  -->
+@*<script src="~/Contents/plugins/validate/jquery.validate.js"></script>*@
+@*<script src="~/Contents/plugins/validate/jquery.validate.unobtrusive.js"></script>*@
+@*<script src="~/Contents/plugins/validate/jquery.unobtrusive-ajax.js"></script>*@
+<!-- widget -->
+<script src="~/Contents/plugins/widget/jquery-ui.custom.min.js"></script>
+<!-- Select2 -->
+<script src="~/Contents/plugins/select2.4.0.3/select2.js"></script>
+<!-- Chosen -->
+<script src="~/Contents/plugins/chosen/chosen.jquery.min.js"></script>
+<!-- Toastr -->
+<script src="~/Contents/plugins/toastr/toastr.js"></script>
+<!-- Notify -->
+<script src="~/Contents/plugins/notify/dist/bootstrap-notify.js"></script>
+<script src="~/Contents/plugins/notify/notify.js"></script>
+<!-- Datepicker -->
+<script src="~/Contents/plugins/datepicker/bootstrap-datepicker.js"></script>
+<!-- DateRangePicker -->
+<script src="~/Contents/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- Datatable -->
+<script src="~/Contents/plugins/datatables/jquery.dataTables.js"></script>
+<script src="~/Contents/plugins/datatables/dataTables.select.min.js"></script>
+<script src="~/Contents/plugins/datatables/dataTables.bootstrap.js"></script>
+<script src="~/Contents/plugins/datatables/dataTables.checkboxes.min.js"></script>
+<script src="~/Contents/plugins/datatables/extensions/ColVis/js/dataTables.colVis.js"></script>
+<script src="~/Contents/plugins/datatables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+<script src="~/Contents/plugins/datatables/extensions/Buttons/js/buttons.colVis.min.js"></script>
+<script src="~/Contents/plugins/datatables/extensions/Buttons/js/buttons.flash.min.js"></script>
+<script src="~/Contents/plugins/datatables/extensions/Buttons/js/buttons.html5.min.js"></script>
+<!-- Iconpicker -->
+<script src="~/Contents/plugins/iconpicker/bootstrap-iconpicker-iconset-all.js"></script>
+<script src="~/Contents/plugins/iconpicker/bootstrap-iconpicker.js"></script>
+<!-- Form -->
+<script src="~/Contents/plugins/form/jquery.form.js"></script>
+<!-- -------------------------------------------------------- -->
+<!-- TSFramework -->
+<script src="~/Contents/plugins/TSFramework/TSFramework.js"></script>
+
+@RenderSection("CustomJS", false)
+
+<script type="text/javascript">
+
+    $('body').vegas({
+        overlay: true,
+        transition: 'fade',
+        transitionDuration: 4000,
+        delay: 10000,
+        color: 'red',
+        animation: 'random',
+        animationDuration: 20000,
+        slides: [
+            { src: '/Contents/imgs/login/1.jpg' },
+            { src: '/Contents/imgs/login/2.jpg' },
+            { src: '/Contents/imgs/login/3.jpg' },
+            { src: '/Contents/imgs/login/4.jpg' },
+            { src: '/Contents/imgs/login/5.jpg' },
+            { src: '/Contents/imgs/login/6.jpg' },
+            { src: '/Contents/imgs/login/7.jpg' },
+            { src: '/Contents/imgs/login/8.jpg' }
+        ]
+    });
+
+</script>
+
+<!-- signalR -->
+<script src="~/Contents/plugins/signalR/jquery.signalR-2.4.0.js"></script>
+
+<!--Reference the autogenerated SignalR hub script. -->
+<script src="~/signalr/hubs"></script>
+
+<script type="text/javascript">
+
+    var NotificationHubWrapper = function() {
+        var self = this;
+        var hub = null;
+        var isStarted = false;
+        var onNotifyCallback = function() {};
+
+        self.start = function() {
+            hub = $.connection.notificationHub;
+            hub.client.onNotify = onNotifyCallback;
+            return $.connection.hub.start()
+                .done(function() { isStarted = true; });
+        };
+
+        $.connection.hub.error(function(error) {
+            toastr.error(error.message);
+        });
+
+        self.stop = function() {
+            isStarted = false;
+            hub = null;
+            return $.connection.notificationHub.stop();
+        };
+
+
+        self.onNotify = function(callback) {
+            onNotifyCallback = callback;
+            if (isStarted) {
+                hub.client.onNotify = onNotifyCallback;
+            }
+        };
+    };
+
+    var notificationHub = new NotificationHubWrapper();
+
+    $(document).ready(function() {
+        notificationHub.onNotify(notifyMessage);
+        notificationHub.start().done(function() {
+        });
+    });
+
+    function notifyMessage(userName, message) {
+        eval(message);
+    }
+
+</script>
+</body>

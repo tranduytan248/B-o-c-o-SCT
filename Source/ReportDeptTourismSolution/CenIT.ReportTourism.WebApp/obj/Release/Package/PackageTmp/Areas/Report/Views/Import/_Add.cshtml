@@ -1,0 +1,67 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Add"), AppProcessor.Messagor.GetMessage("Report_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-plus"></i>
+}
+
+@section FormBody{
+    @*<link href="~/Areas/Report/Views/Import/_Import.css" rel="stylesheet" />*@
+    <link href="~/Contents/Modules/Report/plugins/Import/_Import.css" rel="stylesheet"/>
+
+    @using (Html.BeginForm("Add", "Import", FormMethod.Post, new { encType = "multipart/form-data", id = "AddReport", @class = "form-horizontal" }))
+
+    {
+        <div id="bodyForm">
+            @Html.Partial("_ReportBody")
+        </div>
+    }
+
+    <script type="text/javascript">
+        $('form#AddReport').ajaxForm({
+            beforeSubmit: function() {
+                if (ValidForm()) {
+                    return true; //it will continue your submission.
+                } else {
+                    return false; //ti will stop your submission.
+                }
+            },
+            success: function(response) {
+                if (response.status != undefined) {
+                    if (!response.status && response.errorCode == 1) {
+                        eval(response.message);
+                        response.status = undefined;
+                    } else {
+                        $("#ModalContent #modal_AddReport").modal("hide");
+                        $("#ModalContent #modal_AddReport").on('hidden.bs.modal',
+                            function() {
+                                if (response.status != undefined) {
+                                    eval(response.message);
+                                    _tableDataImport.ajax.reload(null, true);
+                                    $("#ActionArea").load("/Report/Import/ViewAction");
+                                    response.status = undefined;
+                                }
+                            });
+                    }
+                } else {
+                    $("#ModalContent #modal_AddReport" + " #bodyForm").html(response);
+                }
+            }
+        });
+
+        $(document).ready(function() {
+            $('button[type="submit"]').prop('disabled', true);
+            $('input[type="number"]').focusout(function() {
+                ValidMinNumber(this);
+            });
+        });
+
+    </script>
+}
