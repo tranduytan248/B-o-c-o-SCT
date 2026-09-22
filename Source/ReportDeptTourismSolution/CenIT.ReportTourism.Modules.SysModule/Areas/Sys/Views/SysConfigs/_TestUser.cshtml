@@ -1,0 +1,33 @@
+﻿@using TSFramework.App.Processors
+@model List<CenIT.ReportTourism.Models.Sys.SysUserModel>
+
+@{
+    ViewBag.Title = "Giả lập tài khoản";
+    Layout = "";
+}
+
+@using (Ajax.BeginForm("TestUser", "SysConfigs", new AjaxOptions
+{
+    HttpMethod = "POST",
+    OnSuccess = "TestUser_OnProcessSuccess(data, 'TestUser')"
+}, new { @class = "form-horizontal" }))
+{
+    <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title"><i class="fa fa-unlock"></i>&nbsp;@ViewBag.Title</h4>
+    </div>
+    <div class="modal-body form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-md-3">Tài khoản giả lập</label>
+            <div class="col-md-9">
+                @Html.DropDownList("UserName", new SelectList(Model, "UserName", "FullName"), new { @class = "form-control col-md-10" })
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="btnSave" class="btn btn-primary"><i class="fa fa-user-circle-o"></i>&nbsp;Test</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-ban"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Cancel")</button>
+    </div>
+}

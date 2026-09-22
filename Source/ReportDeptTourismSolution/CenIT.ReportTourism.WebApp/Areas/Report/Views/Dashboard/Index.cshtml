@@ -1,0 +1,110 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Report.DashboardModel
+
+@{
+    ViewBag.Title = AppProcessor.Messagor.GetMessage("ReportDashboard_Title");
+}
+
+@section Title
+{
+    @ViewBag.Title
+}
+
+@section HeadCss
+{
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/jvectormap/jquery-jvectormap-1.2.2.css")">
+}
+
+<div id="statisticOnMonth">
+    @*@Html.Partial("_Dashboard")*@
+    <div id="MonthArea">
+        <div class="box box-body box-success no-footer no-header">
+            <div class="col-md-12">
+                <h3 class="box-title">
+                    <i class="fa fa-dashboard"></i>&nbsp;THỐNG KÊ THÁNG <span class="text-danger" id="forMonth">@Model.ForMonth.GetValueOrDefault(DateTime.Now).ToString("MM/yyyy")</span>
+                    <a href="javascript:void(0)" id="SelectMonth">
+                        <i class="fa fa-calendar fa-lg"></i>
+                    </a>
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div id="StatisticEnterpriseArea">
+        @{ Html.RenderAction("StatictisEnterprise", new { forMonth = Model.ForMonth }); }
+    </div>
+    <!-- /.box-header -->
+    <div class="row">
+        <div class="col-md-8">
+            <div id="StatisticVisitorArea">
+                @{ Html.RenderAction("StatisticVisitor", new { forMonth = Model.ForMonth }); }
+            </div>
+        </div>
+        <!-- /.col -->
+        <div class="col-md-4">
+            <div id="StatisticTypeBusinessArea">
+                @{ Html.RenderAction("StatisticTypeBusiness", new { forMonth = Model.ForMonth }); }
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div id="StatisticIncomeArea">
+                @{ Html.RenderAction("StatisticIncome", new { forMonth = Model.ForMonth }); }
+            </div>
+        </div>
+        <!-- /.col -->
+        <div class="col-md-4">
+            <div id="StatisticMapVisitorArea">
+                @{ Html.RenderAction("StatisticMapVisitor", new { forMonth = Model.ForMonth }); }
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+@section CustomJS
+{
+    <script src="@Url.Content("~/Contents/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/jvectormap/jquery-jvectormap-world-mill-en.js")"></script>
+
+    <!-- Morris.js charts -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#SelectMonth").datepicker({
+                format: "mm/yyyy",
+                viewMode: "months",
+                minViewMode: "months",
+                autoclose: true
+            }).on('changeDate',
+                function(e) {
+                    changeMonth(e.date);
+                    $("#MonthArea #forMonth").text(moment(e.date).format("MM/YYYY"));
+                });
+
+        });
+
+        function changeMonth(selectedMonth) {
+            $("#StatisticMapVisitorArea, #StatisticVisitorArea,#StatisticIncomeArea ").children('.box').children('div.overlay').removeClass('hidden');
+
+            $("#StatisticEnterpriseArea").load("@Url.Action("StatictisEnterprise")?forMonth=" +
+                moment(selectedMonth).format("YYYY-MM-DD"));
+            $("#StatisticMapVisitorArea").load("@Url.Action("StatisticMapVisitor")?forMonth=" +
+                moment(selectedMonth).format("YYYY-MM-DD"),
+                function(data, textStatus, xhr) {
+                    $(this).children('.box').children('div.overlay').addClass('hidden');
+                });
+            $("#StatisticVisitorArea").load("@Url.Action("StatisticVisitor")?forMonth=" +
+                moment(selectedMonth).format("YYYY-MM-DD"),
+                function(data, textStatus, xhr) {
+                    $(this).children('.box').children('div.overlay').addClass('hidden');
+                });
+            $("#StatisticIncomeArea").load("@Url.Action("StatisticIncome")?forMonth=" + moment(selectedMonth).format("YYYY-MM-DD"),
+                function(data, textStatus, xhr) {
+                    $(this).children('.box').children('div.overlay').addClass('hidden');
+                });
+        };
+    </script>
+}

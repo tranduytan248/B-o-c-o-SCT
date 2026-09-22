@@ -1,0 +1,62 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceModel
+@Html.AntiForgeryToken()
+
+@using (Html.BeginForm("SaveInfo", "TypeAccommodation", new { area = "Cate" }, FormMethod.Post, new { encType = "multipart/form-data", id = "SaveInfo", @class = "form-horizontal" }))
+{
+    @Html.HiddenFor(model => model.EnterpriseId)
+
+    <div class="box-body" id="bodyForm">
+        <div class="form-group">
+            @Html.TitleFor(model => model.AccommodationClass, new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.DropDownListFor(model => model.AccommodationClass, new SelectList(Model.ListAccommodationClass, "Value", "Text"), "", new { @class = "col-md-4" })
+                @Html.ValidationMessageFor(model => model.AccommodationClass, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.AccommodationClassCertificate, new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @{
+                    if (!string.IsNullOrEmpty(Model.AccommodationClassCertificateView))
+                    {
+                        @Html.Raw(Model.AccommodationClassCertificateView)
+                    }
+                }
+                @Html.HiddenFor(model => model.AccommodationClassCertificate)
+                @Html.FileFor(model => model.FileAccommodationClassCertificate, ".docx,.pdf,.xlsx,.xls", false, new { @class = "col-md-8" })
+                @Html.ValidationMessageFor(model => model.FileAccommodationClassCertificate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <hr/>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new { rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+                @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <button type="button" class="btn btn-primary pull-right" onclick="$('form#SaveInfo').submit();"><i class="fa fa-save"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Save")</button>
+    </div>
+}
+
+<script type="text/javascript">
+    $('form#SaveInfo').ajaxForm({
+        success: function(response) {
+            if (response.status != undefined) {
+                eval(response.message);
+                $("#AccommodationInfo").load(
+                    '@Url.Action("AccommodationInfo", new { enterpriseId = Model.EnterpriseId })',
+                    function() {
+                        _initInputFile_FileAccommodationClassCertificate();
+                    });
+                response.status = undefined;
+            } else {
+                $("#AccommodationInfo").html(response);
+                _initInputFile_FileAccommodationClassCertificate();
+            }
+        }
+    });
+</script>

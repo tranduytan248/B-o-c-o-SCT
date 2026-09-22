@@ -1,0 +1,31 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceInfrastructureModel
+
+<div class="row">
+    <div class="col-md-12">
+        @Html.Button(true, "AddRoomType", Url.Action("AddRoomType", "Accommodation", new {area = "", enterpriseId = Model.EnterpriseId}), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new {@class = "btn btn-sm btn-success pull-right"})
+    </div>
+    <div class="clearfix">
+        <hr/>
+    </div>
+    <div class="col-md-12 table-responsive">
+        <table id="InfrastructureRooms" class="table table-bordered table-striped" width="100%">
+            <thead>
+            <tr>
+                <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                <th>@AppProcessor.Messagor.GetMessage("AccommodationInfrastructure_Label_TypeRoom")</th>
+                <th>@AppProcessor.Messagor.GetMessage("AccommodationInfrastructure_Label_TotalRoom")</th>
+                <th>@AppProcessor.Messagor.GetMessage("AccommodationInfrastructure_Label_AnnouncedPrice")</th>
+                <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var enterpriseId = @Model.EnterpriseId;
+
+</script>
+
+<script src="@Url.Content("~/Views/Accommodation/InfrastructureRooms.js")"></script>

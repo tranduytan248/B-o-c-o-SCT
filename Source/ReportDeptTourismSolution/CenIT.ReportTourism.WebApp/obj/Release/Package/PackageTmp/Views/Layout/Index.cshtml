@@ -1,0 +1,184 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.WebApp.Models.ProfileModel
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+@section HeadJs{
+}
+
+@section HeadCss{
+}
+
+@section Title{
+    @ViewBag.Title
+}
+
+<div class="row">
+    <div class="col-md-12">
+        @Html.Button(true, "AddFunction", Url.Action("Add", "Function"), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new {@class = "btn btn-sm btn-success"})
+    </div>
+    <div class="col-md-12">
+        @using (Html.BeginForm("Add", "Home", FormMethod.Post, new {@class = "form-horizontal"}))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+            <div id="FormContent">
+                <div class="form-group">
+                    @Html.TitleFor(model => model.Name, new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(model => model.Name, new {@class = "col-md-7", placeholder = "Name"})
+                        @Html.ValidationMessageFor(model => model.Name, "", new {@class = "text-danger"})
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.Gender, new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        <div class="radio col-md-2">
+                            @Html.RadioButtonFor(model => model.Gender, 0, new {id = "Female"}) @Html.Label("Female")
+                        </div>
+                        <div class="radio col-md-2">
+                            @Html.RadioButtonFor(model => model.Gender, 1, new {id = "Male"}) @Html.Label("Male")
+                        </div>
+                        <div class="radio col-md-2">
+                            @Html.RadioButtonFor(model => model.Gender, 2, new {id = "Other"}) @Html.Label("Other")
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Gender, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.Age, new {@class = "control-label col-md-3"})
+                    <div class="col-md-2">
+                        @Html.TextBoxFor(model => model.Age, new {@class = "col-md-5", placeholder = "Age", type = "number", min = "18", max = "65"})
+                        @Html.ValidationMessageFor(model => model.Age, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.Birthday, new {@class = "control-label col-md-3"})
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(model => model.Birthday, "{0:dd/MM/yyyy}", new {@class = "col-sm-10 datepicker", placeholder = "Birthday"})
+                        </div>
+
+                        @Html.ValidationMessageFor(model => model.Birthday, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.StartTime, new {@class = "control-label col-md-3"})
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(model => model.StartTime, "{0:dd/MM/yyyy}", new {@class = "col-md-10", placeholder = "StartTime"})
+                        </div>
+                    </div>
+                    @Html.TitleFor(model => model.EndTime, new {@class = "control-label col-md-1"})
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(model => model.EndTime, "{0:dd/MM/yyyy}", new {@class = "col-md-10", placeholder = "EndTime"})
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.Description, new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.TextAreaFor(model => model.Description, new {rows = "3", @class = "col-md-7", placeholder = "Description"})
+                        @Html.ValidationMessageFor(model => model.Description, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.WardID, new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.DropDownListFor(model => model.WardID, new SelectList(Model.ListWards, "Value", "Text"), "", new {@class = "col-md-7", placeholder = "Ward"})
+                        @Html.ValidationMessageFor(model => model.WardID, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.Languages, new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.DropDownListFor(model => model.Languages, new SelectList(Model.ListLanguages, "Value", "Text"), "", new {multiple = "multiple", @class = "col-md-7", placeholder = "Ward"})
+                        @Html.ValidationMessageFor(model => model.Languages, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-3"></label>
+                    @*@Html.TitleFor(model => model.Languages, new { @class = "control-label col-md-3" })*@
+                    <div class="col-md-9">
+                        <div class="checkbox col-md-3">
+                            @Html.CheckBoxFor(model => model.IsActive)
+                            @Html.TitleFor(model => model.IsActive)
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Languages, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-3"></label>
+                    <div class="col-md-9">
+                        <div class="box-body">
+                            <div class="box-profile">
+                                @Html.ImageFor(model => model.Avatar, Model.UrlAvatar, "Avatar", ".png,.jpeg,.gif,.jpg", new {border = "0", style = "background: #fff; height: 165px; object-fit: cover; width: 165px;", @class = "user-avatar img-responsive img-circle"})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.TitleFor(model => model.CVFile, new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.FileFor(model => model.CVFile, ".docx,.pdf", true, new {@class = "col-md-8"})
+                        @Html.ValidationMessageFor(model => model.CVFile, "", new {@class = "text-danger"})
+                        <br/>
+                    </div>
+                </div>
+                <div class="col-md-offset-3">
+                    @Html.ButtonSubmit("btnSave", "<i class='fa fa-save'></i>", "Lưu", new {@class = "btn btn-sm btn-primary"})
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section CustomJS
+{
+    @Html.RenderScripts(ScriptPosition.BodyInside)
+
+    <script type="text/javascript">
+        $(function() {
+            if ($("#StartTime, #EndTime").css("display") !== 'none') {
+                $("#StartTime, #EndTime").daterangepicker({
+                        linkedCalendars: false,
+                        autoUpdateInput: false,
+                        locale: {
+                            "format": "MM/YYYY",
+                            "separator": " - ",
+                            "applyLabel": "Chọn",
+                            "cancelLabel": "Xoá",
+                            "fromLabel": "Từ",
+                            "toLabel": "Đến",
+                            "customRangeLabel": "Tuỳ chọn",
+                            "weekLabel": "Tuần"
+                        },
+                        minDate: "01/01/1970",
+                        maxDate: "31/12/9999",
+                        opens: "center",
+                        drops: "down"
+                    },
+                    function(start, end) {
+                        $('#StartTime').val(start.format('MM/YYYY'));
+                        $('#EndTime').val(end.format('MM/YYYY'));
+                    }).on('cancel.daterangepicker',
+                    function(ev, picker) {
+                        $("#StartTime, #EndTime").val('');
+                    });;
+            }
+        });
+    </script>
+}

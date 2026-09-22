@@ -1,0 +1,25 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CatePublicCateModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.CateId)
+
+<div id="PublicCate">
+
+    <div class="form-group">
+        @Html.TitleFor(model => model.CateName, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.TextBoxFor(model => model.CateName, new { @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("PublicCate_Label_Name") })
+            @Html.ValidationMessageFor(model => model.CateName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.TitleFor(model => model.CateTypeId, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.DropDownListFor(model => model.CateTypeId, new SelectList(Model.ListCateTypes, "Value", "Text"), "", new { @class = "col-md-10", onchange = "OnChangeCombo(this, '#CateTypeName')" })
+            <br/> @Html.ValidationMessageFor(model => model.CateTypeId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    @Html.HiddenFor(model => model.CateTypeName)
+</div>

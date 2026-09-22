@@ -1,0 +1,91 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Traveling.CateTravelingServiceCertificateModel
+@Html.AntiForgeryToken()
+
+@using (Html.BeginForm("SaveCertificate", "TypeTraveling", new {area = "Cate"}, FormMethod.Post, new {encType = "multipart/form-data", id = "SaveCertificate", @class = "form-horizontal"}))
+{
+    @Html.HiddenFor(model => model.EnterpriseId)
+    <div class="box-body" id="bodyForm">
+        <div class="form-group">
+            @Html.TitleFor(model => model.FileLicenseFile, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @{
+                    if (!string.IsNullOrEmpty(Model.LicenseFileView))
+                    {
+                        @Html.Raw(Model.LicenseFileView)
+                    }
+                }
+                @Html.HiddenFor(model => model.LicenseFile)
+                @Html.FileFor(model => model.FileLicenseFile, ".docx,.pdf,.xlsx,.xls", false, new {@class = "col-md-8"})
+                @Html.ValidationMessageFor(model => model.FileLicenseFile, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.LicenseNumber, new {@class = "control-label col-md-4"})
+            <div class="col-md-8">
+                @Html.TextBoxFor(model => model.LicenseNumber, new {@class = "col-md-5", placeholder = "0"})
+                @Html.ValidationMessageFor(model => model.LicenseNumber, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.ReleaseDate, new {@class = "control-label col-md-4"})
+            <div class="col-md-8">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    @Html.TextBoxFor(model => model.ReleaseDate, new {@class = "col-md-3 datepicker", placeholder = "0"})
+                </div>
+                @Html.ValidationMessageFor(model => model.ReleaseDate, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.TitleFor(model => model.TimeRelease, new {@class = "control-label col-md-4"})
+            <div class="col-md-8">
+                @Html.TextBoxFor(model => model.TimeRelease, new {type = "number", min = 1, @class = "col-md-3", placeholder = "0", onblur = "OnFormatNumber(this);"})
+                @Html.ValidationMessageFor(model => model.TimeRelease, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">@AppProcessor.Messagor.GetMessage("TravelingCertificate_Label_ActivityRange")</label>
+            <div class="col-md-8">
+                <div class="checkbox col-md-3">
+                    @Html.CheckBoxFor(model => model.Inbound)
+                    @Html.TitleFor(model => model.Inbound)
+                </div>
+                <div class="checkbox col-md-3">
+                    @Html.CheckBoxFor(model => model.Outbound)
+                    @Html.TitleFor(model => model.Outbound)
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new {rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title")})
+                @Html.ValidationMessageFor(model => model.Reason, "", new {@class = "text-danger"})
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <button type="button" class="btn btn-primary pull-right" onclick="$('form#SaveCertificate').submit();"><i class="fa fa-save"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Save")</button>
+    </div>
+}
+<script type="text/javascript">
+    $('form#SaveCertificate').ajaxForm({
+        success: function(response) {
+            if (response.status != undefined) {
+                eval(response.message);
+                $("#Certificate").load('@Url.Action("Certificate", new {enterpriseId = Model.EnterpriseId})',
+                    function() {
+                        _initInputFile_FileLicenseFile();
+                    });
+                response.status = undefined;
+            } else {
+                $("#Certificate").html(response);
+                _initInputFile_FileLicenseFile();
+            }
+        }
+    });
+</script>

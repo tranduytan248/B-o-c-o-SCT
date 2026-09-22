@@ -1,0 +1,73 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.EnterpriseId)
+
+
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#AccommodationInfo" data-toggle="tab" aria-expanded="true">@AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_Info_Title")</a>
+        </li>
+        <li class="">
+            <a href="#Certificate" data-toggle="tab" aria-expanded="true">@AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_Certificate_Title")</a>
+        </li>
+        <li class="">
+            <a href="#Infrastructures" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_Infrastructure_Title")</a>
+        </li>
+        <li class="">
+            <a href="#HRInformations" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_HRInformation_Title")</a>
+        </li>
+        <li class="">
+            <a href="#TypeServices" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_Accommodation_TypeService_Title")</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="AccommodationInfo">
+            <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            @*@{ Html.RenderAction("AccommodationInfo", new { enterpriseId = Model.EnterpriseId });}*@
+        </div>
+        <div class="tab-pane" id="Certificate">
+            <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            @*@{ Html.RenderAction("Certificate", new { enterpriseId = Model.EnterpriseId });}*@
+        </div>
+        <div class="tab-pane" id="Infrastructures">
+            <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            @*@{ Html.RenderAction("Infrastructure", Model.EnterpriseId);}*@
+        </div>
+        <div class="tab-pane" id="HRInformations">
+            <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            @*@{ Html.RenderAction("HRInformation", Model.EnterpriseId);}*@
+        </div>
+        <div class="tab-pane" id="TypeServices">
+            <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            @*@{ Html.RenderAction("TypeService", Model.EnterpriseId);}*@
+        </div>
+    </div>
+    <!-- /.tab-content -->
+</div>
+<script src="@Url.Content("~/Views/Accommodation/Accommodation.js")"></script>
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $("#AccommodationInfo").load("@Url.Action("AccommodationInfo", new { enterpriseId = Model.EnterpriseId })");
+        $("#Certificate").load("@Url.Action("Certificate", new { enterpriseId = Model.EnterpriseId })");
+        $("#Infrastructures").load("@Url.Action("Infrastructure", new { enterpriseId = Model.EnterpriseId })");
+        $("#HRInformations").load("@Url.Action("HRInformation", new { enterpriseId = Model.EnterpriseId })");
+        $("#TypeServices").load("@Url.Action("TypeService", new { enterpriseId = Model.EnterpriseId })");
+    });
+
+</script>
+@Html.RenderScripts(ScriptPosition.BodyInside)

@@ -1,0 +1,69 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Sys.SysMenuModel
+
+@Html.AntiForgeryToken()
+
+@Html.HiddenFor(model => model.MenuId)
+@Html.HiddenFor(model => model.Depth)
+@Html.HiddenFor(model => model.LevelMenu)
+<div class="form-group">
+    @Html.TitleFor(model => model.Name, new {@class = "control-label col-md-3"})
+    <div class="col-md-9">
+        @Html.TextBoxFor(model => model.Name, new {@class = "col-md-7", placeholder = AppProcessor.Messagor.GetMessage("Menu_Label_Name")})
+        @Html.ValidationMessageFor(model => model.Name, "", new {@class = "text-danger"})
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-md-3">@AppProcessor.Messagor.GetMessage("Menu_Label_Parent")</label>
+    <div class="col-md-9">
+        @Html.DropDownListFor(model => model.ParentId, new SelectList(Model.ParentMenus, "Value", "Text"), "", new {@class = "col-md-8"})
+        @Html.ValidationMessageFor(model => model.ParentId, "", new {@class = "text-danger"})
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-md-3">@AppProcessor.Messagor.GetMessage("Menu_Label_Position")</label>
+    <div class="col-md-9">
+        @Html.TextBoxFor(model => model.Position, new {@class = "col-md-2", type = "number", placeholder = AppProcessor.Messagor.GetMessage("Menu_Label_Position")})
+        @Html.ValidationMessageFor(model => model.Position, "", new {@class = "text-danger"})
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-md-3">@AppProcessor.Messagor.GetMessage("Menu_Label_Link")</label>
+    <div class="col-md-9">
+        @Html.TextBoxFor(model => model.Link, new {@class = "col-md-7", placeholder = AppProcessor.Messagor.GetMessage("Menu_Label_Link")})
+        @Html.ValidationMessageFor(model => model.Link, "", new {@class = "text-danger"})
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-md-3">@AppProcessor.Messagor.GetMessage("Menu_Label_Icon")</label>
+    <div class="col-md-9">
+        <button type="button" class="btn btn-default fa-2x iconpicker" data-iconset="fontawesome" role="iconpicker" id="iconpicker" data-icon="@Model.Icon"></button>
+        @Html.HiddenFor(model => model.Icon, new {@class = "form-control", Value = Model.Icon})
+        @Html.ValidationMessageFor(model => model.Icon, "", new {@class = "text-danger"})
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-md-3">@AppProcessor.Messagor.GetMessage("Menu_Label_LinkFunction")</label>
+    <div class="col-md-9">
+        @Html.DropDownListFor(model => model.FunctionActionId, new SelectList(Model.FunctionActions, "Value", "Text"), AppProcessor.Messagor.GetMessage("Menu_Label_LinkFunction"), new {@class = "col-md-8"})
+        @Html.ValidationMessageFor(model => model.FunctionActionId, "", new {@class = "text-danger"})
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-md-3"></label>
+    <div class="col-md-9">
+        <div class="checkbox">
+            @Html.CheckBoxFor(model => model.IsShow)<label for="IsShow"> &nbsp; @AppProcessor.Messagor.GetMessage("Menu_Label_IsShow")</label>
+            @Html.ValidationMessageFor(model => model.IsShow, "", new {@class = "text-danger"})
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#iconpicker').iconpicker();
+    });
+    $('#iconpicker').on('change',
+        function(e) {
+            $("#Icon").val(e.icon);
+        });
+</script>

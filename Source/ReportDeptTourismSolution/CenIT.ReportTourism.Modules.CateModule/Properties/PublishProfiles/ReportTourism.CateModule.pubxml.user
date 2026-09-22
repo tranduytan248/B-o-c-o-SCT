@@ -1,0 +1,769 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>E:\Projects\BaoCaoSoDuLich\trunk\Modules\Cate</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="App_Data/Modules/Cate_StoredProcedures.xml">
+      <publishTime>08/08/2022 08:40:02</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/Districts.js">
+      <publishTime>07/07/2022 11:09:20</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/_Add.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/_Delete.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/_DistrictByProvince.cshtml">
+      <publishTime>07/07/2022 11:09:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/_Districts.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/_Edit.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Districts/_Search.cshtml">
+      <publishTime>04/25/2022 09:41:45</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Doc/_DeleteDoc.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/Enterprise.js">
+      <publishTime>06/17/2022 16:42:59</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Add.cshtml">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Approve.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_ChangeStatus.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Delete.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Edit.cshtml">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Enterprise.cshtml">
+      <publishTime>06/15/2022 09:41:02</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_EnterpriseInfo.cshtml">
+      <publishTime>06/17/2022 16:42:40</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Import.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_ImportView.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Review.cshtml">
+      <publishTime>08/30/2022 08:25:36</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Enterprise/_Search.cshtml">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/National/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/National/National.js">
+      <publishTime>11/20/2021 09:32:36</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/National/_Add.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/National/_Delete.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/National/_Edit.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/National/_National.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Provinces/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Provinces/Provinces.js">
+      <publishTime>07/07/2022 14:31:36</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Provinces/_Add.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Provinces/_Delete.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Provinces/_Edit.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Provinces/_Provinces.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/PublicCate.js">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/_Add.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/_Childrens.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/_Delete.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/_Edit.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/_PublicCate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/PublicCate/_Search.cshtml">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/Accommodation.js">
+      <publishTime>09/28/2021 17:32:39</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/InfrastructureRooms.js">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/TypeService.js">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_Accommodation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_AddRoomType.cshtml">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_AddTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:46</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_DeleteRoomType.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_DeleteTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_EditRoomType.cshtml">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_EditTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_Info.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_InfrastructureRooms.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_RoomType.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_TabAccommodationInfo.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_TabInfrastructure.cshtml">
+      <publishTime>07/12/2022 08:40:25</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_TabTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeAccommodation/_TypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/ServicesForTourist.js">
+      <publishTime>09/28/2021 17:32:17</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/_Info.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/_ServicesForTourist.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/_TabInfrastructure.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeServicesForTourist/_TabServicesForTouristInfo.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/TouristAttraction.js">
+      <publishTime>09/28/2021 17:32:25</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/TypeService.js">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_AddTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_DeleteTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_EditTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_Info.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TabInfrastructure.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TabTouristAttractionInfo.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TabTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TouristAttraction.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTouristAttraction/_TypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/InfrastructureClassTransports.js">
+      <publishTime>04/25/2022 09:41:48</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/TransportTourists.js">
+      <publishTime>09/28/2021 17:31:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_AddClassTransport.cshtml">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_ClassTransport.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_DeleteClassTransport.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_EditClassTransport.cshtml">
+      <publishTime>04/25/2022 09:41:47</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_Info.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_InfrastructureClassTransports.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_TabInfrastructure.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTransportTourists/_TransportTourists.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/BranchOffice.js">
+      <publishTime>04/25/2022 09:41:48</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/Traveling.js">
+      <publishTime>09/28/2021 17:31:34</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_AddBranchOffice.cshtml">
+      <publishTime>04/25/2022 09:41:48</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_BranchOffice.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_DeleteBranchOffice.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_EditBranchOffice.cshtml">
+      <publishTime>04/25/2022 09:41:48</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_Info.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_TabBranchOffice.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_TabCertificateTravelEscrow.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/TypeTraveling/_Traveling.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/Wards.js">
+      <publishTime>11/20/2021 09:34:49</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/_Add.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/_Delete.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/_Edit.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/_Search.cshtml">
+      <publishTime>04/25/2022 09:41:48</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/_WardByDistrict.cshtml">
+      <publishTime>04/25/2022 09:41:48</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/Wards/_Wards.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/web.config">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Areas/Cate/Views/_ViewStart.cshtml">
+      <publishTime>08/16/2021 08:51:50</publishTime>
+    </File>
+    <File Include="bin/AngleSharp.dll">
+      <publishTime>11/22/2018 22:35:38</publishTime>
+    </File>
+    <File Include="bin/CenIT.ReportTourism.Biz.dll">
+      <publishTime>08/30/2022 08:26:13</publishTime>
+    </File>
+    <File Include="bin/CenIT.ReportTourism.Caches.dll">
+      <publishTime>08/30/2022 08:26:14</publishTime>
+    </File>
+    <File Include="bin/CenIT.ReportTourism.Core.dll">
+      <publishTime>08/30/2022 08:26:15</publishTime>
+    </File>
+    <File Include="bin/CenIT.ReportTourism.Models.dll">
+      <publishTime>08/30/2022 08:26:11</publishTime>
+    </File>
+    <File Include="bin/CenIT.ReportTourism.Modules.CateModule.dll">
+      <publishTime>08/30/2022 08:26:22</publishTime>
+    </File>
+    <File Include="bin/Common.Logging.Core.dll">
+      <publishTime>08/16/2017 06:51:46</publishTime>
+    </File>
+    <File Include="bin/Common.Logging.dll">
+      <publishTime>08/16/2017 06:51:42</publishTime>
+    </File>
+    <File Include="bin/ExcelDataReader.DataSet.dll">
+      <publishTime>05/02/2019 04:39:58</publishTime>
+    </File>
+    <File Include="bin/ExcelDataReader.dll">
+      <publishTime>05/02/2019 04:39:52</publishTime>
+    </File>
+    <File Include="bin/FastMember.dll">
+      <publishTime>03/06/2018 05:29:48</publishTime>
+    </File>
+    <File Include="bin/Interop.DAO.dll">
+      <publishTime>10/08/2016 22:18:56</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNet.SignalR.Core.dll">
+      <publishTime>04/03/2019 00:30:56</publishTime>
+    </File>
+    <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
+      <publishTime>06/15/2015 02:06:24</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.dll">
+      <publishTime>05/07/2021 23:08:46</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.Security.dll">
+      <publishTime>05/07/2021 23:09:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.ReportViewer.Common.dll">
+      <publishTime>06/02/2016 17:42:18</publishTime>
+    </File>
+    <File Include="bin/Microsoft.ReportViewer.DataVisualization.dll">
+      <publishTime>06/02/2016 17:42:26</publishTime>
+    </File>
+    <File Include="bin/Microsoft.ReportViewer.ProcessingObjectModel.dll">
+      <publishTime>06/02/2016 17:42:18</publishTime>
+    </File>
+    <File Include="bin/Microsoft.ReportViewer.WebForms.dll">
+      <publishTime>06/02/2016 17:42:52</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Web.Infrastructure.dll">
+      <publishTime>07/25/2012 11:48:56</publishTime>
+    </File>
+    <File Include="bin/Newtonsoft.Json.dll">
+      <publishTime>04/22/2019 01:06:16</publishTime>
+    </File>
+    <File Include="bin/Owin.dll">
+      <publishTime>11/13/2012 12:19:34</publishTime>
+    </File>
+    <File Include="bin/PreMailer.Net.dll">
+      <publishTime>12/07/2018 11:42:00</publishTime>
+    </File>
+    <File Include="bin/Quartz.dll">
+      <publishTime>05/27/2018 11:18:32</publishTime>
+    </File>
+    <File Include="bin/RazorEngine.dll">
+      <publishTime>06/16/2017 17:11:22</publishTime>
+    </File>
+    <File Include="bin/roslyn/csc.exe">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.Build.Tasks.CodeAnalysis.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.CSharp.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.dll">
+      <publishTime>06/18/2015 20:19:44</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.VisualBasic.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CSharp.Core.targets">
+      <publishTime>12/02/2021 15:27:58</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.VisualBasic.Core.targets">
+      <publishTime>12/02/2021 15:27:58</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Collections.Immutable.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Reflection.Metadata.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/vbc.exe">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/VBCSCompiler.exe">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/VBCSCompiler.exe.config">
+      <publishTime>11/20/2021 09:24:40</publishTime>
+    </File>
+    <File Include="bin/System.Net.Http.Formatting.dll">
+      <publishTime>11/28/2018 13:00:36</publishTime>
+    </File>
+    <File Include="bin/System.Web.Helpers.dll">
+      <publishTime>11/28/2018 13:04:24</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.dll">
+      <publishTime>11/28/2018 13:01:00</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.WebHost.dll">
+      <publishTime>01/28/2015 04:03:46</publishTime>
+    </File>
+    <File Include="bin/System.Web.Mvc.dll">
+      <publishTime>11/28/2018 12:59:46</publishTime>
+    </File>
+    <File Include="bin/System.Web.Razor.dll">
+      <publishTime>11/28/2018 13:00:12</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.Deployment.dll">
+      <publishTime>11/28/2018 13:04:24</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.dll">
+      <publishTime>11/28/2018 13:04:24</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.Razor.dll">
+      <publishTime>11/28/2018 13:04:24</publishTime>
+    </File>
+    <File Include="bin/TiSun.dll">
+      <publishTime>10/30/2020 14:32:14</publishTime>
+    </File>
+    <File Include="bin/TSFramework.App.dll">
+      <publishTime>08/22/2022 08:30:50</publishTime>
+    </File>
+    <File Include="bin/TSFramework.Core.dll">
+      <publishTime>05/25/2022 16:52:59</publishTime>
+    </File>
+    <File Include="bin/TSFramework.Plugable.dll">
+      <publishTime>03/29/2022 10:56:27</publishTime>
+    </File>
+    <File Include="bin/WebApi.AuthenticationFilter.dll">
+      <publishTime>05/11/2014 23:13:24</publishTime>
+    </File>
+    <File Include="Configs/Modules/Cate.config">
+      <publishTime>08/16/2021 14:06:19</publishTime>
+    </File>
+    <File Include="Content/bootstrap-theme.css">
+      <publishTime>11/20/2021 09:35:54</publishTime>
+    </File>
+    <File Include="Content/bootstrap-theme.min.css">
+      <publishTime>09/16/2021 16:28:53</publishTime>
+    </File>
+    <File Include="Content/bootstrap.css">
+      <publishTime>09/16/2021 16:28:53</publishTime>
+    </File>
+    <File Include="Content/bootstrap.min.css">
+      <publishTime>09/16/2021 16:28:53</publishTime>
+    </File>
+    <File Include="Contents/Modules/Cate/Templates/Mẫu import Doanh Nghiệp.xlsx">
+      <publishTime>11/02/2021 13:47:38</publishTime>
+    </File>
+    <File Include="Contents/Modules/Cate/Templates/_MailNotifyEnterpriseTemplate.cshtml">
+      <publishTime>08/23/2022 15:29:06</publishTime>
+    </File>
+    <File Include="fonts/glyphicons-halflings-regular.eot">
+      <publishTime>09/16/2021 16:28:53</publishTime>
+    </File>
+    <File Include="fonts/glyphicons-halflings-regular.svg">
+      <publishTime>09/16/2021 16:28:53</publishTime>
+    </File>
+    <File Include="fonts/glyphicons-halflings-regular.ttf">
+      <publishTime>09/16/2021 16:28:52</publishTime>
+    </File>
+    <File Include="fonts/glyphicons-halflings-regular.woff">
+      <publishTime>09/16/2021 16:28:52</publishTime>
+    </File>
+    <File Include="Global.asax">
+      <publishTime>11/20/2021 09:38:17</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>11/20/2021 09:38:17</publishTime>
+    </File>
+    <File Include="Scripts/bootstrap.js">
+      <publishTime>09/16/2021 16:28:52</publishTime>
+    </File>
+    <File Include="Scripts/bootstrap.min.js">
+      <publishTime>09/16/2021 16:28:52</publishTime>
+    </File>
+    <File Include="Scripts/jquery-1.10.2.js">
+      <publishTime>09/16/2021 16:28:51</publishTime>
+    </File>
+    <File Include="Scripts/jquery-1.10.2.min.js">
+      <publishTime>09/16/2021 16:28:51</publishTime>
+    </File>
+    <File Include="Scripts/jquery-1.10.2.min.map">
+      <publishTime>09/16/2021 16:28:51</publishTime>
+    </File>
+    <File Include="Scripts/modernizr-2.6.2.js">
+      <publishTime>09/16/2021 16:29:03</publishTime>
+    </File>
+    <File Include="Views/Accommodation/Accommodation.js">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/InfrastructureRooms.js">
+      <publishTime>04/25/2022 09:41:49</publishTime>
+    </File>
+    <File Include="Views/Accommodation/TypeService.js">
+      <publishTime>04/25/2022 09:41:49</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_Accommodation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_AddRoomType.cshtml">
+      <publishTime>04/25/2022 09:41:49</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_AddTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:49</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_DeleteRoomType.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_DeleteTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_EditRoomType.cshtml">
+      <publishTime>04/25/2022 09:41:49</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_EditTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:49</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_InfrastructureRooms.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_RoomType.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_TabAccommodationInfo.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_TabInfrastructure.cshtml">
+      <publishTime>07/12/2022 08:29:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_TabTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Accommodation/_TypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/MyEnterprise/Index.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/MyEnterprise/MyEnterprise.js">
+      <publishTime>03/17/2022 15:41:04</publishTime>
+    </File>
+    <File Include="Views/MyEnterprise/_Info.cshtml">
+      <publishTime>04/20/2022 08:42:42</publishTime>
+    </File>
+    <File Include="Views/MyEnterprise/_Search.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/ServicesForTourist/ServicesForTourist.js">
+      <publishTime>09/29/2021 09:00:17</publishTime>
+    </File>
+    <File Include="Views/ServicesForTourist/_ServicesForTourist.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/ServicesForTourist/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/ServicesForTourist/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/ServicesForTourist/_TabInfrastructure.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/ServicesForTourist/_TabServicesForTouristInfo.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/TouristAttraction.js">
+      <publishTime>09/29/2021 09:00:32</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/TypeService.js">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_AddTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_DeleteTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_EditTypeService.cshtml">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TabInfrastructure.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TabTouristAttractionInfo.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TabTypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TouristAttraction.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TouristAttraction/_TypeService.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/InfrastructureClassTransports.js">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/TransportTourists.js">
+      <publishTime>09/29/2021 09:00:48</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_AddClassTransport.cshtml">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_ClassTransport.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_DeleteClassTransport.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_EditClassTransport.cshtml">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_InfrastructureClassTransports.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_TabInfrastructure.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/TransportTourists/_TransportTourists.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/BranchOffice.js">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/Traveling/Traveling.js">
+      <publishTime>09/29/2021 09:01:21</publishTime>
+    </File>
+    <File Include="Views/Traveling/_AddBranchOffice.cshtml">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/Traveling/_BranchOffice.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/_DeleteBranchOffice.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/_EditBranchOffice.cshtml">
+      <publishTime>04/25/2022 09:41:50</publishTime>
+    </File>
+    <File Include="Views/Traveling/_TabBranchOffice.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/_TabCertificate.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/_TabCertificateTravelEscrow.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/_TabHRInformation.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/Traveling/_Traveling.cshtml">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/web.config">
+      <publishTime>03/29/2022 08:36:33</publishTime>
+    </File>
+    <File Include="Views/_ViewStart.cshtml">
+      <publishTime>08/23/2021 16:11:20</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>04/12/2022 10:28:28</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

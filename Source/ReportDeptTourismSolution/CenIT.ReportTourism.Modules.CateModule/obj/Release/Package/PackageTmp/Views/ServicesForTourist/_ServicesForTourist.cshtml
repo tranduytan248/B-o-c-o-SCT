@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.ServicesForTourist.CateServicesForTouristModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new {@class = "text-danger"})
+@Html.HiddenFor(model => model.EnterpriseId)
+
+
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#ServicesForTouristInfo" data-toggle="tab" aria-expanded="true">@AppProcessor.Messagor.GetMessage("Enterprise_ServicesForTourists_Info_Title")</a>
+        </li>
+        <li class="">
+            <a href="#Certificate" data-toggle="tab" aria-expanded="true">@AppProcessor.Messagor.GetMessage("Enterprise_ServicesForTourists_Certificate_Title")</a>
+        </li>
+        <li class="">
+            <a href="#HRInformation" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_ServicesForTourists_HRInformation_Title")</a>
+        </li>
+        <li class="">
+            <a href="#Infrastructures" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_ServicesForTourists_Infrastructure_Title")</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="ServicesForTouristInfo">
+            @{ Html.RenderAction("ServicesForTouristInfo", Model.EnterpriseId); }
+        </div>
+        <div class="tab-pane" id="Certificate">
+            @{ Html.RenderAction("Certificate", Model.EnterpriseId); }
+        </div>
+        <div class="tab-pane" id="HRInformation">
+            @{ Html.RenderAction("HRInformation", Model.EnterpriseId); }
+        </div>
+        <div class="tab-pane" id="Infrastructures">
+            @{ Html.RenderAction("Infrastructure", Model.EnterpriseId); }
+        </div>
+    </div>
+    <!-- /.tab-content -->
+</div>
+<script src="@Url.Content("~/Views/ServicesForTourist/ServicesForTourist.js")"></script>
+@Html.RenderScripts(ScriptPosition.BodyInside)

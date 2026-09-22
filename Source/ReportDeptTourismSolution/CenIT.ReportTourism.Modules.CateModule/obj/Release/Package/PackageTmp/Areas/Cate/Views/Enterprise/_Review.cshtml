@@ -1,0 +1,58 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = $"{AppProcessor.Messagor.GetMessage("Button_Register")} Doanh nghiệp";
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-plus"></i>
+}
+
+@section FormBody{
+    @using (Html.BeginForm("Approve", "Enterprise", new { area = "Cate" }, FormMethod.Post, new { encType = "multipart/form-data", id = "ApproveEnterprise", @class = "form-horizontal" }))
+    {
+        <div id="bodyForm" class="">
+            @Html.Partial("_EnterpriseInfo")
+        </div>
+    }
+    <script src="@Url.Content("~/Contents/plugins/form/jquery.form.js")"></script>
+    <script type="text/javascript">
+
+        function OnSubmitForm(isConfirm) {
+            if (isConfirm)
+                $("#ApproveEnterprise input[type='hidden'][id='IsConfirm']").val("True");
+            else
+                $("#ApproveEnterprise input[type='hidden'][id='IsConfirm']").val("False");
+
+            $('form#ApproveEnterprise').submit();
+        }
+
+        $('form#ApproveEnterprise').ajaxForm({
+            success: function (response) {
+                if (response.status != undefined) {
+                    $("#ModalContent #modal_ReviewEnterprise").modal("hide");
+                    $("#ModalContent #modal_ReviewEnterprise").on('hidden.bs.modal',
+                        function () {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                $("#NotificationEnterprise")
+                                    .load("@Url.Action("Index", "Notification", new {area = ""})");
+                            }
+                            response.status = undefined;
+                        });
+                } else {
+                    $("#ModalContent #modal_ReviewEnterprise" + " #bodyForm").html(response);
+                }
+            }
+        });
+    </script>
+}
+
+@section SubmitControl{
+    <button type="button" id="btnConfirm" class="btn btn-primary" onclick="OnSubmitForm(1)"><i class="fa fa-check-square"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Confirm")</button>
+    <button type="button" id="btnUnconfirm" class="btn bg-olive" onclick="OnSubmitForm(0)"><i class="fa fa-ban"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_NoConfirm")</button>
+}

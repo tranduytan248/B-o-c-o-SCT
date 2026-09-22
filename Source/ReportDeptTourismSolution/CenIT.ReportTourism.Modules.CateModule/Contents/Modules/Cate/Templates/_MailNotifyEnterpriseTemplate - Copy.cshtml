@@ -1,0 +1,121 @@
+﻿@model CenIT.ReportTourism.Models.Cate.TemplateNotifyEnterpise
+
+@{
+    Layout = null;
+}
+<style type="text/css">
+    
+    .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .btn-primary {
+        background-color: #3c8dbc;
+        border-color: #367fa9;
+        color: #fff;
+    }
+    
+    .btn-success {
+        background-color: #00a65a;
+        border-color: #008d4c;
+        color: #fff;
+    }
+    .btn {
+        -webkit-box-shadow: none;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        box-shadow: none;
+        text-decoration: none;
+    }
+
+    .text-red {
+        color: #dd4b39 !important
+    }
+
+    .text-yellow {
+        color: #f39c12 !important
+    }
+
+    .text-aqua {
+        color: #00c0ef !important
+    }
+
+    .text-blue {
+        color: #0073b7 !important
+    }
+
+    .text-black {
+        color: #111 !important
+    }
+
+    .text-light-blue {
+        color: #3c8dbc !important
+    }
+
+    .text-green {
+        color: #00a65a !important
+    }
+
+    .text-gray {
+        color: #d2d6de !important
+    }
+
+    .text-navy {
+        color: #001f3f !important
+    }
+
+    .text-teal {
+        color: #39cccc !important
+    }
+
+    .text-olive {
+        color: #3d9970 !important
+    }
+
+    .text-lime {
+        color: #01ff70 !important
+    }
+
+    .text-orange {
+        color: #ff851b !important
+    }
+
+    .text-fuchsia {
+        color: #f012be !important
+    }
+
+    .text-purple {
+        color: #605ca8 !important
+    }
+
+    .text-maroon {
+        color: #d81b60 !important
+    }
+</style>
+<div id="main_content">
+    <p>Kính gửi: <strong style="color: #3c8dbc">@Model.EnterpriseName</strong></p>
+    <p>
+        Thời hạn nộp báo cáo tháng <b class="text-red" style="font-size: larger;">@(DateTime.Now.ToString("MM/yyyy"))</b> sắp hết. Vui lòng nộp báo cáo về Sở du lịch trước ngày <b class="text-red" style="font-size: larger;">@(Model.DayDeadlineSendReport)/@(DateTime.Now.ToString("MM"))</b>.
+    </p>
+    <p>Các báo cáo nộp sau ngày <b class="text-red" style="font-size: larger;">@(Model.DayDeadlineSendReport)/@(DateTime.Now.ToString("MM"))</b> sẽ được xem là báo cáo trễ hạn. Và sau ngày <b class="text-red" style="font-size: larger;">@(Model.DayDeadlineSendReportLate)/@(DateTime.Now.ToString("MM"))</b> hệ thống sẽ khoá chức năng nộp báo cáo.</p>
+    <a class="btn btn-sm btn-primary" href="@(Model.UrlSubmitReport)Report/Import">Nộp báo cáo</a>
+    <p>Trân trọng!</p>
+</div>

@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Edit"), AppProcessor.Messagor.GetMessage("Enterprise_TouristAttraction_TypeService_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-pencil"></i>
+}
+
+@section FormBody{
+    @using (Html.BeginForm("EditTypeService", "TypeTouristAttraction", new {area = "Cate"}, FormMethod.Post, new {encType = "multipart/form-data", id = "EditTypeService", @class = "form-horizontal"}))
+    {
+        <div id="bodyForm">
+            @Html.Partial("_TypeService")
+        </div>
+    }
+    <script type="text/javascript">
+        $('form').ajaxForm({
+            success: function(response) {
+                if (response.status != undefined) {
+                    $("#ModalContent #modal_EditTypeService").modal("hide");
+                    $("#ModalContent #modal_EditTypeService").on('hidden.bs.modal',
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                _tableTypeService.ajax.reload(null, false);
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    $("#ModalContent #modal_EditTypeService" + " #bodyForm").html(response);
+                }
+            }
+        });
+    </script>
+}

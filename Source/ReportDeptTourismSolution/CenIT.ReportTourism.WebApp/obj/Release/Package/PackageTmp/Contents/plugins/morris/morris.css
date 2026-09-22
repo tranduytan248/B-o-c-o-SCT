@@ -1,0 +1,25 @@
+.morris-hover {
+    position: absolute;
+    z-index: 1090;
+}
+
+.morris-hover.morris-default-style {
+    background: rgba(0, 0, 0, 0.8);
+    border: solid 2px rgba(0, 0, 0, 0.9);
+    border-radius: 10px;
+    color: #f9f9f9;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px;
+    text-align: center;
+}
+
+.morris-hover.morris-default-style .morris-hover-row-label {
+    font-weight: bold;
+    margin: 0.25em 0;
+}
+
+.morris-hover.morris-default-style .morris-hover-point {
+    margin: 0.1em 0;
+    white-space: nowrap;
+}

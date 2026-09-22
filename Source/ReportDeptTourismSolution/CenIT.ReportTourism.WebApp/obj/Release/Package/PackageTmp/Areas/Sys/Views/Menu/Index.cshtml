@@ -1,0 +1,37 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = AppProcessor.Messagor.GetMessage("Menu_Title");
+}
+
+@section Title
+{
+    @ViewBag.Title
+}
+
+@section Action
+{
+    @Html.Button(true, "AddMenu", Url.Action("Add", new { area = "Sys" }), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new { @class = "btn btn-sm btn-success pull-right" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-sm-12 table-responsive">
+            <table id="TableMenu" class="table table-striped table-bordered display" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Menu_Label_Name")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Menu_Label_Link")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Menu_Label_LinkFunction")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section CustomJS
+{
+    <script src="@Url.Content("~/Areas/Sys/Views/Menu/Menu.js")"></script>
+}

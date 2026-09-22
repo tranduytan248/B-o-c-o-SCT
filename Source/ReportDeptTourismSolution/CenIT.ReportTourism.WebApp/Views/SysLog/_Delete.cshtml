@@ -1,0 +1,20 @@
+﻿@model CenIT.ReportTourism.WebApp.Models.FileInfoModel
+
+@{
+    ViewBag.Title = "Xoá file log";
+    Layout = "~/Views/Shared/_FormDel.cshtml";
+}
+
+@section FormBody{
+    @using (Ajax.BeginForm("DeleteFile", "SysLog", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "SysLog_OnProcessSuccess(data, 'DeleteFile')"
+    }, new {@class = "form-horizontal"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Name)
+        @Html.HiddenFor(model => model.FullName)
+        <h4> @Html.Raw(ViewBag.ConfirmMessage)</h4>
+    }
+}

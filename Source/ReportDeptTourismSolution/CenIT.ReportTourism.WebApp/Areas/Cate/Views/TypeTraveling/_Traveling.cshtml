@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Traveling.CateTravelingServiceModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.EnterpriseId)
+
+
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#Certificate" data-toggle="tab" aria-expanded="true">@AppProcessor.Messagor.GetMessage("Enterprise_Traveling_Certificate_Title")</a>
+        </li>
+        <li class="">
+            <a href="#CertificateTravelEscrow" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_Traveling_CertificateTravelEscrow_Title")</a>
+        </li>
+        <li class="">
+            <a href="#HRInformation" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_Traveling_HRInformation_Title")</a>
+        </li>
+        <li class="">
+            <a href="#BranchOffices" data-toggle="tab" aria-expanded="false">@AppProcessor.Messagor.GetMessage("Enterprise_Traveling_BranchOffice_Title")</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="Certificate">
+            @{ Html.RenderAction("Certificate", Model.EnterpriseId); }
+        </div>
+        <div class="tab-pane" id="CertificateTravelEscrow">
+            @{ Html.RenderAction("CertificateTravelEscrow", Model.EnterpriseId); }
+        </div>
+        <div class="tab-pane" id="HRInformation">
+            @{ Html.RenderAction("HRInformation", Model.EnterpriseId); }
+        </div>
+        <div class="tab-pane" id="BranchOffices">
+            @{ Html.RenderAction("BranchOffice", Model.EnterpriseId); }
+        </div>
+    </div>
+    <!-- /.tab-content -->
+</div>
+<script src="@Url.Content("~/Areas/Cate/Views/TypeTraveling/Traveling.js")"></script>
+@Html.RenderScripts(ScriptPosition.BodyInside)

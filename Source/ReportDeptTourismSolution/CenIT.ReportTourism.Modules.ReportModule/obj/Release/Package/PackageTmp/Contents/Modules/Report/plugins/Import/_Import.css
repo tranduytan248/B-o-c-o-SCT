@@ -1,0 +1,16 @@
+﻿table > thead > tr > th {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+table > tbody > tr > td { vertical-align: middle !important; }
+
+table > tbody > tr > td:nth-child(2), table > tbody > tr > td:nth-child(3) { text-align: center !important; }
+
+#DataReport > tbody > tr > td.national .tools {
+    color: #dd4b39;
+    display: none;
+    float: right;
+}
+
+#DataReport > tbody > tr > td.national:hover .tools { display: inline-block; }

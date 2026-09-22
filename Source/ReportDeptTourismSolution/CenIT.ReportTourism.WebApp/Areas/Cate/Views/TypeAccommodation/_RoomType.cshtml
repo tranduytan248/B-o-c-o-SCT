@@ -1,0 +1,67 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceInfrastructureRoomModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.InfrastructureRoomId)
+@Html.HiddenFor(model => model.EnterpriseId)
+
+<div id="RoomType">
+    <div class="form-group">
+        @Html.TitleFor(model => model.RoomType, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.DropDownListFor(model => model.RoomType, new SelectList(Model.ListRoomTypes, "Value", "Text"), "", new { @class = "col-md-10", onchange = "OnChangeCombo(this, '#RoomTypeName')" })
+            @Html.ValidationMessageFor(model => model.RoomType, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.RoomTypeName)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.TitleFor(model => model.TotalRooms, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.TextBoxFor(model => model.TotalRooms, new { type = "number", min = 0, @class = "col-md-3", placeholder = "0", onblur = "OnFormatNumber(this);" })
+            @Html.ValidationMessageFor(model => model.TotalRooms, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.TitleFor(model => model.AnnouncedPrice, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.TextBoxFor(model => model.AnnouncedPriceView, new { min = 0, @class = "col-md-5", placeholder = "0", onblur = "OnFormatCurrency(this, '#AnnouncedPrice')", onfocus = "OnFocusCurrency(this, '#AnnouncedPrice')" })
+            @Html.ValidationMessageFor(model => model.AnnouncedPrice, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.AnnouncedPrice)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.TitleFor(model => model.Reason, new { @class = "control-label col-md-4" })
+        <div class="col-md-8">
+            @Html.TextAreaFor(model => model.Reason, new { rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+            @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    function OnFormatNumber(inptNumber) {
+        var valueCurrency = $(inptNumber).val();
+        $(inptNumber).val(parseInt(valueCurrency));
+    }
+
+    function OnFormatCurrency(inptCurrency, ele) {
+        var valueCurrency = $(inptCurrency).val();
+        if (valueCurrency.length > 0 && !isNaN(valueCurrency)) {
+            $(ele).val(valueCurrency);
+            $(inptCurrency)
+                .val(parseInt(valueCurrency).toLocaleString("he-IL", { style: 'currency', currency: 'VND' }));
+        }
+    }
+
+    function OnFocusCurrency(inptCurrency, ele) {
+        var valueCurrency = $(ele).val();
+        if (valueCurrency.length > 0) {
+            $(inptCurrency).val(valueCurrency);
+        }
+    }
+</script>

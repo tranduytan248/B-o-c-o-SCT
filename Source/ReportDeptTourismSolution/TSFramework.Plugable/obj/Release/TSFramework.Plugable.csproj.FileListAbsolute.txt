@@ -1,0 +1,16 @@
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\bin\Release\TSFramework.Plugable.dll
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\bin\Release\TSFramework.Plugable.pdb
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\bin\Release\TiSun.dll
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\bin\Release\Interop.DAO.dll
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\bin\Release\TiSun.pdb
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\obj\Release\TSFramework.Plugable.csprojResolveAssemblyReference.cache
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\obj\Release\TSFramework.Plugable.dll
+E:\Projects\CenIT.EF.Solution\trunk\Solutions\CenIT.Solution.Urenco\TSFramework.Plugable\obj\Release\TSFramework.Plugable.pdb
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\bin\Release\TSFramework.Plugable.dll
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\bin\Release\TSFramework.Plugable.pdb
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\bin\Release\TiSun.dll
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\bin\Release\Interop.DAO.dll
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\bin\Release\TiSun.pdb
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\obj\Release\TSFramework.Plugable.dll
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\obj\Release\TSFramework.Plugable.pdb
+E:\Projects\BaoCaoSoDuLich\trunk\Source\ReportDeptTourismSolution\TSFramework.Plugable\obj\Release\TSFramework.Plugable.csprojResolveAssemblyReference.cache

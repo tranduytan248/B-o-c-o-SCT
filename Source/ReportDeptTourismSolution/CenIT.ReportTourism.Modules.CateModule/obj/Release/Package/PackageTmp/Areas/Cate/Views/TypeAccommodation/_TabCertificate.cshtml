@@ -1,0 +1,123 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Accommodation.CateAccommodationServiceCertificateModel
+@Html.AntiForgeryToken()
+
+@using (Html.BeginForm("SaveCertificate", "TypeAccommodation", new {area = "Cate"}, FormMethod.Post, new {encType = "multipart/form-data", id = "SaveCertificate", @class = "form-horizontal"}))
+{
+    @Html.HiddenFor(model => model.EnterpriseId)
+    <div class="box-body" id="bodyForm">
+        <div class="form-group">
+            @Html.TitleFor(model => model.SecurityCertificate, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @{
+                    if (!string.IsNullOrEmpty(Model.SecurityCertificateView))
+                    {
+                        @Html.Raw(Model.SecurityCertificateView)
+                    }
+                }
+                @Html.HiddenFor(model => model.SecurityCertificate)
+                @Html.FileFor(model => model.FileSecurityCertificate, ".docx,.pdf,.xlsx,.xls", false, new {@class = "col-md-8"})
+                @Html.ValidationMessageFor(model => model.FileSecurityCertificate, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.TitleFor(model => model.FireProtectionCertificate, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @{
+                    if (!string.IsNullOrEmpty(Model.FireProtectionCertificateView))
+                    {
+                        @Html.Raw(Model.FireProtectionCertificateView)
+                    }
+                }
+                @Html.HiddenFor(model => model.FireProtectionCertificate)
+                @Html.FileFor(model => model.FileFireProtectionCertificate, ".docx,.pdf,.xlsx,.xls", false, new {@class = "col-md-8"})
+                @Html.ValidationMessageFor(model => model.FileFireProtectionCertificate, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.TitleFor(model => model.EnvironmentalProtectionCertificate, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @{
+                    if (!string.IsNullOrEmpty(Model.EnvironmentalProtectionCertificateView))
+                    {
+                        @Html.Raw(Model.EnvironmentalProtectionCertificateView)
+                    }
+                }
+                @Html.HiddenFor(model => model.EnvironmentalProtectionCertificate)
+                @Html.FileFor(model => model.FileEnvironmentalProtectionCertificate, ".docx,.pdf,.xlsx,.xls", false, new {@class = "col-md-8"})
+                @Html.ValidationMessageFor(model => model.FileEnvironmentalProtectionCertificate, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.TitleFor(model => model.HygieneFoodSafetyCertificate, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @{
+                    if (!string.IsNullOrEmpty(Model.HygieneFoodSafetyCertificateView))
+                    {
+                        @Html.Raw(Model.HygieneFoodSafetyCertificateView)
+                    }
+                }
+
+                @Html.HiddenFor(model => model.HygieneFoodSafetyCertificate)
+                @Html.FileFor(model => model.FileHygieneFoodSafetyCertificate, ".docx,.pdf,.xlsx,.xls", false, new {@class = "col-md-8"})
+                @Html.ValidationMessageFor(model => model.FileHygieneFoodSafetyCertificate, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.TitleFor(model => model.ConstructionPermit, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @{
+                    if (!string.IsNullOrEmpty(Model.ConstructionPermitView))
+                    {
+                        @Html.Raw(Model.ConstructionPermitView)
+                    }
+                }
+
+                @Html.HiddenFor(model => model.ConstructionPermit)
+                @Html.FileFor(model => model.FileConstructionPermit, ".docx,.pdf,.xlsx,.xls", false, new {@class = "col-md-8"})
+                @Html.ValidationMessageFor(model => model.FileConstructionPermit, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <hr/>
+        <div class="form-group">
+            @Html.TitleFor(model => model.Reason, new {@class = "control-label col-md-3"})
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Reason, new {rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title")})
+                @Html.ValidationMessageFor(model => model.Reason, "", new {@class = "text-danger"})
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <button type="button" class="btn btn-primary pull-right" onclick="$('form#SaveCertificate').submit();"><i class="fa fa-save"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Save")</button>
+    </div>
+}
+<script type="text/javascript">
+
+    $('form#SaveCertificate').ajaxForm({
+        success: function(response) {
+            if (response.status != undefined) {
+                eval(response.message);
+                $("#Certificate").load('@Url.Action("Certificate", new {enterpriseId = Model.EnterpriseId})',
+                    function() {
+                        _initInputFile_FileSecurityCertificate();
+                        _initInputFile_FileFireProtectionCertificate();
+                        _initInputFile_FileEnvironmentalProtectionCertificate();
+                        _initInputFile_FileHygieneFoodSafetyCertificate();
+                        _initInputFile_FileConstructionPermit();
+                    });
+                response.status = undefined;
+            } else {
+                $("#Certificate").html(response);
+                _initInputFile_FileSecurityCertificate();
+                _initInputFile_FileFireProtectionCertificate();
+                _initInputFile_FileEnvironmentalProtectionCertificate();
+                _initInputFile_FileHygieneFoodSafetyCertificate();
+                _initInputFile_FileConstructionPermit();
+            }
+        }
+    });
+</script>

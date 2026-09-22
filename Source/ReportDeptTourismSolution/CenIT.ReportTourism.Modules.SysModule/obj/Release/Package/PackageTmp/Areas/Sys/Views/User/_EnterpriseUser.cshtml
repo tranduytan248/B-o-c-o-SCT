@@ -1,0 +1,97 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models.EnterpriseUserModel
+
+
+@Html.HiddenFor(model => model.UserName)
+@Html.HiddenFor(model => model.FullName)
+@Html.HiddenFor(model => model.Email)
+
+<link rel="stylesheet" href="~/Contents/Modules/Sys/plugins/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css"/>
+
+<div id="PermissionModule">
+    <div class="form-group">
+        @Html.TitleFor(model => model.UserName, new {@class = "control-label col-md-3"})
+        <div class="col-md-9">
+            @Html.TextBoxFor(model => model.UserName, new {@class = "col-md-7", disabled = true, placeholder = AppProcessor.Messagor.GetMessage("AppModule_Label_ModuleName")})
+            @Html.ValidationMessageFor(model => model.UserName, "", new {@class = "text-danger"})
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.TitleFor(model => model.StrEnterprisesSelected, new {@class = "control-label col-md-3"})
+        <div class="col-md-9">
+            @Html.DropDownList("SelectedEnterprises", new SelectList(Model.Enterprises, "Value", "Text"),
+                new {@class = "form-control col-md-10 none-select2", multiple = "multiple", placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select_Enterprises")})
+        </div>
+        @Html.HiddenFor(model => model.StrEnterprisesSelected)
+    </div>
+
+    @*<script type="text/javascript">
+            $(function () {
+                $('#PermissionModule #SelectedEnterprises').val(("@Model.StrEnterprisesSelected").split(','));
+                $('#PermissionModule #SelectedEnterprises').select2({ no_results_text: "@AppProcessor.Messagor.GetMessage("Common_NotFound")" }).change(function (item) {
+                    var val = $('#PermissionModule select[id$=SelectedEnterprises] option:selected').map(function () { return this.value }).get().join(",");
+                    $('#PermissionModule input[type="hidden"][id$="StrEnterprisesSelected"]').val(val);
+                });
+            });
+
+        </script>*@
+
+    <script type="text/javascript" src="~/Contents/Modules/Sys/plugins/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            debugger;
+            //$('select#SelectedEnterprises').select2('destroy');
+            $('select#SelectedEnterprises').multiselect({
+                maxHeight: 400,
+                numberDisplayed: 1,
+                includeSelectAllOption: true,
+                selectAllNumber: true,
+                selectAllText: 'Chọn/Bỏ chọn tất cả!',
+                nonSelectedText: 'Chọn doanh nghiệp',
+                resetText: "Reset",
+                enableFiltering: true,
+                enableCaseInsensitiveFiltering: true,
+                includeResetOption: true,
+                includeResetDivider: true,
+                filterPlaceholder: 'Tìm kiếm doanh nghiệp',
+                allSelectedText: 'Chọn tất cả',
+                nSelectedText: 'doanh nghiệp đã được chọn',
+                enableClickableOptGroups: true,
+                enableCollapsibleOptGroups: true,
+                onChange: function(option, checked, select) {
+                    var selectedValues = $('input[type="hidden"][id$="StrEnterprisesSelected"]').val();
+                    var arrSelectedValues = selectedValues != undefined && selectedValues.length > 0
+                        ? selectedValues.split(',')
+                        : [];
+                    var idxOpt = arrSelectedValues.indexOf($(option).val());
+
+                    if (checked) {
+                        if (idxOpt < 0) {
+                            arrSelectedValues.push($(option).val());
+                            $('input[type="hidden"][id$="StrEnterprisesSelected"]').val(arrSelectedValues);
+                        }
+                    } else {
+                        if (idxOpt > -1) {
+                            arrSelectedValues.splice(idxOpt, 1);
+                            $('input[type="hidden"][id$="StrEnterprisesSelected"]').val(arrSelectedValues);
+                        }
+                    }
+                },
+                onSelectAll: function() {
+                    var arrSelectedValues = $('select#SelectedEnterprises option:selected')
+                        .map(function(a, item) { return item.value; });
+                    $('input[type="hidden"][id$="StrEnterprisesSelected"]').val(arrSelectedValues.toArray());
+                },
+                onDeselectAll: function (options) {
+                    $('input[type="hidden"][id$="StrEnterprisesSelected"]').val('');
+                }
+            });
+        });
+
+        $(function() {
+            var selectedValues = $('input[type="hidden"][id$="StrEnterprisesSelected"]').val();
+            $('select#SelectedEnterprises').multiselect('select', selectedValues.split(","));
+        });
+    </script>
+</div>

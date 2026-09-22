@@ -1,0 +1,103 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models.ReportDataImportSearchModel
+
+@{
+    ViewBag.Title = AppProcessor.Messagor.GetMessage("ReportDataImport_Title");
+}
+
+@section HeadCss
+{
+
+    <link href="@Url.Content("~/Contents/Modules/Report/plugins/jquery-confirm-v3.3.4/jquery-confirm.min.css")" rel="stylesheet"/>
+}
+
+@section Title
+{
+    @ViewBag.Title
+}
+
+@section Action
+{
+    <div id="ActionArea">
+        @Html.Partial("_ActionView", Model)
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tải mẫu báo cáo ở đây</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body with-border">
+                <p class="text-light-blue"><i class="fa fa-download"></i>&nbsp;<a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_LuuTru.xlsx" })">Mẫu kinh doanh Dịch vụ lưu trú</a></p>
+                <p class="text-light-blue"><i class="fa fa-download"></i>&nbsp;<a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_LuHanh.xlsx" })">Mẫu kinh doanh Dịch vụ lữ hành</a></p>
+                <p class="text-light-blue"><i class="fa fa-download"></i>&nbsp;<a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_KhuDuLich.xlsx" })">Mẫu kinh doanh Điểm/Khu du lịch</a></p>
+                <hr/>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="alert alert-info alert-dismissible" id="InfoTimeReport">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-info"></i> Thông tin!</h4>
+            <p>Thời hạn nộp báo cáo trước <b class="text-danger fa-2x">23h59 ngày @Model.DayDeadlineSendReport</b>. Báo cáo nộp sau ngày <b class="text-danger fa-2x">@Model.DayDeadlineSendReport</b> sẽ được xem là trễ hạn. Và sau ngày <b class="text-danger fa-2x">@Model.DayDeadlineSendReportLate</b> chức năng báo cáo sẽ bị khoá.</p>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        @Html.Partial("_Search")
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-12 table-responsive">
+            <table id="DataImports" class="table table-bordered table-striped" width="100%">
+                <thead>
+                <tr>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("DataImport_Label_Enterprise")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("DataImport_Label_ForMonth")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("DataImport_Label_TypeReport")</th>
+                    <th>Người báo cáo</th>
+                    <th>Ngày báo cáo</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section CustomJS
+{
+    <script src="@Url.Content("~/Contents/Modules/Report/plugins/jquery-confirm-v3.3.4/jquery-confirm.min.js")"></script>
+    <script src="@Url.Content("~/Areas/Report/Views/Import/Import.js")"></script>
+
+    @Html.RenderScripts(ScriptPosition.BodyEnd)
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#SearchDataReport #FromMonth, #SearchDataReport #ToMonth").datepicker("remove");
+            $("#SearchDataReport #FromMonth, #SearchDataReport #ToMonth").datepicker({
+                format: "mm/yyyy",
+                viewMode: "months",
+                minViewMode: "months",
+                autoclose: true
+            });
+            $("#SearchDataReport #FromMonth, #SearchDataReport #ToMonth").datepicker().trigger("update");
+
+            window.setTimeout(function() {
+                    //$("#InfoTimeReport button[class='close']")
+                    $("#InfoTimeReport").slideUp(500,
+                        function() {
+                            $("#InfoTimeReport").hide();
+                        });
+                },
+                30000);
+        });
+    </script>
+
+}

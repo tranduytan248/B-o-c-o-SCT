@@ -1,0 +1,21 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.Traveling.CateTravelingServiceBranchOfficeModel
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Delete"), AppProcessor.Messagor.GetMessage("Enterprise_Traveling_BranchOffice_Title"));
+    Layout = "~/Views/Shared/_FormDel.cshtml";
+}
+
+@section FormBody{
+    @using (Ajax.BeginForm("DeleteBranchOffice", "Traveling", new {area = ""}, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "TravelingBranchOffice_OnProcessSuccess(data, 'DeleteBranchOffice')"
+    }, new {@class = "form-horizontal"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.BranchOfficeId)
+        @Html.HiddenFor(model => model.EnterpriseId)
+        @Html.HiddenFor(model => model.BranchName)
+        <h4> @Html.Raw(ViewBag.ConfirmMessage)</h4>
+    }
+}

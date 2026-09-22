@@ -1,0 +1,41 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = AppProcessor.Messagor.GetMessage("Ward_Title");
+}
+
+@section Title
+{
+    @ViewBag.Title
+}
+
+@section Action
+{
+    @Html.Button(true, "AddWards", Url.Action("Add", new {area = "Cate"}), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new {@class = "btn btn-sm btn-success pull-right", data_width = "700px"})
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        @Html.Partial("_Search")
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-12 table-responsive">
+            <table id="DSNational" class="table table-bordered table-striped" width="100%">
+                <thead>
+                <tr>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_District")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_Code")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_Name")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section CustomJS
+{
+    <script src="@Url.Content("~/Areas/Cate/Views/Wards/Wards.js")"></script>
+
+}

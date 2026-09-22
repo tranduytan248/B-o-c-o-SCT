@@ -1,0 +1,40 @@
+﻿@using Microsoft.Reporting.WebForms
+@using ReportViewerForMvc
+@using TSFramework.App.Processors
+@{
+    Layout = "";
+}
+<div class="modal-header bg-primary">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title"><i class="fa fa-file-excel-o"></i>&nbsp;@ViewBag.Title</h4>
+</div>
+<div class="modal-body form">
+    <div class="form-body" id="FormBody">
+        @if (ViewBag.ReportViewer != null)
+        {
+            <div class="table-responsive no-padding" style="height: calc(100vh); height: -moz-calc(100vh); height: -webkit-calc(100vh)">
+                @Html.ReportViewer(ViewBag.ReportViewer as ReportViewer, new { onload = "loadReport()" })
+            </div>
+        }
+        <script type="text/javascript">
+            function loadReport() {
+                $("#loader").removeClass("show pageload-loading").css("display", "none");
+                $('#FormBody iframe').css("height", "calc(100vh)");
+                $('#FormBody iframe').css("width", "100%");
+            }
+
+            $(document).ready(function() {
+                $('#FormBody iframe').on('load',
+                    function() { $("#loader").removeClass("show pageload-loading").css("display", "none"); });
+                $('#FormBody iframe').css("height", "calc(100vh)");
+                $('#FormBody iframe').css("width", "100%");
+            });
+
+        </script>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal">@AppProcessor.Messagor.GetMessage("Button_Cancel")</button>
+</div>

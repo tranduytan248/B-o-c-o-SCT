@@ -1,0 +1,22 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Edit"), AppProcessor.Messagor.GetMessage("Enterprise_Traveling_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-plus"></i>
+}
+
+@section FormBody{
+    <div class="form-horizontal" id="bodyForm">
+        @Html.Partial("_Traveling")
+    </div>
+}
+@section SubmitControl{
+
+}

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Provider xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <StoredProcedures ProviderName="ReportTourismProvider">
+
+    <Procedure Name="Report_DataImports_ImportDatas" Value="p_Report_DataImports_ImportDatas" />
+    <Procedure Name="Report_DataImports_Get" Value="p_Report_DataImports_Get" />
+    <Procedure Name="Report_DataImports_GetDataImport" Value="p_Report_DataImports_GetDataImport" />
+    <Procedure Name="Report_DataImports_Delete" Value="p_Report_DataImports_Delete" />
+    <Procedure Name="Report_DataImports_GetForUserOnMonth" Value="p_Report_DataImports_GetForUserOnMonth" />
+    <Procedure Name="Report_DataImports_GetViaEnterpriseOnMonth" Value="p_Report_DataImports_GetViaEnterpriseOnMonth" />
+    <Procedure Name="Report_DataImports_GenerateSaleOfTourism" Value="p_Report_DataImports_GenerateSaleOfTourism" />
+    <Procedure Name="Report_DataImports_CheckDataImport" Value="p_Report_DataImports_CheckDataImport" />
+
+    <Procedure Name="Report_ThongKe_BaoCaoTrongThang" Value="p_Report_ThongKe_BaoCaoTrongThang" />
+    <Procedure Name="Report_ThongKe_BaoCaoTre" Value="p_Report_ThongKe_BaoCaoTre" />
+    <Procedure Name="Report_ThongKe_BaoCaoChuaNop" Value="p_Report_ThongKe_BaoCaoChuaNop" />
+    <Procedure Name="Report_ThongKe_BaoCaoDoanhNghiep" Value="p_Report_ThongKe_BaoCaoDoanhNghiep" />
+
+    <Procedure Name="Report_DataImports_Get" Value="p_Report_DataImports_Get" />
+
+    <Procedure Name="Report_Reports_01_UocKetQuaHoatDongKinhDoanh"
+               Value="p_Report_Reports_01_UocKetQuaHoatDongKinhDoanh" />
+    <Procedure Name="Report_Reports_02_ThongKeQuocTichKhachDuLich"
+               Value="p_Report_Reports_02_ThongKeQuocTichKhachDuLich" />
+    <Procedure Name="Report_Reports_03_DoanhNghiepChuaGuiBaoCao"
+               Value="p_Report_Reports_03_DoanhNghiepChuaGuiBaoCao" />
+
+    <Procedure Name="Report_Dashboard_StatisticEnterprise" Value="p_Report_Dashboard_StatisticEnterprise" />
+    <Procedure Name="Report_Dashboard_StatisticTypeBusiness" Value="p_Report_Dashboard_StatisticTypeBusiness" />
+    <Procedure Name="Report_Dashboard_StatisticVisitor" Value="p_Report_Dashboard_StatisticVisitor" />
+    <Procedure Name="Report_Dashboard_StatisticMapVisitor" Value="p_Report_Dashboard_StatisticMapVisitor" />
+    <Procedure Name="Report_Dashboard_StatisticIncome" Value="p_Report_Dashboard_StatisticIncome" />
+
+    <Procedure Name="Report_ExtendInfos_Get" Value="p_Report_ExtendInfos_Get" />
+    <Procedure Name="Report_ExtendInfos_Save" Value="p_Report_ExtendInfos_Save" />
+    <Procedure Name="Report_ExtendInfos_GetByID" Value="p_Report_ExtendInfos_GetByID" />
+    <Procedure Name="Report_ExtendInfos_GetViaMonth" Value="p_Report_ExtendInfos_GetViaMonth" />
+
+  </StoredProcedures>
+
+</Provider>

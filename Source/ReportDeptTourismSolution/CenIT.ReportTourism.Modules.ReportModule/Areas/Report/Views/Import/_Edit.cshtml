@@ -1,0 +1,226 @@
+﻿@using CenIT.ReportTourism.Core.Conts
+@model CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models.TourismReportModel
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@{
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-plus"></i>
+}
+
+type="text/css"
+
+@section FormBody{
+    @*<link href="~/Areas/Report/Views/Import/_Import.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/Contents/Modules/Report/plugins/Import/_Import.css" rel="stylesheet"/>
+
+    @using (Html.BeginForm("Edit", "Import", FormMethod.Post, new { encType = "multipart/form-data", id = "EditReport", @class = "form-horizontal" }))
+
+    {
+        @Html.HiddenFor(model => model.EnableSignDigitalDoc)
+        <div id="bodyForm">
+            @{
+                if (DateTime.Now.Day > Model.DayDeadlineSendReport && DateTime.Now.Day <= Model.DayDeadlineSendReportLate)
+                {
+                    <div class="alert alert-danger alert-dismissible" style="border-radius: unset;">
+                        <h4><i class="icon fa fa-bullhorn"></i> Quá hạn nộp báo cáo tháng @DateTime.Now.ToString("MM/yyyy")!</h4>
+                        <p>Đã qua hạn nộp báo cáo lúc <b>24h00 ngày @Model.DayDeadlineSendReport</b> hàng tháng. Báo cáo nộp sau ngày <b>@Model.DayDeadlineSendReport</b> sẽ được xem là trễ hạn.</p>
+                    </div>
+                    <hr/>
+                }
+                var visibleInfoSmartCA = string.IsNullOrEmpty(Model.AccessToken) || !Model.EnableSignDigitalDoc ? "hidden" : "";
+                var visibleSmartCA = string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc ? "" : "hidden";
+
+                <div class="form-group col-md-12 @visibleSmartCA" id="ButtonLoginSmartCA">
+                    <a id="LoginSmartCA" href="@Url.Action("LoginSmartCA")" data-modal="true" data-modal-id="LoginSmartCA" class="pull-right btn btn-sm btn-default">
+                        <img class="pull-right" alt="" src="~/Contents/imgs/VNPT SmartCA_sm.png"/>
+                    </a>
+                </div>
+            }
+
+            <div class="box box-primary no-footer @visibleInfoSmartCA" id="BoxUserInfo">
+                <div class="box-header">
+                    <h3 class="box-title text-bold">Thông tin tài khoản Smart CA</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body" id="UserInfo">
+                    @{
+                        if (!string.IsNullOrEmpty(Model.AccessToken))
+                        {
+                            Html.RenderAction("UserInfo");
+                        }
+                    }
+                </div>
+            </div>
+
+            @Html.HiddenFor(model => model.ForMonth)
+            @Html.HiddenFor(model => model.EnterpriseId)
+            @Html.HiddenFor(model => model.EnterpriseName)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.EnterpriseName, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.EnterpriseName, new { @readonly = true, @class = "col-md-10" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.TypeReport, new { @class = "control-label col-md-3" })
+                <div class="col-md-4">
+                    @Html.TextBoxFor(model => model.TypeReportName, new { @readonly = true, @class = "col-md-12" })
+                </div>
+                @Html.LabelFor(model => model.ForMonth, new { @class = "control-label col-md-2" })
+                <div class="col-md-3">
+                    <div class="input-group col-md-7">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @readonly = true, @class = "form-control", placeholder = "MM/yyyy" })
+                    </div>
+                </div>
+            </div>
+
+            <hr/>
+
+            @Html.Partial("_EditReport", Model.ListDataImports)
+        </div>
+    }
+
+    <script src="~/Areas/Report/Views/Import/_ReportBody.js"></script>
+    @{
+        if (Model.TypeReport == EnumTypeBusiness.Accommodation)
+        {
+            <script src="~/Areas/Report/Views/Import/_AccommodationService.js"></script>
+        }
+        else if (Model.TypeReport == EnumTypeBusiness.Traveling
+                 || Model.TypeReport == EnumTypeBusiness.TransportTourists)
+        {
+            <script src="~/Areas/Report/Views/Import/_TravelingService.js"></script>
+        }
+        else if (Model.TypeReport == EnumTypeBusiness.ServicesForTourists
+                 || Model.TypeReport == EnumTypeBusiness.TouristAttraction)
+        {
+            <script src="~/Areas/Report/Views/Import/_TouristAttractionService.js"></script>
+        }
+    }
+
+    <script type="text/javascript">
+        $('form#EditReport').ajaxForm({
+            beforeSubmit: function(arr, $form, options) {
+                if (ValidForm()) {
+                    return true; //it will continue your submission.
+                } else {
+                    return false; //ti will stop your submission.
+                }
+            },
+            success: function(response) {
+                if (response.status != undefined) {
+                    if (!response.status && response.errorCode == 1) {
+                        eval(response.message);
+                        response.status = undefined;
+                    } else {
+                        $("#ModalContent #modal_EditReport").modal("hide");
+                        $("#ModalContent #modal_EditReport").on('hidden.bs.modal',
+                            function() {
+                                if (response.status != undefined) {
+                                    eval(response.message);
+                                    _tableDataImport.ajax.reload(null, true);
+                                    $("#ActionArea").load("/Report/Import/ViewAction");
+                                    response.status = undefined;
+                                }
+                            });
+                    }
+                } else {
+                    $("#ModalContent #modal_EditReport" + " #bodyForm").html(response);
+                }
+            }
+        });
+
+        $(document).ready(function() {
+            $('input[type="number"]').focusout(function() {
+                ValidMinNumber(this);
+            });
+
+            @{
+                if (string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)
+                {
+                    @Html.Raw($"var a = document.createElement('a');a.style.display = 'none';a.href = '{Url.Action("LoginSmartCA")}';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
+                    @Html.Raw("$('#modal_EditReport button[type=\"submit\"]').prop('disabled', true);")
+                    ;
+                }
+            }
+        });
+
+        String.format = function() {
+            var s = arguments[0];
+            for (var i = 0; i < arguments.length - 1; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                s = s.replace(reg, arguments[i + 1]);
+            }
+            return s;
+        };
+
+        function signOutSmartCA() {
+            $.ajax({
+                method: "GET",
+                url: "@Url.Action("SignoutSmartCA", "Import")",
+                async: false
+            }).done(function(response) {
+                if (response.status) {
+                    $("#BoxUserInfo").addClass('hidden');
+                    $("#ButtonLoginSmartCA").removeClass('hidden');
+                    $("#UserInfo").empty();
+                    $('#modal_EditReport button[type="submit"]').prop('disabled', true);
+                }
+            });
+        }
+
+    </script>
+
+    <script type="text/javascript">
+
+        function LoginSmartCA_OnProcessSuccess(response, formId) {
+            if (response.status != undefined) {
+                if (response.status) {
+                    $("#ModalContent #modal_" + formId).modal("hide");
+                    $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                        function() {
+                            if (response.status != undefined) {
+                                eval(response.message);
+                                if (response.errorCode == 1) {
+                                    signOutSmartCA();
+                                }
+                                if (response.status) {
+                                    $("#UserInfo").parents('section.content')
+                                        .find('div.col-md-5.hidden, div.col-md-7.hidden')
+                                        .removeClass('hidden');
+                                    $("#BoxUserInfo").removeClass('hidden');
+                                    $("#ButtonLoginSmartCA").addClass('hidden');
+                                    $("#UserInfo").load("@Url.Action("UserInfo")");
+                                    $('#modal_EditReport button[type="submit"]').removeAttr("disabled");
+                                }
+                                response.status = undefined;
+                            }
+                        });
+                } else {
+                    eval(response.message);
+                    response.status = undefined;
+                }
+            } else {
+                $("#ModalContent #modal_" + formId + " #ContentLogin").html(response);
+            }
+        }
+
+    </script>
+}

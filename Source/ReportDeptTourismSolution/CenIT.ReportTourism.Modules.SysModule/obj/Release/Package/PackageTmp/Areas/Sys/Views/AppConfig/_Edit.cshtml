@@ -1,0 +1,27 @@
+﻿@using TSFramework.App.Processors
+@{
+    ViewBag.Title = string.Format(AppProcessor.Messagor.GetMessage("Modal_Title_Edit"), AppProcessor.Messagor.GetMessage("AppConfig_Title"));
+    Layout = "~/Views/Shared/_Form.cshtml";
+}
+
+@section FormType{
+    bg-primary
+}
+
+@section FormIcon{
+    <i class="fa fa-pencil"></i>
+}
+
+@section FormBody{
+
+    @using (Ajax.BeginForm("Edit", "AppConfig", new {area = "Sys"}, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "AppConfig_OnProcessSuccess(data, 'EditAppConfig')"
+    }, new {@class = "form-horizontal"}))
+    {
+        <div id="bodyForm">
+            @Html.Partial("_AppConfig")
+        </div>
+    }
+}

@@ -1,0 +1,13 @@
+﻿using System.Web.Optimization;
+
+namespace CenIT.ReportTourism.WebApp
+{
+    public class BundleConfig
+    {
+        // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
+        public static void RegisterBundles(BundleCollection bundles)
+        {
+            BundleTable.EnableOptimizations = false;
+        }
+    }
+}
