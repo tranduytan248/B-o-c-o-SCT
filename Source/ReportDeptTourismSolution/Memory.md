@@ -2122,5 +2122,9 @@ Tại màn hình `http://crm.git/Cate/DigitalSalesWorkflow`:
 - [x] Cập nhật `# Không được phép`, `# Source Control`, `# Checklist trước khi Commit` trong `.agents/rules/CODING_RULES.md`.
 - [x] Tạo file `.gitignore` tại root repo (`D:\SVN\Bao-cao-SCT\.gitignore`) và solution.
 - [x] Ghi nhận quyết định kiến trúc và quy chuẩn vào `Memory.md`.
+- [x] Thực thi `git rm -r --cached` loại bỏ toàn bộ 4.528 file `bin/` và `obj/` đang bị track khỏi Git index.
+- [x] Revert các tệp binary WebApp tạm thời và commit sạch sẽ `af3d9d1` lên nhánh `main`.
+- [x] Đưa danh sách "Changes" trên GitHub Desktop từ 925 file về đúng 12 file mã nguồn thực tế.
+
 
 
