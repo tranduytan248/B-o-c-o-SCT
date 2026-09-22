@@ -12,14 +12,7 @@ namespace CenIT.ReportTourism.WebApp.Controllers
 {
     public class HomeController : AppController
     {
-        private readonly SysLayoutCache _sysLayoutCache;
-        private readonly SysModuleCache _sysModuleCache;
-
-        public HomeController()
-        {
-            _sysLayoutCache = new SysLayoutCache();
-            _sysModuleCache = new SysModuleCache();
-        }
+        private readonly SysModuleCache _sysModuleCache = new SysModuleCache();
 
         [ActionType(Type = EnumActionType.View)]
         public ActionResult Index()
@@ -79,7 +72,7 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                     {
                         moduleController.ControllerContext =
                             new ControllerContext(Request.RequestContext, moduleController);
-                        dataModuleHtml = RenderPartialToString(moduleController, $@"~/Views/{module.ModuleView}",
+                        dataModuleHtml = RenderPartialToString(moduleController, $"~/Views/{module.ModuleView}",
                             null, ViewData, TempData);
                         //dataModuleHtml = RenderPartialToString(moduleController, $@"~/Views/{moduleName}/_View.cshtml",
                         //    null, ViewData, TempData);

@@ -15,7 +15,7 @@
                 <div class="form-group">
                     @Html.TitleFor(model => model.ListProvinceId, new { @class = "control-label col-md-3" })
                     <div class="col-md-9">
-                        @Html.DropDownListFor(model => model.ListProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { multiple = true, @class = "col-md-5 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+                        @Html.DropDownListFor(model => model.ListProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
                     </div>
                 </div>
             </div>

@@ -65,7 +65,7 @@
             <br />
         </div>
     </div>
-    
+
     <div class="form-group row">
         <div class="col-md-4">
             @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label" })
@@ -115,11 +115,11 @@
         if (Model.EnterpriseId > 0)
         {
             <div class="form-group row">
-                    <div class="col-md-12">
-                        @Html.TitleFor(model => model.Reason, new { @class = "control-label" })
-                        @Html.TextAreaFor(model => model.Reason, new { rows = "2", @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
-                        @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
-                    </div>
+                <div class="col-md-12">
+                    @Html.TitleFor(model => model.Reason, new { @class = "control-label" })
+                    @Html.TextAreaFor(model => model.Reason, new { rows = "2", @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+                    @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
+                </div>
             </div>
         }
         else
@@ -130,14 +130,14 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("a[name='DownloadRefDoc']").on('click',
-            function() {
+            function () {
                 var url = $(this).data('href');
                 $.ajax({
                     type: 'GET',
                     url: url,
-                    success: function(response) {
+                    success: function (response) {
                         if (typeof response != "undefined" && response != null && response.status) {
                             window.location = response.downloadPath;
                         } else if (typeof response != "undefined" && response != null && !response.status) {

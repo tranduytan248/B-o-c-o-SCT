@@ -19,8 +19,7 @@
         //var visibleSmartCA = string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc ? "" : "hidden";
         //var visibleFormUpload = !(string.IsNullOrEmpty(Model.AccessToken) || !Model.EnableSignDigitalDoc);
 
-        <div class="row" id="ButtonLoginSmartCA">
-            <div class="col-md-2"></div>
+        <div class="row text-center" id="ButtonLoginSmartCA">
             <div class="radio col-md-3">
                 @Html.RadioButtonFor(model => model.TypeSignature, 2, new { onchange = "OnTypeSignature(this);", id = "TokenSign" })
                 <label for="TokenSign" data-toggle="tooltip" data-placement="top" title="Dùng cho doanh nghiệp sử dụng VNPT Token">Dùng Token ký số</label>
@@ -73,22 +72,19 @@
             </div>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.ForMonth, new { @class = "control-label col-md-3" })
-            <div class="col-md-4">
+        <div class="form-group row">
+            <div class="col-md-3">
+            @Html.LabelFor(model => model.ForMonth, new { @class = "control-label" })
                 <div class="input-group">
                     <div class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                     </div>
-                    @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @class = "col-md-5", placeholder = "MM/yyyy" })
+                    @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @class = "col-md-12 form-control", placeholder = "MM/yyyy" })
                 </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.EnterpriseId, new { @class = "control-label col-md-3" })
             <div class="col-md-9">
-                @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), new { @class = "col-md-9" })
+                @Html.LabelFor(model => model.EnterpriseId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), new { @class = "col-md-12 form-control" })
                 @Html.ValidationMessageFor(model => model.EnterpriseId, "", new { @class = "text-danger" })
             </div>
             @Html.HiddenFor(model => model.EnterpriseName)
@@ -108,10 +104,10 @@
                 }
             }
         </div>
-        <div class="form-group">
-            @Html.TitleFor(model => model.Reason, new { @class = "control-label col-md-3" })
-            <div class="col-md-9">
-                @Html.TextAreaFor(model => model.Reason, new { rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+        <div class="form-group row">
+            <div class="col-md-12">
+                @Html.TitleFor(model => model.Reason, new { @class = "control-label" })
+                @Html.TextAreaFor(model => model.Reason, new { rows = "2", @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
                 @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
             </div>
         </div>
