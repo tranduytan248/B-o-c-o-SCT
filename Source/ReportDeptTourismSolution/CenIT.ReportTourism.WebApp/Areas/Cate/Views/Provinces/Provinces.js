@@ -51,9 +51,9 @@ function initTableNational() {
                             '<a data-modal="" data-modal-id="Edit" href="/Cate/Provinces/Edit/' +
                             data +
                             '" class="fa fa-pencil btn btn-default btn-form" title="Cập nhật" data-toggle="tooltip"></a>' +
-                            '<a data-modal="" data-width="1024" data-modal-id="ListDistricts" href="/Cate/Districts/DistrictByProvince/' +
+                            '<a data-modal="" data-width="1024" data-modal-id="ListWards" href="/Cate/Wards/WardByProvince/' +
                             data +
-                            '" class="fa fa-list btn btn-default btn-form" title="Danh sách Quận/Huyện" data-toggle="tooltip"></a>';
+                            '" class="fa fa-list btn btn-default btn-form" title="Danh sách Xã/Phường" data-toggle="tooltip"></a>';
 
                         _html +=
                             '<a data-modal="" data-modal-id="Delete" href="/Cate/Provinces/Delete/' +

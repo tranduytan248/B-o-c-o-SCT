@@ -27,6 +27,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         private readonly CateProvinceCache _provinceCache = new CateProvinceCache();
         private readonly CateWardCache _wardCache = new CateWardCache();
 
+        private int _defaultProvinceId = 23;
         private readonly string _enterpriseFolder = "Enterprise";
         private readonly CateEnterpriseRegisterNotifyCache _enterpriseRegisterNotifyCache = new CateEnterpriseRegisterNotifyCache();
         private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Label");
@@ -43,7 +44,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         {
             var searchModel = new EnterpriseSearchModel
             {
-                ListWards = _wardCache.GetAll()
+                ListWards = _wardCache.GetAll(_defaultProvinceId)
                     .OrderBy(d => d.WardName)
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList(),
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
@@ -79,8 +80,9 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             searchModel.TypeBusinessIds =
                 string.IsNullOrEmpty(searchModel.TypeBusinessIds) ? null : searchModel.TypeBusinessIds;
             searchModel.WardIds = string.IsNullOrEmpty(searchModel.WardIds) ? null : searchModel.WardIds;
+            int total;
             var data = _enterpriseCache.Get(User.UserName, searchModel.TypeBusinessIds, searchModel.WardIds,
-                out var total, dataSearch);
+                out total, dataSearch);
 
             var result = Json(
                 new { draw = Convert.ToInt32(draw), recordsTotal = total, recordsFiltered = total, data },
@@ -202,7 +204,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 
             if (model.ProvinceId != null)
             {
-                model.ListWards = _wardCache.GetByProvinceId(model.ProvinceId, out int _)
+                int totalWards;
+                model.ListWards = _wardCache.GetByProvinceId(model.ProvinceId, out totalWards)
                     .OrderBy(w => w.WardName)
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
             }
@@ -357,8 +360,9 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         [ActionType(Type = EnumActionType.View)]
         public ActionResult WardViaProvince(int provinceId = 0)
         {
+            int total;
             var lstWardViaProvinces =
-                _wardCache.GetByProvinceId(provinceId, out int _).OrderBy(d => d.WardName).ToList();
+                _wardCache.GetByProvinceId(provinceId, out total).OrderBy(d => d.WardName).ToList();
             return Json(new { Wards = lstWardViaProvinces });
         }
 
@@ -387,7 +391,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 
             if (model.ProvinceId != null)
             {
-                model.ListWards = _wardCache.GetByProvinceId(model.ProvinceId, out int _)
+                int total;
+                model.ListWards = _wardCache.GetByProvinceId(model.ProvinceId, out total)
                     .OrderBy(w => w.WardName)
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
             }
@@ -561,8 +566,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             dataImport.Columns.Add("BusinessAddress");
             dataImport.Columns.Add("StreetName");
             dataImport.Columns.Add("WardName");
-            dataImport.Columns.Add("DistrictName");
-            //dataImport.Columns.Add("ProvinceName");
+            dataImport.Columns.Add("ProvinceName");
             dataImport.Columns.Add("Phone");
             dataImport.Columns.Add("Website");
             dataImport.Columns.Add("Email");

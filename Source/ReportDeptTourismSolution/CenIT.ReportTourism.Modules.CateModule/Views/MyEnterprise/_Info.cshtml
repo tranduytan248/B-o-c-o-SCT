@@ -79,18 +79,10 @@
                             <div class="box-body">
                                 <div class="form-group">
                                     @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label col-md-2" })
-                                    <div class="col-md-9">
-                                        @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "col-md-4", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Province"), onchange = "OnChangeProvince(this, 'select#DistrictId');" })
+                                    <div class="col-md-4">
+                                        @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "col-md-12", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Province"), onchange = "OnChangeProvince(this, 'select#DistrictId');" })
                                         @Html.ValidationMessageFor(model => model.ProvinceId, "", new { @class = "text-danger" })
                                         @Html.HiddenFor(model => model.ProvinceName)
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    @Html.TitleFor(model => model.DistrictId, new { @class = "control-label col-md-2" })
-                                    <div class="col-md-4">
-                                        @Html.DropDownListFor(model => model.DistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeDistrict(this, 'select#WardId')" })
-                                        @Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
-                                        @Html.HiddenFor(model => model.DistrictName)
                                     </div>
                                     @Html.TitleFor(model => model.WardId, new { @class = "control-label col-md-2" })
                                     <div class="col-md-4">
@@ -121,7 +113,6 @@
                                 if (!string.IsNullOrEmpty(Model.ListPathCertificateFiles))
                                 {
                                     @Html.Raw(Model.ListPathCertificateFiles)
-                                    ;
                                 }
                             }
 

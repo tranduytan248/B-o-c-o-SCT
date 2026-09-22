@@ -22,7 +22,7 @@ namespace CenIT.ReportTourism.Caches.Cate
         {
             var objectKey = EHashMD5.FromObject(search);
             var rawKey =
-                $"ListWards-ViaDistrict-{provinceIds}-ViaSearch-{objectKey}";
+                $"ListWards-ViaProvince-{provinceIds}-ViaSearch-{objectKey}";
             var rawKeyTotal = string.Concat(rawKey, "-Total");
             total = 0;
             var cacheTotal = (int?)GetCacheItem(rawKeyTotal);

@@ -19,6 +19,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         private readonly CateWardCache _wardCache = new CateWardCache();
 
         private readonly string _wardTitle = AppProcessor.Messagor.GetMessage("Ward_Title");
+        private readonly string _provinceTitle = AppProcessor.Messagor.GetMessage("Province_Title");
 
         // GET: Cate/Wards
 
@@ -57,7 +58,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             };
             searchModel.ProvinceIds = string.IsNullOrEmpty(searchModel.ProvinceIds) ? null : searchModel.ProvinceIds;
 
-            var data = _wardCache.Get(searchModel.ProvinceIds, out int total, dataSearch);
+            int total;
+            var data = _wardCache.Get(searchModel.ProvinceIds, out total, dataSearch);
             var result = Json(
                 new { draw = Convert.ToInt32(draw), recordsTotal = total, recordsFiltered = total, data },
                 JsonRequestBehavior.AllowGet);
@@ -70,15 +72,9 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         public ActionResult Add(int? districtId, int? provinceId)
         {
             var provinceModel = _provinceCache.GetById(provinceId.GetValueOrDefault(0));
-            var districtModel = _districtCache.GetById(districtId.GetValueOrDefault(0));
             var model = new CateWardModel
             {
-                DistrictId = districtId.GetValueOrDefault(0),
-                DistrictCode = districtModel?.DistrictCode,
-                Districts = _districtCache.GetAll()
-                    .Select(d => new ListItem($"{d.ProvinceName} - {d.DistrictName}", d.DistrictId.ToString()))
-                    .ToList(),
-                ProvinceId = districtModel?.ProvinceId ?? 0,
+                ProvinceId = provinceModel?.ProvinceId ?? 0,
                 ProvinceCode = provinceModel?.ProvinceCode,
                 Provinces = _provinceCache.GetAll()
                     .Select(d => new ListItem($"{d.ProvinceName} ", d.ProvinceId.ToString())).ToList()
@@ -97,12 +93,6 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 var provinceModel = _provinceCache.GetAll().FirstOrDefault();
                 model.ProvinceId = provinceModel?.ProvinceId;
                 model.ProvinceName = provinceModel?.ProvinceName;
-                var districtModel = _districtCache.GetAll().FirstOrDefault();
-                model.DistrictId = districtModel?.DistrictId;
-                model.DistrictName = districtModel?.DistrictName;
-                model.Districts = _districtCache.GetAll()
-                    .OrderBy(d => d.DistrictName)
-                    .Select(d => new ListItem(d.DistrictName, d.DistrictId.ToString())).ToList();
                 model.Provinces = _provinceCache.GetAll().OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
                 return PartialView("_Wards", model);
@@ -111,7 +101,6 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             string response;
             var idNatinal = _wardCache.Save(new CateWardModel
             {
-                DistrictId = model.DistrictId,
                 ProvinceId = model.ProvinceId,
                 WardId = model.WardId,
                 WardCode = model.WardCode,
@@ -150,16 +139,6 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 
             model.Provinces = _provinceCache.GetAll().OrderBy(d => d.ProvinceName)
                 .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
-            model.Districts = _districtCache.GetAll()
-                .OrderBy(d => d.DistrictName)
-                .Select(d => new ListItem(d.DistrictName, d.DistrictId.ToString())).ToList();
-            if (model.ProvinceId == null) return PartialView("_Edit", model);
-            {
-                int totalDistrict;
-                model.Districts = _districtCache.GetByDistricts(model.ProvinceId, out totalDistrict)
-                    .OrderBy(w => w.DistrictName)
-                    .Select(d => new ListItem(d.DistrictName, d.DistrictId.ToString())).ToList();
-            }
 
             return PartialView("_Edit", model);
         }
@@ -178,21 +157,13 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 model.ProvinceName = provinceModel?.ProvinceName;
                 model.Provinces = _provinceCache.GetAll().OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
-                var districtModel = _districtCache.GetAll().FirstOrDefault();
-                model.DistrictId = districtModel?.DistrictId;
-                model.DistrictName = districtModel?.DistrictName;
-                model.Districts = _districtCache.GetAll()
-                    .OrderBy(d => d.DistrictName)
-                    .Select(d => new ListItem(d.DistrictName, d.DistrictId.ToString())).ToList();
-                model.Provinces = _provinceCache.GetAll().OrderBy(d => d.ProvinceName)
-                    .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
+
                 return PartialView("_Wards", model);
             }
 
             string response;
             var nationalId = _wardCache.Save(new CateWardModel
             {
-                DistrictId = model.DistrictId,
                 ProvinceId = model.ProvinceId,
                 WardId = model.WardId,
                 WardCode = model.WardCode,
@@ -213,7 +184,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 );
             return Json(new
             {
-                status = true, message = response
+                status = true,
+                message = response
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -250,49 +222,49 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         [AjaxOnly]
         [HttpGet]
         [ActionType(Type = EnumActionType.View)]
-        public ActionResult WardViaDistrict(int provinceId)
+        public ActionResult WardByProvince(int id = 0)
         {
-            int totalDistrict;
-            var lstWardViaDistricts = _districtCache.GetByDistricts(provinceId, out totalDistrict)
-                .OrderBy(d => d.ProvinceName).ToList();
-            return Json(new { Wards = lstWardViaDistricts });
+            var province = _provinceCache.GetById(id);
+
+            if (province == null)
+                return Json(new
+                {
+                    status = true,
+                    message = CreateMessage($"{_provinceTitle}", EnumProcessType.DataNotExist, EnumMsgIcon.Error)
+                });
+
+            return PartialView("_WardByProvince", province);
         }
 
         [AjaxOnly]
         [HttpGet]
         [ActionType(Type = EnumActionType.View)]
-        public ActionResult WardViaListDistrict(string provinceId)
+        public ActionResult WardViaProvince(int provinceId)
         {
-            if (string.IsNullOrWhiteSpace(provinceId)) return Json(null);
-            var provinceIds = provinceId.Split('|');
-            if (provinceId.Length <= 0) return Json(null);
-            var lstWardViaDistricts = _districtCache.GetAll()
-                .Where(x => provinceIds.Contains(x.ProvinceId.ToString())).ToList();
-            return Json(new { Wards = lstWardViaDistricts });
+            int total;
+            var lstWardViaProvinces = _wardCache.GetByProvinceId(provinceId, out total)
+                .OrderBy(d => d.ProvinceName).ToList();
+            return Json(new { Wards = lstWardViaProvinces });
         }
 
         [AjaxOnly]
-        [ActionType(Type = EnumActionType.Add)]
         [HttpGet]
-        public ActionResult WardByDistrict(int id)
+        [ActionType(Type = EnumActionType.View)]
+        public ActionResult WardViaListProvince(string provinceIds)
         {
-            var districtModel = _districtCache.GetById(id);
-            if (districtModel != null)
-                return PartialView("_WardByDistrict",
-                    new CateDistrictModel
-                        { DistrictId = districtModel.DistrictId, DistrictName = districtModel.DistrictName });
-            var districtName = AppProcessor.Messagor.GetMessage("District_Title");
-            return Json(new
-            {
-                status = true,
-                message = CreateMessage($"{districtName}", EnumProcessType.DataNotExist, EnumMsgIcon.Error)
-            }, JsonRequestBehavior.AllowGet);
+            if (string.IsNullOrWhiteSpace(provinceIds)) return Json(null);
+            var arrProvinceIds = provinceIds.Split('|');
+            if (arrProvinceIds.Length <= 0) return Json(null);
+            var lstWardViaProvinces = _wardCache.GetAll()
+                .Where(x => provinceIds.Contains(x.ProvinceId.ToString())).ToList();
+            return Json(new { Wards = lstWardViaProvinces });
         }
+
 
         [AjaxOnly]
         [ActionType(Type = EnumActionType.Add)]
         [HttpPost]
-        public ActionResult GetWardByDistricts(int? provinceId, int? districtId, MyWardsSearchModel searchModel)
+        public ActionResult GetWardByProvinces(MyWardsSearchModel searchModel)
         {
             var search = Request.Form.GetValues("search[value]")?[0];
             var draw = Request.Form.GetValues("draw")?[0];
@@ -311,8 +283,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             };
 
             int total;
-            var data = _wardCache.Get(provinceId, districtId, searchModel.ProvinceIds, searchModel.DistrictIds,
-                out total, dataSearch);
+            var data = _wardCache.Get($"{searchModel.ProvinceId}", out total, dataSearch);
             var result = Json(
                 new { draw = Convert.ToInt32(draw), recordsTotal = total, recordsFiltered = total, data },
                 JsonRequestBehavior.AllowGet);

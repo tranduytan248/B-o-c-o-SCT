@@ -7,14 +7,7 @@
     <Procedure Name="Cate_Province_Get" Value="p_Cate_Province_Get" />
     <Procedure Name="Cate_Province_GetById" Value="p_Cate_Province_GetById" />
     <Procedure Name="Cate_Province_Save" Value="p_Cate_Province_Save" />
-    <Procedure Name="Cate_Province_GetViaDistrictId" Value="p_Cate_Province_GetViaDistrictId" />
-
-    <Procedure Name="Cate_District_Delete" Value="p_Cate_District_Delete" />
-    <Procedure Name="Cate_District_Get" Value="p_Cate_District_Get" />
-    <Procedure Name="Cate_District_GetById" Value="p_Cate_District_GetById" />
-    <Procedure Name="Cate_District_Save" Value="p_Cate_District_Save" />
-    <Procedure Name="Cate_District_GetByProvinceCode" Value="p_Cate_District_GetByProvinceCode" />
-    <Procedure Name="Cate_District_GetByProvinceID" Value="p_Cate_District_GetByProvinceID" />
+    <Procedure Name="Cate_Province_GetViaWardId" Value="p_Cate_Province_GetViaWardId" />
 
     <Procedure Name="Cate_Street_Delete" Value="p_Cate_Street_Delete" />
     <Procedure Name="Cate_Street_Get" Value="p_Cate_Street_Get" />
@@ -26,7 +19,7 @@
     <Procedure Name="Cate_Ward_Get" Value="p_Cate_Ward_Get" />
     <Procedure Name="Cate_Ward_GetById" Value="p_Cate_Ward_GetById" />
     <Procedure Name="Cate_Ward_Save" Value="p_Cate_Ward_Save" />
-    <Procedure Name="Cate_Ward_GetByDistrictId" Value="p_Cate_Ward_GetByDistrictId" />
+    <Procedure Name="Cate_Ward_GetByProvinceId" Value="p_Cate_Ward_GetByProvinceId" />
     <Procedure Name="Cate_Ward_GetByStreetId" Value="p_Cate_Ward_GetByStreetId" />
 
     <Procedure Name="Cate_Team_Delete" Value="p_Cate_Team_Delete" />

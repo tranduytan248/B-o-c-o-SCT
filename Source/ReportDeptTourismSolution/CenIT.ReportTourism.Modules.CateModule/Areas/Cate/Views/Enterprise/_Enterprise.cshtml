@@ -7,59 +7,51 @@
 
 <div id="Enterprise">
 
-    <div class="form-group">
-        @Html.TitleFor(model => model.OwnerEnterpriseName, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.OwnerEnterpriseName, new { @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Owner") })
+    <div class="form-group row">
+        <div class="col-md-6">
+            @Html.TitleFor(model => model.OwnerEnterpriseName, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.OwnerEnterpriseName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Owner") })
             @Html.ValidationMessageFor(model => model.OwnerEnterpriseName, "", new { @class = "text-danger" })
         </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.BusinessName, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.BusinessName, new { @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_BusinessName") })
+        <div class="col-md-6">
+            @Html.TitleFor(model => model.BusinessName, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.BusinessName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_BusinessName") })
             @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
         </div>
     </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.TaxCode, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.TaxCode, new { @class = "col-md-4", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_TaxCode") })
+    <div class="form-group row">
+        <div class="col-md-3">
+            @Html.TitleFor(model => model.TaxCode, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.TaxCode, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_TaxCode") })
             @Html.ValidationMessageFor(model => model.TaxCode, "", new { @class = "text-danger" })
         </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.TypeBusiness, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.DropDownListFor(model => model.TypeBusiness, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { @class = "col-md-7", onchange = "OnChangeCombo(this, '#TypeBusinessName');" })
-            <br/> @Html.ValidationMessageFor(model => model.TypeBusiness, "", new { @class = "text-danger" })
+        <div class="col-md-4">
+            @Html.TitleFor(model => model.TypeBusiness, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.TypeBusiness, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#TypeBusinessName');" })
+            <br /> @Html.ValidationMessageFor(model => model.TypeBusiness, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.TypeBusinessName)
         </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.Website, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.Website, new { rows = 3, @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Website") })
-            @Html.ValidationMessageFor(model => model.Website, "", new { @class = "text-danger" })
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.Phone, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.Phone, new { @class = "col-md-4", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Phone") })
-            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.Email, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.Email, new { rows = 3, @class = "col-md-6", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Email") })
+        <div class="col-md-5">
+            @Html.TitleFor(model => model.Email, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Email, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Email") })
             @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
         </div>
     </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.ListCertificateFiles, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
+    <div class="form-group row">
+        <div class="col-md-4">
+            @Html.TitleFor(model => model.Website, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Website, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Website") })
+            @Html.ValidationMessageFor(model => model.Website, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-2">
+            @Html.TitleFor(model => model.Phone, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Phone, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Phone") })
+            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-12">
+            @Html.TitleFor(model => model.ListCertificateFiles, new { @class = "control-label" })
             @{
                 if (!string.IsNullOrEmpty(Model.ListPathCertificateFiles))
                 {
@@ -68,42 +60,32 @@
                 }
             }
 
-            @Html.FileFor(model => model.ListCertificateFiles, ".docx,.pdf,.xlsx,.xls", true, new { @class = "col-md-8" })
+            @Html.FileFor(model => model.ListCertificateFiles, ".docx,.pdf,.xlsx,.xls", true, new { @class = "col-md-12" })
             @Html.ValidationMessageFor(model => model.ListCertificateFiles, "", new { @class = "text-danger" })
-            <br/>
+            <br />
         </div>
     </div>
 
-    <div class="form-group">
-        @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "col-md-5", onchange = "OnChangeProvince(this, 'select#DistrictId');" })
+    <div class="form-group row">
+        <div class="col-md-4">
+            @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeProvince(this, 'select#WardId');" })
             @Html.ValidationMessageFor(model => model.ProvinceId, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.ProvinceName)
         </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.DistrictId, new { @class = "control-label col-md-3" })
         <div class="col-md-3">
-            @Html.DropDownListFor(model => model.DistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeDistrict(this, 'select#WardId')" })
-            @Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
-            @Html.HiddenFor(model => model.DistrictName)
-        </div>
-        @Html.TitleFor(model => model.WardId, new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.DropDownListFor(model => model.WardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeCombo(this, '#WardName');" })
+            @Html.TitleFor(model => model.WardId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.WardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#WardName');" })
             @Html.ValidationMessageFor(model => model.WardId, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.WardName)
         </div>
-    </div>
-    <div class="form-group">
-        @Html.TitleFor(model => model.BusinessAddress, new { @class = "control-label col-md-3" })
-        <div class="col-md-3">
+        <div class="col-md-2">
+            @Html.TitleFor(model => model.BusinessAddress, new { @class = "control-label" })
             @Html.TextBoxFor(model => model.BusinessAddress, new { @class = "col-md-12", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Address") })
             @Html.ValidationMessageFor(model => model.BusinessAddress, "", new { @class = "text-danger" })
         </div>
-        @Html.TitleFor(model => model.StreetName, new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
+        <div class="col-md-3">
+            @Html.TitleFor(model => model.StreetName, new { @class = "control-label" })
             @Html.TextBoxFor(model => model.StreetName, new { @class = "col-md-12", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Street") })
             @Html.ValidationMessageFor(model => model.StreetName, "", new { @class = "text-danger" })
         </div>
@@ -111,24 +93,20 @@
 
     <div class="box box-body no-shadow">
         <h4 class="box-title text-bold text-blue">@AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentation")</h4>
-        <div class="form-group">
-            @Html.TitleFor(model => model.LegalRepresentationName, new { @class = "control-label col-md-3" })
-            <div class="col-md-9">
-                @Html.TextBoxFor(model => model.LegalRepresentationName, new { @class = "col-md-6", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationName") })
+        <div class="form-group row">
+            <div class="col-md-5">
+                @Html.TitleFor(model => model.LegalRepresentationName, new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.LegalRepresentationName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationName") })
                 @Html.ValidationMessageFor(model => model.LegalRepresentationName, "", new { @class = "text-danger" })
             </div>
-        </div>
-        <div class="form-group">
-            @Html.TitleFor(model => model.LegalRepresentationPhone, new { @class = "control-label col-md-3" })
-            <div class="col-md-9">
-                @Html.TextBoxFor(model => model.LegalRepresentationPhone, new { @class = "col-md-3", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationPhone") })
+            <div class="col-md-3">
+                @Html.TitleFor(model => model.LegalRepresentationPhone, new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.LegalRepresentationPhone, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationPhone") })
                 @Html.ValidationMessageFor(model => model.LegalRepresentationPhone, "", new { @class = "text-danger" })
             </div>
-        </div>
-        <div class="form-group">
-            @Html.TitleFor(model => model.LegalRepresentationEmail, new { @class = "control-label col-md-3" })
-            <div class="col-md-9">
-                @Html.TextBoxFor(model => model.LegalRepresentationEmail, new { @class = "col-md-6", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationEmail") })
+            <div class="col-md-4">
+                @Html.TitleFor(model => model.LegalRepresentationEmail, new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.LegalRepresentationEmail, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_LegalRepresentationEmail") })
                 @Html.ValidationMessageFor(model => model.LegalRepresentationEmail, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -136,10 +114,10 @@
     @{
         if (Model.EnterpriseId > 0)
         {
-            <div class="form-group">
-                @Html.TitleFor(model => model.Reason, new { @class = "control-label col-md-3" })
-                <div class="col-md-9">
-                    @Html.TextAreaFor(model => model.Reason, new { rows = "3", @class = "col-md-10", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
+            <div class="form-group row">
+                <div class="col-md-12">
+                    @Html.TitleFor(model => model.Reason, new { @class = "control-label" })
+                    @Html.TextAreaFor(model => model.Reason, new { rows = "2", @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Reason_Title") })
                     @Html.ValidationMessageFor(model => model.Reason, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -152,14 +130,14 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("a[name='DownloadRefDoc']").on('click',
-            function() {
+            function () {
                 var url = $(this).data('href');
                 $.ajax({
                     type: 'GET',
                     url: url,
-                    success: function(response) {
+                    success: function (response) {
                         if (typeof response != "undefined" && response != null && response.status) {
                             window.location = response.downloadPath;
                         } else if (typeof response != "undefined" && response != null && !response.status) {
@@ -169,7 +147,7 @@
                 });
             });
 
-        OnChangeProvince('select#ProvinceId', 'select#DistrictId');
+        OnChangeProvince('select#ProvinceId', 'select#WardId');
     });
 
 </script>

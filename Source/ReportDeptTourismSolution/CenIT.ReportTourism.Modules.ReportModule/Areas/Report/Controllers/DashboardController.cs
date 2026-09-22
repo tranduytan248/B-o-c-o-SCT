@@ -15,14 +15,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
     public class DashboardController : AppController
 
     {
-        private readonly ReportDashboardCache _dashboardCache;
-        private readonly ReportCache _reportCache;
-
-        public DashboardController()
-        {
-            _dashboardCache = new ReportDashboardCache();
-            _reportCache = new ReportCache();
-        }
+        private readonly ReportDashboardCache _dashboardCache = new ReportDashboardCache();
+        private readonly ReportCache _reportCache = new ReportCache();
 
         [ActionType(Type = EnumActionType.View)]
         public ActionResult Index()

@@ -1,0 +1,129 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Cate.CateProvinceModel
+<div class="modal-header bg-primary">
+    <button type="button" class="close" style="padding-right: 10px;" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">Danh sách Phường thuộc Tỉnh/Thành phố<b>[@Model.ProvinceName]</b></h4>
+</div>
+<div class="modal-body row" id="bodyForm">
+    <div class="col-md-12">
+        @Html.Button(true, "AddWards", Url.Action("Add", "Wards", new { area = "Cate", provinceId = Model.ProvinceId }), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new { @class = "btn btn-sm btn-success pull-right" })
+
+    </div>
+    <div class="clearfix">
+        <hr/>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-12 table-responsive">
+            <table id="WardByProvince" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_No")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Province_Title")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_Code")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Ward_Label_Name")</th>
+                    <th>@AppProcessor.Messagor.GetMessage("Column_Action")</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Cancel")</button>
+</div>
+<script type="text/javascript">
+    var _ProvinceActionURLs = {
+        WardByProvince: "/Cate/Wards/GetWardByProvinces"
+    };
+
+    var _tableWardByProvince;
+
+    $(document).ready(function() {
+        initTableProvince();
+    });
+
+    function initTableProvince() {
+        if (window._tableWardByProvince != undefined) {
+            $("#WardByProvince").dataTable().fnDestroy();
+        }
+        _tableWardByProvince = $("#WardByProvince").DataTable({
+            "Responsive": true,
+            //"columnDefs": [{ "className": "text-left custom-middle-align", "targets": [0] }],
+            "language": {
+                "processing":
+                    "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+            },
+            "lengthChange": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+            {
+                "url": _ProvinceActionURLs.WardByProvince,
+                "type": "POST",
+                "dataType": "JSON",
+                "data": {
+                    "ProvinceId": "@Html.Raw(Model.ProvinceId)"
+                }
+            },
+            "columns": [
+                {
+                    "data": "",
+                    "defaultContent": "1",
+                    "render": function(data, type, row, meta) {
+                        return meta.settings._iDisplayStart + meta.row + 1;
+                    }
+                },
+                {
+                    "data": "ProvinceName",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "WardCode",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "WardName",
+                    "defaultContent": ""
+                },
+                {
+                    "data": "WardId",
+                    "style": "width:100px;",
+                    "orderable": false,
+                    "render": function(data, type, row, meta) {
+                        var html = "";
+                        if (type === "display") {
+                            html += '<a data-modal="" data-modal-id="Edit" href="/Cate/Wards/Edit/' +
+                                data +
+                                '" class="fa fa-pencil btn btn-default btn-form"  title="Cập nhật" data-toggle="tooltip"></a>';
+                            html += '<a data-modal="" data-modal-id="Delete" href="/Cate/Wards/Delete/' +
+                                data +
+                                '" class="fa fa-trash-o btn btn-danger btn-form" title="Xoá" data-toggle="tooltip"></a>';
+                        }
+
+                        return html;
+                    }
+                }
+            ]
+        });
+    }
+
+    function App_OnProcessSuccess(response, formId) {
+        if (response.status != undefined) {
+            $("#ModalContent #modal_" + formId).modal("hide");
+            $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
+                function() {
+                    if (response.status != undefined) {
+                        eval(response.message);
+                        _tableWardByProvince.ajax.reload(null, false);
+                        response.status = undefined;
+                    }
+                });
+        } else {
+            $("#ModalContent #modal_" + formId + " #bodyForm").html(response);
+        }
+
+    }
+
+</script>

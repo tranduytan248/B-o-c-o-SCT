@@ -33,11 +33,11 @@
         <!-- mini logo for sidebar mini 50x50 pixels -->
         <span class="logo-mini text-sm">
             @*<small>VNPT</small>*@
-            <img src="~/Contents/imgs/logo-sdl.png" height="auto" width="100%" alt="" style="margin: auto;" />
+            <img src="~/Contents/imgs/logo-sct.png" height="auto" width="100%" alt="" style="margin: auto;" />
         </span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg">
-            <img src="~/Contents/imgs/logo-sdl.png" height="auto" width="70%" alt="" />
+        <span class="logo-lg" style="margin: 3px 0;">
+            <img src="~/Contents/imgs/logo-sct.png" height="auto" width="70%" alt="" />
         </span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
@@ -50,7 +50,8 @@
             <span class="icon-bar"></span>
         </a>
         <span class="header-title text-bold hidden-xs">
-            <img alt="" width="69px" src="~/Contents/imgs/sodulich-logo.png" />&nbsp;@AppProcessor.Messagor.GetMessage("App_Title").ToUpper()
+            @*<img alt="" width="69px" src="~/Contents/imgs/sodulich-logo.png" />&nbsp;*@
+            @AppProcessor.Messagor.GetMessage("App_Title").ToUpper()
         </span>
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">

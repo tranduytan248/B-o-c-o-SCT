@@ -65,22 +65,14 @@
         <h4 class="box-title text-bold text-blue"><i class="fa fa-address-card-o"></i>&nbsp;Địa chỉ kinh doanh</h4>
         <div class="form-group">
             @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label col-md-3" })
-            <div class="col-md-9">
-                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "col-md-5", onchange = "OnChangeProvince(this, 'select#DistrictId');" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.ListProvinces, "Value", "Text"), "", new { @class = "form-control col-md-12", onchange = "OnChangeProvince(this, 'select#WardId');" })
                 @Html.ValidationMessageFor(model => model.ProvinceId, "", new { @class = "text-danger" })
                 @Html.HiddenFor(model => model.ProvinceName)
             </div>
-        </div>
-        <div class="form-group">
-            @Html.TitleFor(model => model.DistrictId, new { @class = "control-label col-md-3" })
-            <div class="col-md-3">
-                @Html.DropDownListFor(model => model.DistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeDistrict(this, 'select#WardId')" })
-                @Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
-                @Html.HiddenFor(model => model.DistrictName)
-            </div>
             @Html.TitleFor(model => model.WardId, new { @class = "control-label col-md-2" })
             <div class="col-md-4">
-                @Html.DropDownListFor(model => model.WardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeCombo(this, '#WardName');" })
+                @Html.DropDownListFor(model => model.WardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { @class = "form-control col-md-12", onchange = "OnChangeCombo(this, '#WardName');" })
                 @Html.ValidationMessageFor(model => model.WardId, "", new { @class = "text-danger" })
                 @Html.HiddenFor(model => model.WardName)
             </div>
@@ -167,20 +159,19 @@
         $(eleName).val($(cbb).children("option:selected").text());
     }
 
-    function OnChangeDistrict(cbbDistrict, cbbWard) {
-        if ($("#DistrictName").length > 0) {
-            $("#DistrictName").val($(cbbDistrict).children("option:selected").text());
+    function OnChangeProvince(cbbProvince, cbbWard) {
+        if ($("#ProvinceName").length > 0) {
+            $("#ProvinceName").val($(cbbProvince).children("option:selected").text());
         }
-
         var wardId = $(cbbWard).val();
 
         $(cbbWard).empty();
-        $(".chosen-select").trigger("chosen:updated");
-        var selected = $(cbbDistrict).val();
-        var url = "@Url.Action("WardViaDistrict")?districtId=" + selected;
+        $(cbbWard).trigger("chosen:updated");
+        var selected = $(cbbProvince).val();
+        var urlWardViaProvince = "@Url.Action("WardViaProvince")?provinceId=" + selected;
         $.ajax({
             type: "GET",
-            url: url,
+            url: urlWardViaProvince,
             dataType: "JSON",
             success: function(response) {
                 $(cbbWard).append('<option value=""></option>');
@@ -192,35 +183,6 @@
                                 selected = "selected";
                         }
                         $(cbbWard).append('<option value="' + item.WardId + '" ' + selected + '>' + item.WardName + "</option>");
-                    });
-            }
-        });
-    }
-
-    function OnChangeProvince(cbbProvince, cbbDistrict) {
-        if ($("#ProvinceName").length > 0) {
-            $("#ProvinceName").val($(cbbProvince).children("option:selected").text());
-        }
-        var districtId = $(cbbDistrict).val();
-
-        $(cbbDistrict).empty();
-        $(".chosen-select").trigger("chosen:updated");
-        var selected = $(cbbProvince).val();
-        var url = "@Url.Action("DistrictsViaProvince")?provinceId=" + selected;
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "JSON",
-            success: function(response) {
-                $(cbbDistrict).append('<option value=""></option>');
-                $.each(response.Districts,
-                    function(index, item) {
-                        var selected = "";
-                        if (districtId.length > 0 && districtId != "0") {
-                            if (item.DistrictId == districtId)
-                                selected = "selected";
-                        }
-                        $(cbbDistrict).append('<option value="' + item.DistrictId + '" ' + selected + '>' + item.DistrictName + "</option>");
                     });
             }
         });

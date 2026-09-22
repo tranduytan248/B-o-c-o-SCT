@@ -11,7 +11,7 @@
         <div class="form-group">
             @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label col-md-4" })
             <div class="col-md-8">
-                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.Provinces, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeDistrict(this, $('select#DistrictId'))" })
+                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.Provinces, "Value", "Text"), "", new { @class = "col-md-12"})
                 <br/>@Html.ValidationMessageFor(model => model.ProvinceId, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -21,30 +21,18 @@
         <div class="form-group">
             @Html.TitleFor(model => model.ProvinceId, new { @class = "control-label col-md-4" })
             <div class="col-md-8">
-                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.Provinces, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeDistrict(this, $('select#DistrictId'))" })
+                @Html.DropDownListFor(model => model.ProvinceId, new SelectList(Model.Provinces, "Value", "Text"), "", new { @class = "col-md-12"})
                 <br/>@Html.ValidationMessageFor(model => model.ProvinceId, "", new { @class = "text-danger" })
             </div>
         </div>
     }
-}
 
-<div class="form-group">
-    @Html.TitleFor(model => model.DistrictId, new { @class = "control-label col-md-4" })
-    <div class="col-md-8">
-        @Html.DropDownListFor(model => model.DistrictId, new SelectList(Model.Districts, "Value", "Text"), "", new { @class = "col-md-12", onchange = "OnChangeCombo(this, '#DistrictName');" })
-        <br/>@Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.DistrictName)
-
-    </div>
-</div>
-
-@{
     if (Model.WardId > 0)
     {
         <div class="form-group">
             @Html.TitleFor(model => model.WardCode, new { @class = "control-label col-md-4" })
             <div class="col-md-8">
-                @Html.TextBoxFor(model => model.WardCode, new { @class = "mytheme-short-text", @readonly = "readonly" })
+                @Html.TextBoxFor(model => model.WardCode, new { @class = "form-control col-md-12", @readonly = "readonly" })
 
             </div>
         </div>
@@ -54,7 +42,7 @@
         <div class="form-group" style="display: none">
             @Html.TitleFor(model => model.WardCode, new { @class = "control-label col-md-4" })
             <div class="col-md-8">
-                @Html.TextBoxFor(model => model.WardCode, new { @class = "mytheme-short-text" })
+                @Html.TextBoxFor(model => model.WardCode, new { @class = "form-control col-md-12" })
 
             </div>
         </div>
@@ -63,19 +51,20 @@
 <div class="form-group">
     @Html.TitleFor(model => model.WardName, new { @class = "control-label col-md-4" })
     <div class="col-md-8">
-        @Html.TextBoxFor(model => model.WardName, new { @class = "col-md-8", placeholder = AppProcessor.Messagor.GetMessage("Ward_Label_Name") })
+        @Html.TextBoxFor(model => model.WardName, new { @class = "form-control col-md-12", placeholder = AppProcessor.Messagor.GetMessage("Ward_Label_Name") })
         @Html.ValidationMessageFor(model => model.WardName, "", new { @class = "text-danger" })
     </div>
 </div>
+
 <script type="text/javascript">
-    function OnChangeDistrict(cbbDistrict, cbbWard) {
+    function OnChangeProvince(cbbProvince, cbbWard) {
         if ($("#ProvinceName").length > 0) {
-            $("#ProvinceName").val($(cbbDistrict).children("option:selected").text());
+            $("#ProvinceName").val($(cbbProvince).children("option:selected").text());
         }
         $(cbbWard).empty();
         $(".chosen-select").trigger("chosen:updated");
-        var selected = $(cbbDistrict).val();
-        var url = "/Cate/Wards/WardViaDistrict?provinceId=" + selected;
+        var selected = $(cbbProvince).val();
+        var url = "/Cate/Wards/WardViaProvince?provinceId=" + selected;
         $.ajax({
             type: "GET",
             url: url,
@@ -84,7 +73,7 @@
                 $(cbbWard).append('<option value=""></option>');
                 $.each(response.Wards,
                     function(index, item) {
-                        $(cbbWard).append('<option value="' + item.DistrictId + '">' + item.DistrictName + "</option>");
+                        $(cbbWard).append('<option value="' + item.ProvinceId + '">' + item.ProvinceName + "</option>");
                     });
             }
         });

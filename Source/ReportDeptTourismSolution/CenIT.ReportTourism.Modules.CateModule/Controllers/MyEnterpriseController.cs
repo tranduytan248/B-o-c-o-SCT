@@ -22,14 +22,6 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
 {
     public class MyEnterpriseController : AppController
     {
-        public MyEnterpriseController()
-        {
-            _enterpriseCache = new CateEnterpriseCache();
-            _districtCache = new CateDistrictCache();
-            _wardCache = new CateWardCache();
-            _provinceCache = new CateProvinceCache();
-        }
-
         // GET: MyEnterprise
         public ActionResult Index()
         {
@@ -43,13 +35,13 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
 
         #region Enterprise
 
-        private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Title");
-        private readonly CateEnterpriseCache _enterpriseCache;
-        private readonly CateDistrictCache _districtCache;
-        private readonly CateWardCache _wardCache;
-        private readonly CateProvinceCache _provinceCache;
+
+        private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
+        private readonly CateWardCache _wardCache = new CateWardCache();
+        private readonly CateProvinceCache _provinceCache = new CateProvinceCache();
 
         private readonly string _enterpriseFolder = "Enterprise";
+        private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Title");
 
         private readonly string _moduleRefDocsPathFolder =
             ConfigurationManager.AppSettings["AttachmentFolderPath"] ?? @"/Contents/Modules/Cate/Attachments/";
@@ -67,22 +59,16 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                     message = CreateMessage($"{_enterpriseTitle}",
                         EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 });
-            var provinceModel = _provinceCache.GetViaDistrict(model.DistrictId);
+            var provinceModel = _provinceCache.GetViaWard(model.WardId);
             model.ListProvinces = _provinceCache.GetAll()
                 .OrderBy(d => d.ProvinceName)
                 .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString()))
                 .Distinct().ToList();
-            model.ListDistricts = _districtCache.GetAll(provinceModel?.ProvinceId)
-                .OrderBy(d => d.DistrictName)
-                .Select(d => new ListItem(d.DistrictName, d.DistrictId.ToString()))
+
+            model.ListWards = _wardCache.GetAll(provinceModel?.ProvinceId)
+                .OrderBy(d => d.WardName)
+                .Select(d => new ListItem(d.WardName, d.WardId.ToString()))
                 .Distinct().ToList();
-            if (model.DistrictId != null)
-            {
-                int totalWard;
-                model.ListWards = _wardCache.GetByDistrictId(model.DistrictId, out totalWard)
-                    .OrderBy(w => w.WardName)
-                    .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
-            }
 
             model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                 .Cast<EnumTypeBusiness>()
@@ -108,17 +94,10 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString()))
                     .Distinct().ToList();
 
-                model.ListDistricts = _districtCache.GetAll(model.ProvinceId)
-                    .OrderBy(d => d.DistrictName)
-                    .Select(d => new ListItem(d.DistrictName, d.DistrictId.ToString()))
+                model.ListWards = _wardCache.GetAll(model.ProvinceId)
+                    .OrderBy(d => d.WardName)
+                    .Select(d => new ListItem(d.WardName, d.WardId.ToString()))
                     .Distinct().ToList();
-                if (model.DistrictId != null)
-                {
-                    int totalWard;
-                    model.ListWards = _wardCache.GetByDistrictId(model.DistrictId, out totalWard)
-                        .OrderBy(w => w.WardName)
-                        .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
-                }
 
                 model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
@@ -138,8 +117,6 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 StreetName = model.StreetName,
                 WardId = model.WardId,
                 WardName = model.WardName,
-                DistrictId = model.DistrictId,
-                DistrictName = model.DistrictName,
                 TypeBusiness = model.TypeBusiness,
                 TypeBusinessName = model.TypeBusinessName,
                 LegalRepresentationName = model.LegalRepresentationName,
@@ -179,84 +156,84 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
             return Json(new { status = true, message = response }, JsonRequestBehavior.AllowGet);
         }
 
-        [AjaxOnly]
-        [HttpGet]
-        [ActionType(Type = EnumActionType.Edit)]
-        public ActionResult TypeBusinessInfo(int id = 0)
-        {
-            var model = _enterpriseCache.GetById(id);
-            if (model == null)
-                return Json(new
-                {
-                    status = true,
-                    message = CreateMessage($"{_enterpriseTitle}",
-                        EnumProcessType.DataNotExist, EnumMsgIcon.Error)
-                });
-            switch ((EnumTypeBusiness)model.TypeBusiness)
-            {
-                case EnumTypeBusiness.Accommodation:
-                {
-                    return RedirectToAction("Info", "Accommodation",
-                        new
-                        {
-                            enterpriseId = id
-                        });
-                }
+        //[AjaxOnly]
+        //[HttpGet]
+        //[ActionType(Type = EnumActionType.Edit)]
+        //public ActionResult TypeBusinessInfo(int id = 0)
+        //{
+        //    var model = _enterpriseCache.GetById(id);
+        //    if (model == null)
+        //        return Json(new
+        //        {
+        //            status = true,
+        //            message = CreateMessage($"{_enterpriseTitle}",
+        //                EnumProcessType.DataNotExist, EnumMsgIcon.Error)
+        //        });
+        //    switch ((EnumTypeBusiness)model.TypeBusiness)
+        //    {
+        //        case EnumTypeBusiness.Accommodation:
+        //            {
+        //                return RedirectToAction("Info", "Accommodation",
+        //                    new
+        //                    {
+        //                        enterpriseId = id
+        //                    });
+        //            }
 
-                case EnumTypeBusiness.ServicesForTourists:
-                {
-                    return RedirectToAction("Info", "ServicesForTourist",
-                        new
-                        {
-                            enterpriseId = id
-                        });
-                }
+        //        case EnumTypeBusiness.ServicesForTourists:
+        //            {
+        //                return RedirectToAction("Info", "ServicesForTourist",
+        //                    new
+        //                    {
+        //                        enterpriseId = id
+        //                    });
+        //            }
 
-                case EnumTypeBusiness.TouristAttraction:
-                {
-                    return RedirectToAction("Info", "TouristAttraction",
-                        new
-                        {
-                            enterpriseId = id
-                        });
-                }
+        //        case EnumTypeBusiness.TouristAttraction:
+        //            {
+        //                return RedirectToAction("Info", "TouristAttraction",
+        //                    new
+        //                    {
+        //                        enterpriseId = id
+        //                    });
+        //            }
 
-                case EnumTypeBusiness.TransportTourists:
-                {
-                    return RedirectToAction("Info", "TransportTourists",
-                        new
-                        {
-                            enterpriseId = id
-                        });
-                }
+        //        case EnumTypeBusiness.TransportTourists:
+        //            {
+        //                return RedirectToAction("Info", "TransportTourists",
+        //                    new
+        //                    {
+        //                        enterpriseId = id
+        //                    });
+        //            }
 
-                case EnumTypeBusiness.Traveling:
-                {
-                    return RedirectToAction("Info", "Traveling",
-                        new
-                        {
-                            enterpriseId = id
-                        });
-                }
+        //        case EnumTypeBusiness.Traveling:
+        //            {
+        //                return RedirectToAction("Info", "Traveling",
+        //                    new
+        //                    {
+        //                        enterpriseId = id
+        //                    });
+        //            }
 
-                default:
-                    return RedirectToAction("Info", "Accommodation",
-                        new
-                        {
-                            enterpriseId = id
-                        });
-            }
-        }
+        //        default:
+        //            return RedirectToAction("Info", "Accommodation",
+        //                new
+        //                {
+        //                    enterpriseId = id
+        //                });
+        //    }
+        //}
 
         [AjaxOnly]
         [HttpGet]
         [ActionType(Type = EnumActionType.View)]
-        public ActionResult WardViaDistrict(int districtId = 0)
+        public ActionResult WardViaProvince(int provinceId = 0)
         {
-            int totalWard;
-            var lstWardViaDistricts = _wardCache.GetByDistrictId(districtId, out totalWard).OrderBy(d => d.DistrictName)
-                .ToList();
-            return Json(new { Wards = lstWardViaDistricts });
+            int total;
+
+            var lstWardViaProvinces = _wardCache.GetByProvinceId(provinceId, out total).OrderBy(d => d.ProvinceName).ToList();
+            return Json(new { Wards = lstWardViaProvinces });
         }
 
         #endregion

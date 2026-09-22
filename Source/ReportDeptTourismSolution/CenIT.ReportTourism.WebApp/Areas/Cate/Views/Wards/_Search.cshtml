@@ -19,15 +19,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    @Html.TitleFor(model => model.ListDistrictId, new { @class = "control-label col-md-3" })
-                    <div class="col-md-9">
-                        @Html.DropDownListFor(model => model.ListDistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { multiple = true, @class = "col-md-6 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
-                    </div>
-                </div>
-            </div>
-            <div class="clearfix"></div>
         </div>
         <div class="box-footer">
             <div class="col-md-12 text-center">

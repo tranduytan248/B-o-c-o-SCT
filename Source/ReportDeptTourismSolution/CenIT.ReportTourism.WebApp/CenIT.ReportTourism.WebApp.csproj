@@ -28,6 +28,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -484,6 +485,7 @@
     <Content Include="Contents\css\loader.css" />
     <Content Include="Contents\imgs\banner-email-sdl.png" />
     <Content Include="Contents\imgs\bg-logo-vnpt.png" />
+    <Content Include="Contents\imgs\logo-sct.png" />
     <Content Include="Contents\imgs\logo-sdl.png" />
     <Content Include="Contents\imgs\logo_footer_vnpt.png" />
     <Content Include="Contents\imgs\vnpt-smart-ca-bg.jpg" />
@@ -1699,12 +1701,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\PublishProfiles\CenIT.ReportTourism.Publish.pubxml" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="ReportViewerWebForm.aspx" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
-    <Content Include="Scripts\jquery.signalR-2.4.1.js" />
-    <Content Include="Scripts\jquery.signalR-2.4.1.min.js" />
     <Content Include="SqlServerTypes\x64\SqlServerSpatial110.dll" />
     <Content Include="SqlServerTypes\x86\SqlServerSpatial110.dll" />
     <Content Include="Views\Accommodation\Accommodation.js" />
@@ -1844,7 +1841,6 @@
     <Content Include="Views\Accommodation\_TabInfrastructure.cshtml" />
     <Content Include="Views\Accommodation\_TabTypeService.cshtml" />
     <Content Include="Views\Accommodation\_TypeService.cshtml" />
-    <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Account\_ForgotView.cshtml" />
     <Content Include="Views\Account\_ForgotPassword.cshtml" />
     <Content Include="Views\Account\_ForgotBox.cshtml" />

@@ -10,30 +10,21 @@
             </button>
         </div>
     </div>
-    <div class="box-body with-border">
-        <div class="row form-horizontal" id="Search">
-            <div class="col-md-12">
-                <div class="form-group">
-                    @Html.TitleFor(model => model.ListTypeBusinessId, new { @class = "control-label col-md-3" })
-                    <div class="col-md-9">
-                        @Html.DropDownListFor(model => model.ListTypeBusinessId, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { multiple = true, @class = "col-md-6 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
-                    </div>
-                </div>
+    <div class="box-body with-border" id="Search">
+        <div class="form-group row">
+            <div class="col-md-6">
+                @Html.TitleFor(model => model.ListTypeBusinessId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListTypeBusinessId, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
             </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    @Html.TitleFor(model => model.ListDistrictId, new { @class = "control-label col-md-3" })
-                    <div class="col-md-9">
-                        @Html.DropDownListFor(model => model.ListDistrictId, new SelectList(Model.ListDistricts, "Value", "Text"), "", new { multiple = true, @class = "col-md-6 chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
-                    </div>
-                </div>
+            <div class="col-md-6">
+                @Html.TitleFor(model => model.ListWardId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListWardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
             </div>
-            <div class="clearfix"></div>
         </div>
-        <div class="box-footer">
-            <div class="col-md-12 text-center">
-                <button type="button" class="btn btn-primary" onclick="_tableEnterprise.ajax.reload(null, false);"><i class="fa fa-search-plus"></i>&nbsp;Tìm kiếm</button>
-            </div>
+    </div>
+    <div class="box-footer">
+        <div class="col-md-12 text-center">
+            <button type="button" class="btn btn-primary" onclick="_tableEnterprise.ajax.reload(null, false);"><i class="fa fa-search-plus"></i>&nbsp;Tìm kiếm</button>
         </div>
     </div>
 </div>

@@ -41,35 +41,23 @@ namespace CenIT.ReportTourism.WebApp.Controllers
     [AllowAnonymous]
     public class AccountController : AppController
     {
-        public AccountController()
-        {
-            _userCache = new SysUserCache();
-            _provinceCache = new CateProvinceCache();
-            _districtCache = new CateDistrictCache();
-            _wardCache = new CateWardCache();
-            _enterpriseCache = new CateEnterpriseCache();
-            _configsCache = new SysConfigsCache();
-            _enterpriseRegisterNotifyCache = new CateEnterpriseRegisterNotifyCache();
-        }
-
         #region Properties
 
         private const string SESSION_VARIABLE_NAME = "SessionNumber";
-        private readonly SysConfigsCache _configsCache;
-        private readonly CateDistrictCache _districtCache;
-        private readonly CateEnterpriseCache _enterpriseCache;
+        private readonly SysConfigsCache _configsCache = new SysConfigsCache();
+        private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
 
         private readonly string _enterpriseFolder = "Enterprise";
-        private readonly CateEnterpriseRegisterNotifyCache _enterpriseRegisterNotifyCache;
+        private readonly CateEnterpriseRegisterNotifyCache _enterpriseRegisterNotifyCache = new CateEnterpriseRegisterNotifyCache();
         private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Label");
 
         private readonly string _moduleRefDocsPathFolder =
             ConfigurationManager.AppSettings["AttachmentFolderPath"] ?? @"/Contents/Modules/Cate/Attachments/";
         //private readonly SysConfigsCache _configsCache;
 
-        private readonly CateProvinceCache _provinceCache;
-        private readonly SysUserCache _userCache;
-        private readonly CateWardCache _wardCache;
+        private readonly CateProvinceCache _provinceCache = new CateProvinceCache();
+        private readonly SysUserCache _userCache = new SysUserCache();
+        private readonly CateWardCache _wardCache = new CateWardCache();
 
         #endregion
 
@@ -435,7 +423,6 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 ListProvinces = _provinceCache.GetAll()
                     .OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList(),
-                ListDistricts = new List<ListItem>(),
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -459,7 +446,6 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 model.ListProvinces = _provinceCache.GetAll()
                     .OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
-                model.ListDistricts = new List<ListItem>();
                 model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -482,8 +468,6 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 StreetName = model.StreetName,
                 WardId = model.WardId,
                 WardName = model.WardName,
-                DistrictId = model.DistrictId,
-                DistrictName = model.DistrictName,
                 TypeBusiness = model.TypeBusiness,
                 TypeBusinessName = model.TypeBusinessName,
                 LegalRepresentationName = model.LegalRepresentationName,
@@ -1058,22 +1042,12 @@ namespace CenIT.ReportTourism.WebApp.Controllers
         [AjaxOnly]
         [HttpGet]
         [ActionType(Type = EnumActionType.View)]
-        public ActionResult WardViaDistrict(int districtId = 0)
+        public ActionResult WardViaProvince(int provinceId = 0)
         {
-            int totalWard;
-            var lstWardViaDistricts =
-                _wardCache.GetByDistrictId(districtId, out totalWard).OrderBy(d => d.WardName).ToList();
-            return Json(new { Wards = lstWardViaDistricts });
-        }
-
-        [AjaxOnly]
-        [ActionType(Type = EnumActionType.View)]
-        [HttpGet]
-        public ActionResult DistrictsViaProvince(int provinceId = 0)
-        {
-            var lstDistrictsViaProvince =
-                _districtCache.GetByProvinceID(provinceId).OrderBy(d => d.DistrictName).ToList();
-            return Json(new { Districts = lstDistrictsViaProvince });
+                int totalWards;
+            var lstWardViaProvinces =
+                _wardCache.GetByProvinceId(provinceId, out totalWards).OrderBy(d => d.WardName).ToList();
+            return Json(new { Wards = lstWardViaProvinces });
         }
 
         private int SaveUploadFile(CateEnterpriseModel model)

@@ -9,7 +9,7 @@ function OnLoadEnterpriseInfo(cbb, eleInfo, eleTypeBusinessInfo) {
     $(eleInfo).empty();
     $(eleInfo).load(_myEnterpriseUrls.enterpriseInfoUrl + enterpriseId);
     $(eleTypeBusinessInfo).empty();
-    $(eleTypeBusinessInfo).load(_myEnterpriseUrls.enterpriseTypeBusinessInfoUrl + enterpriseId);
+    //$(eleTypeBusinessInfo).load(_myEnterpriseUrls.enterpriseTypeBusinessInfoUrl + enterpriseId);
 }
 
 function CateDoc_OnProcessSuccess(response, formId) {
@@ -29,13 +29,15 @@ function CateDoc_OnProcessSuccess(response, formId) {
     }
 }
 
-function OnChangeDistrict(cbbDistrict, cbbWard) {
-    if ($("#DistrictName").length > 0) {
-        $("#DistrictName").val($(cbbDistrict).children("option:selected").text());
+function OnChangeProvince(cbbProvince, cbbWard) {
+    if ($("#ProvinceName").length > 0) {
+        $("#ProvinceName").val($(cbbProvince).children("option:selected").text());
     }
+
     $(cbbWard).empty();
-    var selected = $(cbbDistrict).val();
-    var url = "/MyEnterprise/WardViaDistrict?districtId=" + selected;
+    $(cbbWard).trigger("chosen:updated");
+    var selected = $(cbbProvince).val();
+    var url = "/Cate/Enterprise/WardViaProvince?provinceId=" + selected;
     $.ajax({
         type: "GET",
         url: url,
@@ -46,51 +48,6 @@ function OnChangeDistrict(cbbDistrict, cbbWard) {
                 function(index, item) {
                     $(cbbWard).append('<option value="' + item.WardId + '">' + item.WardName + "</option>");
                 });
-            $(".chosen-select").trigger("chosen:updated");
         }
     });
 }
-
-function OnChangeProvince(cbbProvince, cbbDistrict) {
-    if ($("#ProvinceName").length > 0) {
-        $("#ProvinceName").val($(cbbProvince).children("option:selected").text());
-    }
-
-    $(cbbDistrict).empty();
-    $(".chosen-select").trigger("chosen:updated");
-    var selected = $(cbbProvince).val();
-    var url = "/Cate/Enterprise/DistrictsViaProvince?provinceId=" + selected;
-    $.ajax({
-        type: "GET",
-        url: url,
-        dataType: "JSON",
-        success: function(response) {
-            $(cbbDistrict).append('<option value=""></option>');
-            $.each(response.Districts,
-                function(index, item) {
-                    $(cbbDistrict).append('<option value="' + item.DistrictId + '">' + item.DistrictName + "</option>");
-                });
-        }
-    });
-}
-
-//function initDownloadDoc() {
-//    var btnDownloadDoc = $("a[name='DownloadRefDoc']");
-//    if (typeof btnDownloadDoc != "undefined") {
-//        btnDownloadDoc.on('click',
-//            function () {
-//                var url = $(this).data('href');
-//                $.ajax({
-//                    type: 'GET',
-//                    url: url,
-//                    success: function (response) {
-//                        if (typeof response != "undefined" && response != null && response.status) {
-//                            window.location = response.downloadPath;
-//                        } else if (typeof response != "undefined" && response != null && !response.status) {
-//                            eval(response.message);
-//                        }
-//                    }
-//                });
-//            });
-//    }
-//}

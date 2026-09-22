@@ -4,38 +4,38 @@
 var _tableNatinal;
 $(document).ready(function() {
     initTableNational();
-    $("#ListProvinceId").change(function() {
-        try {
-            var value = $(this).val();
-            $("#ListDistrictId").empty();
-            if (value != null && value != undefined)
-                value = value.join("|");
-            else
-                value = "|";
-            $.ajax({
-                url: "/Cate/Wards/WardViaListDistrict",
-                dataType: "JSON",
-                contentType: "application/json; charset=utf-8",
-                data: { provinceId: value }, // you could throw any javascript object you like here
-                success: function(data) {
-                    $("#ListDistrictId").append('<option value=""></option>');
-                    $.each(data.Wards,
-                        function(index, item) {
-                            console.log(item);
-                            $("#ListDistrictId").append('<option value="' +
-                                item.DistrictId +
-                                '">' +
-                                item.DistrictName +
-                                "</option>");
-                        });
-                    // process the results
-                }
-            });
-        } catch (e) {
-            console.log(e.message);
-        }
+    //$("#ListProvinceId").change(function() {
+    //    try {
+    //        var value = $(this).val();
+    //        $("#ListDistrictId").empty();
+    //        if (value != null && value != undefined)
+    //            value = value.join("|");
+    //        else
+    //            value = "|";
+    //        $.ajax({
+    //            url: "/Cate/Wards/WardViaListDistrict",
+    //            dataType: "JSON",
+    //            contentType: "application/json; charset=utf-8",
+    //            data: { provinceId: value }, // you could throw any javascript object you like here
+    //            success: function(data) {
+    //                $("#ListDistrictId").append('<option value=""></option>');
+    //                $.each(data.Wards,
+    //                    function(index, item) {
+    //                        console.log(item);
+    //                        $("#ListDistrictId").append('<option value="' +
+    //                            item.DistrictId +
+    //                            '">' +
+    //                            item.DistrictName +
+    //                            "</option>");
+    //                    });
+    //                // process the results
+    //            }
+    //        });
+    //    } catch (e) {
+    //        console.log(e.message);
+    //    }
 
-    });
+    //});
 });
 
 function initTableNational() {
@@ -59,13 +59,7 @@ function initTableNational() {
                         $("#Search select#ListProvinceId").val().length > 0
                         ? $("#Search select#ListProvinceId").val()
                         : "";
-                },
-                "DistrictIds": function() {
-                    return $("#Search select#ListDistrictId").val() != null &&
-                        $("#Search select#ListDistrictId").val().length > 0
-                        ? $("#Search select#ListDistrictId").val()
-                        : "";
-                }
+                }                
             }
         },
         "columns": [
@@ -77,7 +71,7 @@ function initTableNational() {
                 }
             },
             {
-                "data": "DistrictName",
+                "data": "ProvinceName",
                 "defaultContent": ""
             },
             {
