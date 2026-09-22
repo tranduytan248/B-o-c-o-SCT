@@ -1,0 +1,22 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+build.log
+
+## Visual Studio cache & temporary files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## NuGet Packages
+packages/
+*.nuget.props
+*.nuget.targets
+
+## Temporary files
+*.tmp
+*.bak

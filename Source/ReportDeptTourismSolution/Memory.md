@@ -33,6 +33,11 @@
    - Đưa toàn bộ các file trong 5 thư mục con (`Accommodation`, `ServicesForTourist`, `TouristAttraction`, `TransportTourists`, `Traveling`) vào biên dịch trong `Models.csproj`, `Biz.csproj`, `Caches.csproj`.
 5. **Kết quả nghiệm thu biên dịch:**
    - Lệnh MSBuild thực thi hoàn tất: **Build Succeeded: 0 Error(s)**.
+6. **Quy tắc Bất Di Bất Dịch khi Commit & Push Code (Anti-Bin/Obj):**
+   - **CẤM TUYỆT ĐỐI** commit và push bất kỳ tệp tin nào thuộc thư mục `bin/` và `obj/` (`*.dll`, `*.pdb`, `*.cache`, `*.FileListAbsolute.txt`...).
+   - **CẤM DÙNG `git add .` HOẶC `git add -A` BỪA BÃI** vì sẽ kéo theo các file nhị phân trung gian sinh ra trong quá trình build.
+   - **BẮT BUỘC** `git add` đích danh từng file mã nguồn/tài liệu được sửa đổi (`.cs`, `.cshtml`, `.js`, `.css`, `.csproj`, `.sln`, `.xml`, `.config`, `.md`).
+   - Luôn chạy `git status` hoặc `git diff --cached --name-status` rà soát staging trước khi thực hiện commit.
 
 ---
 
@@ -2078,4 +2083,44 @@ Tại màn hình `http://crm.git/Cate/DigitalSalesWorkflow`:
 - [x] Đồng bộ Triple Mirroring và UTF-8 BOM.
 - [x] Biên dịch MSBuild thành công.
 - [x] Kiểm thử 4 tầng test suite PASS 100%.
+
+---
+
+# 2026-09-22 Quy định: Tuyệt đối không commit & push file trong thư mục bin và obj lên Git
+
+## 1. Mô tả yêu cầu
+- Người dùng yêu cầu: "note lại khi push code thì ko đẩy các file trong thư mục obj và bin".
+- Ghi nhận và thiết lập quy chuẩn nghiêm ngặt trên toàn bộ hệ thống tài liệu và quy tắc (`Gemini.md`, `Memory.md`, `.agents/rules/CODING_RULES.md`), đồng thời bổ sung file `.gitignore` để ngăn chặn triệt để.
+
+## 2. Phân tích nguyên nhân & Rủi ro
+- **Nguyên nhân**: Khi biên dịch bằng Visual Studio hoặc MSBuild, hệ thống tự động sinh hàng trăm file nhị phân trung gian và output trong các thư mục `bin/Debug`, `bin/Release`, `obj/Debug`, `obj/Release` (`*.dll`, `*.pdb`, `*.cache`, `*.FileListAbsolute.txt`...).
+- **Rủi ro**: Nếu lập trình viên hoặc AI dùng lệnh `git add .` hoặc `git add -A`, toàn bộ các file binary này sẽ bị đẩy lên remote repo, dẫn đến:
+  1. Dung lượng repository phình to bất thường.
+  2. Xung đột mã nguồn liên tục (merge conflicts trên binary dll/pdb).
+  3. Lộ mã nhị phân và cache không cần thiết trong lịch sử commit.
+
+## 3. Quy chuẩn & Giải pháp kỹ thuật áp dụng
+1. **Quy tắc bất biến trong CODING_RULES & Gemini.md**:
+   - CẤM commit và push bất kỳ file nào thuộc thư mục `bin/` và `obj/`.
+   - CẤM sử dụng `git add .` hoặc `git add -A` bừa bãi.
+   - BẮT BUỘC `git add` đích danh từng file mã nguồn cụ thể.
+   - BẮT BUỘC rà soát `git status` và `git diff --cached --name-status` trước khi `git commit`. Nếu lỡ stage nhầm, phải chạy `git reset HEAD <file>` để loại bỏ.
+2. **Thiết lập `.gitignore`**:
+   - Tạo file `.gitignore` chuẩn cho .NET Framework tại thư mục gốc repository (`D:\SVN\Bao-cao-SCT\.gitignore`) và thư mục Solution (`Source\ReportDeptTourismSolution\.gitignore`) loại trừ:
+     - `[Bb]in/`
+     - `[Oo]bj/`
+     - `packages/`
+     - `build.log`
+     - `*.suo`, `*.user`, `*.userosscache`, `*.sln.docstates`
+3. **Đồng bộ tri thức**:
+   - Cập nhật mục 9 trong `Gemini.md`.
+   - Cập nhật mục Source Control & Checklist trong `CODING_RULES.md`.
+   - Lưu trữ quyết định vào `Memory.md`.
+
+## 4. Checklist
+- [x] Cập nhật mục 9 "QUY TẮC BẮT BUỘC KHI COMMIT & PUSH CODE (ANTI-BIN/OBJ POLLUTION)" trong `Gemini.md`.
+- [x] Cập nhật `# Không được phép`, `# Source Control`, `# Checklist trước khi Commit` trong `.agents/rules/CODING_RULES.md`.
+- [x] Tạo file `.gitignore` tại root repo (`D:\SVN\Bao-cao-SCT\.gitignore`) và solution.
+- [x] Ghi nhận quyết định kiến trúc và quy chuẩn vào `Memory.md`.
+
 

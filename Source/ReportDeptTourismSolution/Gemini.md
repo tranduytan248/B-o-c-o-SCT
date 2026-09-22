@@ -325,3 +325,23 @@ Mỗi thay đổi mã nguồn trước khi bàn giao PHẢI đáp ứng:
 3. **Tầng 3 (DOM ID Collision):** Các trường nhập liệu trong Modal Add/Edit không trùng ID với trang cha.
 4. **Tầng 4 (Sys_Messages Coverage):** Mọi key `AppProcessor.Messagor.GetMessage("...")` đều tồn tại trong DB `Sys_Messages`.
 5. **Tầng 5 (Clean Code):** Không hardcode chuỗi tiếng Việt vào mã C#, không viết thẻ `<style>` nội tuyến trong `.cshtml`.
+
+---
+
+## 9. QUY TẮC BẮT BUỘC KHI COMMIT & PUSH CODE (ANTI-BIN/OBJ POLLUTION)
+
+> [!CAUTION]
+> **NGHIÊM CẤM PUSH CÁC FILE TRONG THƯ MỤC BIN VÀ OBJ LÊN GIT:**
+> 1. **CẤM TUYỆT ĐỐI** commit và push các tệp tin trong thư mục `bin/` và `obj/` (`*.dll`, `*.pdb`, `*.cache`, `*.FileListAbsolute.txt`...).
+> 2. **CẤM DÙNG `git add .` HOẶC `git add -A` BỪA BÃI:**
+>    - Thao tác này sẽ vô tình đưa hàng trăm MB file binary biên dịch vào Git repository, gây phình to repo và conflict nhánh.
+>    - **BẮT BUỘC** `git add` đích danh từng file mã nguồn cần commit:
+>      ```powershell
+>      # Ví dụ: Chỉ add file mã nguồn cụ thể
+>      git add Path/To/File.cs Path/To/View.cshtml Gemini.md Memory.md
+>      ```
+> 3. **KIỂM TRA BẮT BUỘC TRƯỚC KHI COMMIT:**
+>    - Luôn chạy lệnh `git status` hoặc `git diff --cached --name-status` để rà soát toàn bộ danh sách file đã stage.
+>    - Nếu phát hiện bất kỳ file nào nằm trong `bin/` hoặc `obj/`, phải lập tức unstage bằng `git reset HEAD <file>`.
+> 4. **CẤU HÌNH LOẠI TRỪ TRONG `.gitignore`:**
+>    - Duy trì tệp `.gitignore` chuẩn cho .NET Framework để tự động bỏ qua toàn bộ `[Bb]in/`, `[Oo]bj/`, `packages/`, `*.suo`, `*.user`, `build.log`.

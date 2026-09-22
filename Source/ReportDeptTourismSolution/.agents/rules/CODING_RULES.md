@@ -48,6 +48,10 @@ Mọi source code được AI hoặc lập trình viên tạo ra phải:
 
 ❌ Không sửa các file không liên quan.
 
+❌ Không bao giờ commit hoặc push các file trong thư mục `bin/` và `obj/` (`*.dll`, `*.pdb`, `*.cache`, `*.FileListAbsolute.txt`, v.v.).
+
+❌ Không dùng lệnh `git add .` hoặc `git add -A` bừa bãi vì sẽ kéo theo các file nhị phân và cache biên dịch trong `bin/` và `obj/` vào Git staging.
+
 ---
 
 # Quy tắc Encoding
@@ -84,8 +88,8 @@ AI phải:
 
 Không commit:
 
-- bin
-- obj
+- bin (tuyệt đối không commit các file `*.dll`, `*.pdb`, `*.cache`...)
+- obj (tuyệt đối không commit `*.cache`, `*.FileListAbsolute.txt`...)
 - publish
 - temp
 - backup
@@ -97,9 +101,16 @@ Không commit:
 - Token
 - Connection String Production
 
+### Quy tắc kiểm soát tệp bin/ và obj/ (Anti-Bin/Obj Git Pollution):
+- **CẤM TUYỆT ĐỐI** commit và push các tệp tin trong thư mục `bin/` và `obj/` (`*.dll`, `*.pdb`, `*.cache`, `*.FileListAbsolute.txt`...).
+- **CẤM DÙNG `git add .` HOẶC `git add -A` BỪA BÃI:**
+  - BẮT BUỘC dùng lệnh `git add` chỉ định đích danh từng tệp mã nguồn cần commit (ví dụ: `git add Path/To/File.cs Path/To/View.cshtml`).
+  - Trước khi commit, PHẢI chạy `git status` hoặc `git diff --cached --name-status` để kiểm tra danh sách staged files. Nếu có bất kỳ tệp nào thuộc `bin/` hay `obj/`, phải lập tức hủy stage bằng `git reset HEAD <file>`.
+  - Luôn duy trì tệp `.gitignore` chuẩn ở thư mục gốc repo và solution để chặn tự động các thư mục build.
+
 ### Quy tắc nhánh & Upcode Demo:
 - **CẤM TUYỆT ĐỐI tự động push hoặc merge sang nhánh `upcode-demo`!**
-- Mọi thao tác commit và push code hàng ngày **CHỈ ĐƯỢC PHÉP** thực hiện trên nhánh làm việc chính hiện tại (`crm_v2`).
+- Mọi thao tác commit và push code hàng ngày **CHỈ ĐƯỢC PHÉP** thực hiện trên nhánh làm việc chính hiện tại (`crm_v2` hoặc nhánh làm việc được chỉ định).
 - **CHỈ ĐƯỢC PHÉP** merge hoặc push sang nhánh `upcode-demo` KHI VÀ CHỈ KHI người dùng có yêu cầu rõ ràng bằng văn bản (ví dụ: *"upcode demo"*, *"đẩy lên demo"*, *"deploy demo"*).
 
 ---
@@ -147,3 +158,4 @@ Không log:
 - Không lỗi Encoding.
 - Không còn thẻ `<style>` nội tuyến trong file `.cshtml` (100% tách ra file `.css` cùng thư mục).
 - Không sửa file ngoài phạm vi.
+- Không có bất kỳ file nào trong thư mục `bin/` hoặc `obj/` nằm trong staged list (`git diff --cached --name-status`).
