@@ -1,7 +1,7 @@
 ﻿@model CenIT.ReportTourism.Models.Report.ReportDataImportModel
 <div class="form-group row">
-    @Html.TitleFor(model => model.FileImport, new { @class = "control-label" })
     <div class="col-md-12">
+        @Html.TitleFor(model => model.FileImport, new { @class = "control-label" })
         @Html.FileFor(model => model.FileImport, ".xlsx,.xls", false, new { @class = "col-md-12" })
         @Html.ValidationMessageFor(model => model.FileImport, "", new { @class = "text-danger" })
     </div>

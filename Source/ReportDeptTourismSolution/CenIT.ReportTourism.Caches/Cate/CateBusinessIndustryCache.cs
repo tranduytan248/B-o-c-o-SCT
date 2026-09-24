@@ -1,0 +1,84 @@
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using CenIT.ReportTourism.Biz.Cate;
+using CenIT.ReportTourism.Models.Cate;
+using CenIT.ReportTourism.Models.Sys;
+using TSFramework.Core.Members.Caching;
+using TSFramework.Core.Utils;
+
+namespace CenIT.ReportTourism.Caches.Cate
+{
+    [DataObject]
+    public class CateBusinessIndustryCache : CacheLayer
+    {
+        private CateBusinessIndustryBiz _businessIndustryApi;
+        private CateBusinessIndustryBiz Api => _businessIndustryApi ?? (_businessIndustryApi = new CateBusinessIndustryBiz());
+
+        protected override string[] MasterCacheKeyArray => new[] { "BusinessIndustryCache", "CENIT.APP.Cache" };
+
+        [DataObjectMethod(DataObjectMethodType.Select, true)]
+        public List<CateBusinessIndustryModel> Get(out int total, SysSearchModel search = null)
+        {
+            var objectKey = EHashMD5.FromObject(search);
+            var rawKey = string.Concat("ListBusinessIndustry-", objectKey);
+            var rawKeyTotal = string.Concat(rawKey, "-Total");
+            total = 0;
+            var cacheTotal = (int?)GetCacheItem(rawKeyTotal);
+            total = cacheTotal ?? 0;
+            
+            // See if the item is in the cache
+            if (GetCacheItem(rawKey) is List<CateBusinessIndustryModel> businessIndustry) return businessIndustry;
+            // Item not found in cache - retrieve it and insert it into the cache
+            businessIndustry = Api.Get(out total, search);
+            AddCacheItem(rawKey, businessIndustry);
+            AddCacheItem(rawKeyTotal, total);
+            return businessIndustry;
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Select, true)]
+        public List<CateBusinessIndustryModel> GetAll()
+        {
+            int total;
+            var rawKey = "AllBusinessIndustry";
+            // See if the item is in the cache
+            if (GetCacheItem(rawKey) is List<CateBusinessIndustryModel> businessIndustry) return businessIndustry;
+            // Item not found in cache - retrieve it and insert it into the cache
+            businessIndustry = Api.Get(out total, null);
+            AddCacheItem(rawKey, businessIndustry);
+            return businessIndustry;
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Update, false)]
+        public int? Save(CateBusinessIndustryModel model)
+        {
+            var industryid = Api.Save(model);
+            if (industryid > 0)
+                // Invalidate the cache
+                InvalidateCache();
+            return industryid;
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Select, false)]
+        public CateBusinessIndustryModel GetById(int? businessIndustryid)
+        {
+            if (businessIndustryid < 0) return null;
+            var rawKey = string.Concat("BusinessIndustryByID-", businessIndustryid);
+            // See if the item is in the cache
+            if (GetCacheItem(rawKey) is CateBusinessIndustryModel businessIndustry) return businessIndustry;
+            // Item not found in cache - retrieve it and insert it into the cache
+            businessIndustry = Api.GetById(businessIndustryid) ?? new CateBusinessIndustryModel();
+            AddCacheItem(rawKey, businessIndustry);
+            return businessIndustry;
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Delete, false)]
+        public bool Delete(CateBusinessIndustryModel model)
+        {
+            var isDeleted = Api.Delete(model);
+            if (isDeleted)
+                // Invalidate the cache
+                InvalidateCache();
+            return isDeleted;
+        }
+    }
+}

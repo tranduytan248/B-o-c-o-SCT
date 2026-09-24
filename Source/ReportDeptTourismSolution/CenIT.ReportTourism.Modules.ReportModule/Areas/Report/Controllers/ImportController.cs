@@ -42,18 +42,18 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 {
     public class ImportController : AppController
     {
-        private readonly SysConfigsCache _configCache;
-        private readonly CateEnterpriseCache _enterpriseCache;
+        private readonly SysConfigsCache _configCache = new SysConfigsCache();
+        private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
 
         private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Title");
-        private readonly ReportDataImportCache _importCache;
+        private readonly ReportDataImportCache _importCache = new ReportDataImportCache();
         private readonly string _importTile = AppProcessor.Messagor.GetMessage("ReportDataImport_Title");
-        private readonly CateNationalCache _nationalCache;
         private readonly CateBusinessProductCache _businessProductCache;
+        private readonly CateNationalCache _nationalCache = new CateNationalCache();
 
         private readonly string _templateImportPathFolder =
             ConfigurationManager.AppSettings["Modules_Report_TemplateImportFolderPath"] ??
-            @"/Contents/Modules/Report/Templates/";
+            "/Contents/Modules/Report/Templates/";
 
         #region Mapping
 
@@ -74,10 +74,14 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             //    (int)EnumTypeBusiness.TransportTourists,
             //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
             //},
-            //{
-            //    (int)EnumTypeBusiness.TouristAttraction,
-            //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
-            //}
+            {
+                (int)EnumTypeBusiness.Manufacturing,
+                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Manufacturing))
+            },
+            {
+                (int)EnumTypeBusiness.Trading,
+                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Trading))
+            }
         };
 
         #endregion
@@ -90,7 +94,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             _nationalCache = new CateNationalCache();
             _businessProductCache = new CateBusinessProductCache();
         }
-
         // GET: Cate/ReportDataImport
         public ActionResult Index()
         {
@@ -1658,7 +1661,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             }
 
             var enterprises = _enterpriseCache.GetViaUser(User.UserName) ?? new List<CateEnterpriseModel>();
-            if (!enterprises.Any(x => x.EnterpriseId == enterpriseId.Value))
+            if (enterprises.All(x => x.EnterpriseId != enterpriseId.Value))
             {
                 return PartialView("_BusinessProductReport", products);
             }
@@ -2105,7 +2108,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         private readonly string _signedFilesPathFolder =
             ConfigurationManager.AppSettings["Modules_Sys_SignedDoc_FolderPath"] ??
-            @"/Contents/Modules/Report/ReportSignedDocs/";
+            "/Contents/Modules/Report/ReportSignedDocs/";
 
         #endregion
 

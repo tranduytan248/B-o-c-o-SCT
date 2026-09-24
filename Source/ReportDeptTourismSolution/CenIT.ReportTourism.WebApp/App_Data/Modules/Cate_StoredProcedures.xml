@@ -1,156 +1,182 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Provider xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <StoredProcedures ProviderName="SysProvider">
+     <StoredProcedures ProviderName="SysProvider">
 
-    <Procedure Name="Cate_Province_Delete" Value="p_Cate_Province_Delete" />
-    <Procedure Name="Cate_Province_Get" Value="p_Cate_Province_Get" />
-    <Procedure Name="Cate_Province_GetById" Value="p_Cate_Province_GetById" />
-    <Procedure Name="Cate_Province_Save" Value="p_Cate_Province_Save" />
-    <Procedure Name="Cate_Province_GetViaWardId" Value="p_Cate_Province_GetViaWardId" />
+          <Procedure Name="Cate_Province_Delete" Value="p_Cate_Province_Delete" />
+          <Procedure Name="Cate_Province_Get" Value="p_Cate_Province_Get" />
+          <Procedure Name="Cate_Province_GetById" Value="p_Cate_Province_GetById" />
+          <Procedure Name="Cate_Province_Save" Value="p_Cate_Province_Save" />
+          <Procedure Name="Cate_Province_GetViaWardId" Value="p_Cate_Province_GetViaWardId" />
 
-    <Procedure Name="Cate_Street_Delete" Value="p_Cate_Street_Delete" />
-    <Procedure Name="Cate_Street_Get" Value="p_Cate_Street_Get" />
-    <Procedure Name="Cate_Street_GetById" Value="p_Cate_Street_GetById" />
-    <Procedure Name="Cate_Street_Save" Value="p_Cate_Street_Save" />
-    <Procedure Name="Cate_Street_GetByWard" Value="p_Cate_Street_GetByWard" />
+          <Procedure Name="Cate_Street_Delete" Value="p_Cate_Street_Delete" />
+          <Procedure Name="Cate_Street_Get" Value="p_Cate_Street_Get" />
+          <Procedure Name="Cate_Street_GetById" Value="p_Cate_Street_GetById" />
+          <Procedure Name="Cate_Street_Save" Value="p_Cate_Street_Save" />
+          <Procedure Name="Cate_Street_GetByWard" Value="p_Cate_Street_GetByWard" />
 
-    <Procedure Name="Cate_Ward_Delete" Value="p_Cate_Ward_Delete" />
-    <Procedure Name="Cate_Ward_Get" Value="p_Cate_Ward_Get" />
-    <Procedure Name="Cate_Ward_GetById" Value="p_Cate_Ward_GetById" />
-    <Procedure Name="Cate_Ward_Save" Value="p_Cate_Ward_Save" />
-    <Procedure Name="Cate_Ward_GetByProvinceId" Value="p_Cate_Ward_GetByProvinceId" />
-    <Procedure Name="Cate_Ward_GetByStreetId" Value="p_Cate_Ward_GetByStreetId" />
+          <Procedure Name="Cate_Ward_Delete" Value="p_Cate_Ward_Delete" />
+          <Procedure Name="Cate_Ward_Get" Value="p_Cate_Ward_Get" />
+          <Procedure Name="Cate_Ward_GetById" Value="p_Cate_Ward_GetById" />
+          <Procedure Name="Cate_Ward_Save" Value="p_Cate_Ward_Save" />
+          <Procedure Name="Cate_Ward_GetByProvinceId" Value="p_Cate_Ward_GetByProvinceId" />
+          <Procedure Name="Cate_Ward_GetByStreetId" Value="p_Cate_Ward_GetByStreetId" />
 
-    <Procedure Name="Cate_Team_Delete" Value="p_Cate_Team_Delete" />
-    <Procedure Name="Cate_Team_Get" Value="p_Cate_Team_Get" />
-    <Procedure Name="Cate_Team_GetById" Value="p_Cate_Team_GetById" />
-    <Procedure Name="Cate_Team_Save" Value="p_Cate_Team_Save" />
-    <Procedure Name="Cate_Team_GetByWardId" Value="Cate_Team_GetByWardId" />
+          <Procedure Name="Cate_Team_Delete" Value="p_Cate_Team_Delete" />
+          <Procedure Name="Cate_Team_Get" Value="p_Cate_Team_Get" />
+          <Procedure Name="Cate_Team_GetById" Value="p_Cate_Team_GetById" />
+          <Procedure Name="Cate_Team_Save" Value="p_Cate_Team_Save" />
+          <Procedure Name="Cate_Team_GetByWardId" Value="Cate_Team_GetByWardId" />
 
-    <Procedure Name="Cate_National_Get" Value="p_Cate_National_Get" />
-    <Procedure Name="Cate_National_Save" Value="p_Cate_National_Save" />
-    <Procedure Name="Cate_National_Delete" Value="p_Cate_National_Delete" />
-    <Procedure Name="Cate_National_GetByID" Value="p_Cate_National_GetByID" />
+          <Procedure Name="Cate_National_Get" Value="p_Cate_National_Get" />
+          <Procedure Name="Cate_National_Save" Value="p_Cate_National_Save" />
+          <Procedure Name="Cate_National_Delete" Value="p_Cate_National_Delete" />
+          <Procedure Name="Cate_National_GetByID" Value="p_Cate_National_GetByID" />
 
-    <Procedure Name="Cate_Enterprises_Get" Value="p_Cate_Enterprises_Get" />
-    <Procedure Name="Cate_Enterprises_Save" Value="p_Cate_Enterprises_Save" />
-    <Procedure Name="Cate_Enterprises_Delete" Value="p_Cate_Enterprises_Delete" />
-    <Procedure Name="Cate_Enterprises_GetByID" Value="p_Cate_Enterprises_GetByID" />
-    <Procedure Name="Cate_Enterprises_SaveDocs" Value="p_Cate_Enterprises_SaveDocs" />
-    <Procedure Name="Cate_Enterprises_ChangeStatus" Value="p_Cate_Enterprises_ChangeStatus" />
-    <Procedure Name="Cate_Enterprises_GetViaUser" Value="p_Cate_Enterprises_GetViaUser" />
-    <Procedure Name="Cate_Enterprises_GetNotSumitReportYet" Value="p_Cate_Enterprises_GetNotSumitReportYet" />
-    <Procedure Name="Cate_Enterprises_Import" Value="p_Cate_Enterprises_Import" />
-    <Procedure Name="Cate_Enterprises_Search" Value="p_Cate_Enterprises_Search" />
-    <Procedure Name="Cate_Enterprises_Register" Value="p_Cate_Enterprises_Register" />
+          <Procedure Name="Cate_Enterprises_Get" Value="p_Cate_Enterprises_Get" />
+          <Procedure Name="Cate_Enterprises_Save" Value="p_Cate_Enterprises_Save" />
+          <Procedure Name="Cate_Enterprises_Delete" Value="p_Cate_Enterprises_Delete" />
+          <Procedure Name="Cate_Enterprises_GetByID" Value="p_Cate_Enterprises_GetByID" />
+          <Procedure Name="Cate_Enterprises_SaveDocs" Value="p_Cate_Enterprises_SaveDocs" />
+          <Procedure Name="Cate_Enterprises_ChangeStatus" Value="p_Cate_Enterprises_ChangeStatus" />
+          <Procedure Name="Cate_Enterprises_GetViaUser" Value="p_Cate_Enterprises_GetViaUser" />
+          <Procedure Name="Cate_Enterprises_GetNotSumitReportYet" Value="p_Cate_Enterprises_GetNotSumitReportYet" />
+          <Procedure Name="Cate_Enterprises_Import" Value="p_Cate_Enterprises_Import" />
+          <Procedure Name="Cate_Enterprises_Search" Value="p_Cate_Enterprises_Search" />
+          <Procedure Name="Cate_Enterprises_Register" Value="p_Cate_Enterprises_Register" />
 
-    <Procedure Name="Cate_EnterpriseRegisterNotifies_Get" Value="p_Cate_EnterpriseRegisterNotifies_Get" />
-    <Procedure Name="Cate_EnterpriseRegisterNotifies_Save" Value="p_Cate_EnterpriseRegisterNotifies_Save" />
-    <Procedure Name="Cate_EnterpriseRegisterNotifies_GetByID" Value="p_Cate_EnterpriseRegisterNotifies_GetByID" />
+          <Procedure Name="Cate_EnterpriseRegisterNotifies_Get" Value="p_Cate_EnterpriseRegisterNotifies_Get" />
+          <Procedure Name="Cate_EnterpriseRegisterNotifies_Save" Value="p_Cate_EnterpriseRegisterNotifies_Save" />
+          <Procedure Name="Cate_EnterpriseRegisterNotifies_GetByID" Value="p_Cate_EnterpriseRegisterNotifies_GetByID" />
 
-    <Procedure Name="Cate_PublicCates_Get" Value="p_Cate_PublicCates_Get" />
-    <Procedure Name="Cate_PublicCates_Save" Value="p_Cate_PublicCates_Save" />
-    <Procedure Name="Cate_PublicCates_Delete" Value="p_Cate_PublicCates_Delete" />
-    <Procedure Name="Cate_PublicCates_GetByID" Value="p_Cate_PublicCates_GetByID" />
+          <Procedure Name="Cate_PublicCates_Get" Value="p_Cate_PublicCates_Get" />
+          <Procedure Name="Cate_PublicCates_Save" Value="p_Cate_PublicCates_Save" />
+          <Procedure Name="Cate_PublicCates_Delete" Value="p_Cate_PublicCates_Delete" />
+          <Procedure Name="Cate_PublicCates_GetByID" Value="p_Cate_PublicCates_GetByID" />
 
-    <Procedure Name="Cate_Docs_Delete" Value="p_Cate_Docs_Delete" />
-    <Procedure Name="Cate_Docs_GetByID" Value="p_Cate_Docs_GetByID" />
-    <Procedure Name="Cate_AccommodationServices_SaveCertificates" Value="p_Cate_AccommodationServices_SaveCertificates" />
-    <Procedure Name="Cate_AccommodationServices_GetCertificates" Value="p_Cate_AccommodationServices_GetCertificates" />
-    <Procedure Name="Cate_AccommodationServices_GetInfrastructures"
-               Value="p_Cate_AccommodationServices_GetInfrastructures" />
-    <Procedure Name="Cate_AccommodationServices_SaveInfrastructures"
-               Value="p_Cate_AccommodationServices_SaveInfrastructures" />
-    <Procedure Name="Cate_AccommodationServices_GetHRInformations"
-               Value="p_Cate_AccommodationServices_GetHRInformations" />
-    <Procedure Name="Cate_AccommodationServices_SaveHRInformations"
-               Value="p_Cate_AccommodationServices_SaveHRInformations" />
-    <Procedure Name="Cate_AccommodationServices_GetInfo" Value="p_Cate_AccommodationServices_GetInfo" />
-    <Procedure Name="Cate_AccommodationServices_SaveInfo" Value="p_Cate_AccommodationServices_SaveInfo" />
+          <Procedure Name="Cate_Docs_Delete" Value="p_Cate_Docs_Delete" />
+          <Procedure Name="Cate_Docs_GetByID" Value="p_Cate_Docs_GetByID" />
+          <Procedure Name="Cate_AccommodationServices_SaveCertificates" Value="p_Cate_AccommodationServices_SaveCertificates" />
+          <Procedure Name="Cate_AccommodationServices_GetCertificates" Value="p_Cate_AccommodationServices_GetCertificates" />
+          <Procedure Name="Cate_AccommodationServices_GetInfrastructures"
+                     Value="p_Cate_AccommodationServices_GetInfrastructures" />
+          <Procedure Name="Cate_AccommodationServices_SaveInfrastructures"
+                     Value="p_Cate_AccommodationServices_SaveInfrastructures" />
+          <Procedure Name="Cate_AccommodationServices_GetHRInformations"
+                     Value="p_Cate_AccommodationServices_GetHRInformations" />
+          <Procedure Name="Cate_AccommodationServices_SaveHRInformations"
+                     Value="p_Cate_AccommodationServices_SaveHRInformations" />
+          <Procedure Name="Cate_AccommodationServices_GetInfo" Value="p_Cate_AccommodationServices_GetInfo" />
+          <Procedure Name="Cate_AccommodationServices_SaveInfo" Value="p_Cate_AccommodationServices_SaveInfo" />
 
-    <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_Get"
-               Value="p_Cate_AccommodationServices_Infrastructures_Rooms_Get" />
-    <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_Save"
-               Value="p_Cate_AccommodationServices_Infrastructures_Rooms_Save" />
-    <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_Delete"
-               Value="p_Cate_AccommodationServices_Infrastructures_Rooms_Delete" />
-    <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_GetByID"
-               Value="p_Cate_AccommodationServices_Infrastructures_Rooms_GetByID" />
+          <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_Get"
+                     Value="p_Cate_AccommodationServices_Infrastructures_Rooms_Get" />
+          <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_Save"
+                     Value="p_Cate_AccommodationServices_Infrastructures_Rooms_Save" />
+          <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_Delete"
+                     Value="p_Cate_AccommodationServices_Infrastructures_Rooms_Delete" />
+          <Procedure Name="Cate_AccommodationServices_Infrastructures_Rooms_GetByID"
+                     Value="p_Cate_AccommodationServices_Infrastructures_Rooms_GetByID" />
 
-    <Procedure Name="Cate_AccommodationServices_TypeServices_Get" Value="p_Cate_AccommodationServices_TypeServices_Get" />
-    <Procedure Name="Cate_AccommodationServices_TypeServices_Save"
-               Value="p_Cate_AccommodationServices_TypeServices_Save" />
-    <Procedure Name="Cate_AccommodationServices_TypeServices_Delete"
-               Value="p_Cate_AccommodationServices_TypeServices_Delete" />
-    <Procedure Name="Cate_AccommodationServices_TypeServices_GetByID"
-               Value="p_Cate_AccommodationServices_TypeServices_GetByID" />
+          <Procedure Name="Cate_AccommodationServices_TypeServices_Get" Value="p_Cate_AccommodationServices_TypeServices_Get" />
+          <Procedure Name="Cate_AccommodationServices_TypeServices_Save"
+                     Value="p_Cate_AccommodationServices_TypeServices_Save" />
+          <Procedure Name="Cate_AccommodationServices_TypeServices_Delete"
+                     Value="p_Cate_AccommodationServices_TypeServices_Delete" />
+          <Procedure Name="Cate_AccommodationServices_TypeServices_GetByID"
+                     Value="p_Cate_AccommodationServices_TypeServices_GetByID" />
 
-    <Procedure Name="Cate_TravelingServices_SaveCertificates" Value="p_Cate_TravelingServices_SaveCertificates" />
-    <Procedure Name="Cate_TravelingServices_GetCertificates" Value="p_Cate_TravelingServices_GetCertificates" />
-    <Procedure Name="Cate_TravelingServices_SaveCertificateTravelEscrows"
-               Value="p_Cate_TravelingServices_SaveCertificateTravelEscrows" />
-    <Procedure Name="Cate_TravelingServices_GetCertificateTravelEscrows"
-               Value="p_Cate_TravelingServices_GetCertificateTravelEscrows" />
-    <Procedure Name="Cate_TravelingServices_GetHRInformations" Value="p_Cate_TravelingServices_GetHRInformations" />
-    <Procedure Name="Cate_TravelingServices_SaveHRInformations" Value="p_Cate_TravelingServices_SaveHRInformations" />
+          <Procedure Name="Cate_TravelingServices_SaveCertificates" Value="p_Cate_TravelingServices_SaveCertificates" />
+          <Procedure Name="Cate_TravelingServices_GetCertificates" Value="p_Cate_TravelingServices_GetCertificates" />
+          <Procedure Name="Cate_TravelingServices_SaveCertificateTravelEscrows"
+                     Value="p_Cate_TravelingServices_SaveCertificateTravelEscrows" />
+          <Procedure Name="Cate_TravelingServices_GetCertificateTravelEscrows"
+                     Value="p_Cate_TravelingServices_GetCertificateTravelEscrows" />
+          <Procedure Name="Cate_TravelingServices_GetHRInformations" Value="p_Cate_TravelingServices_GetHRInformations" />
+          <Procedure Name="Cate_TravelingServices_SaveHRInformations" Value="p_Cate_TravelingServices_SaveHRInformations" />
 
-    <Procedure Name="Cate_TravelingServices_BranchOffices_Get" Value="p_Cate_TravelingServices_BranchOffices_Get" />
-    <Procedure Name="Cate_TravelingServices_BranchOffices_Save" Value="p_Cate_TravelingServices_BranchOffices_Save" />
-    <Procedure Name="Cate_TravelingServices_BranchOffices_Delete" Value="p_Cate_TravelingServices_BranchOffices_Delete" />
-    <Procedure Name="Cate_TravelingServices_BranchOffices_GetByID"
-               Value="p_Cate_TravelingServices_BranchOffices_GetByID" />
+          <Procedure Name="Cate_TravelingServices_BranchOffices_Get" Value="p_Cate_TravelingServices_BranchOffices_Get" />
+          <Procedure Name="Cate_TravelingServices_BranchOffices_Save" Value="p_Cate_TravelingServices_BranchOffices_Save" />
+          <Procedure Name="Cate_TravelingServices_BranchOffices_Delete" Value="p_Cate_TravelingServices_BranchOffices_Delete" />
+          <Procedure Name="Cate_TravelingServices_BranchOffices_GetByID"
+                     Value="p_Cate_TravelingServices_BranchOffices_GetByID" />
 
-    <Procedure Name="Cate_TransportTouristsServices_SaveCertificates"
-               Value="p_Cate_TransportTouristsServices_SaveCertificates" />
-    <Procedure Name="Cate_TransportTouristsServices_GetCertificates"
-               Value="p_Cate_TransportTouristsServices_GetCertificates" />
-    <Procedure Name="Cate_TransportTouristsServices_GetHRInformations"
-               Value="p_Cate_TransportTouristsServices_GetHRInformations" />
-    <Procedure Name="Cate_TransportTouristsServices_SaveHRInformations"
-               Value="p_Cate_TransportTouristsServices_SaveHRInformations" />
-    <Procedure Name="Cate_TransportTouristsServices_GetInfrastructures"
-               Value="p_Cate_TransportTouristsServices_GetInfrastructures" />
-    <Procedure Name="Cate_TransportTouristsServices_SaveInfrastructures"
-               Value="p_Cate_TransportTouristsServices_SaveInfrastructures" />
+          <Procedure Name="Cate_TransportTouristsServices_SaveCertificates"
+                     Value="p_Cate_TransportTouristsServices_SaveCertificates" />
+          <Procedure Name="Cate_TransportTouristsServices_GetCertificates"
+                     Value="p_Cate_TransportTouristsServices_GetCertificates" />
+          <Procedure Name="Cate_TransportTouristsServices_GetHRInformations"
+                     Value="p_Cate_TransportTouristsServices_GetHRInformations" />
+          <Procedure Name="Cate_TransportTouristsServices_SaveHRInformations"
+                     Value="p_Cate_TransportTouristsServices_SaveHRInformations" />
+          <Procedure Name="Cate_TransportTouristsServices_GetInfrastructures"
+                     Value="p_Cate_TransportTouristsServices_GetInfrastructures" />
+          <Procedure Name="Cate_TransportTouristsServices_SaveInfrastructures"
+                     Value="p_Cate_TransportTouristsServices_SaveInfrastructures" />
 
-    <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_Get"
-               Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Get" />
-    <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_Save"
-               Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Save" />
-    <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_Delete"
-               Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Delete" />
-    <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_GetByID"
-               Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_GetByID" />
+          <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_Get"
+                     Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Get" />
+          <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_Save"
+                     Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Save" />
+          <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_Delete"
+                     Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Delete" />
+          <Procedure Name="Cate_TransportTouristsServices_Infrastructures_ClassTransports_GetByID"
+                     Value="p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_GetByID" />
 
-    <Procedure Name="Cate_TouristAttractions_SaveCertificates" Value="p_Cate_TouristAttractions_SaveCertificates" />
-    <Procedure Name="Cate_TouristAttractions_GetCertificates" Value="p_Cate_TouristAttractions_GetCertificates" />
-    <Procedure Name="Cate_TouristAttractions_GetHRInformations" Value="p_Cate_TouristAttractions_GetHRInformations" />
-    <Procedure Name="Cate_TouristAttractions_SaveHRInformations" Value="p_Cate_TouristAttractions_SaveHRInformations" />
-    <Procedure Name="Cate_TouristAttractions_GetInfrastructures" Value="p_Cate_TouristAttractions_GetInfrastructures" />
-    <Procedure Name="Cate_TouristAttractions_SaveInfrastructures" Value="p_Cate_TouristAttractions_SaveInfrastructures" />
-    <Procedure Name="Cate_TouristAttractions_GetInfo" Value="p_Cate_TouristAttractions_GetInfo" />
-    <Procedure Name="Cate_TouristAttractions_SaveInfo" Value="p_Cate_TouristAttractions_SaveInfo" />
+          <Procedure Name="Cate_TouristAttractions_SaveCertificates" Value="p_Cate_TouristAttractions_SaveCertificates" />
+          <Procedure Name="Cate_TouristAttractions_GetCertificates" Value="p_Cate_TouristAttractions_GetCertificates" />
+          <Procedure Name="Cate_TouristAttractions_GetHRInformations" Value="p_Cate_TouristAttractions_GetHRInformations" />
+          <Procedure Name="Cate_TouristAttractions_SaveHRInformations" Value="p_Cate_TouristAttractions_SaveHRInformations" />
+          <Procedure Name="Cate_TouristAttractions_GetInfrastructures" Value="p_Cate_TouristAttractions_GetInfrastructures" />
+          <Procedure Name="Cate_TouristAttractions_SaveInfrastructures" Value="p_Cate_TouristAttractions_SaveInfrastructures" />
+          <Procedure Name="Cate_TouristAttractions_GetInfo" Value="p_Cate_TouristAttractions_GetInfo" />
+          <Procedure Name="Cate_TouristAttractions_SaveInfo" Value="p_Cate_TouristAttractions_SaveInfo" />
 
-    <Procedure Name="Cate_TouristAttractions_TypeServices_Get" Value="p_Cate_TouristAttractions_TypeServices_Get" />
-    <Procedure Name="Cate_TouristAttractions_TypeServices_Save" Value="p_Cate_TouristAttractions_TypeServices_Save" />
-    <Procedure Name="Cate_TouristAttractions_TypeServices_Delete" Value="p_Cate_TouristAttractions_TypeServices_Delete" />
-    <Procedure Name="Cate_TouristAttractions_TypeServices_GetByID"
-               Value="p_Cate_TouristAttractions_TypeServices_GetByID" />
+          <Procedure Name="Cate_TouristAttractions_TypeServices_Get" Value="p_Cate_TouristAttractions_TypeServices_Get" />
+          <Procedure Name="Cate_TouristAttractions_TypeServices_Save" Value="p_Cate_TouristAttractions_TypeServices_Save" />
+          <Procedure Name="Cate_TouristAttractions_TypeServices_Delete" Value="p_Cate_TouristAttractions_TypeServices_Delete" />
+          <Procedure Name="Cate_TouristAttractions_TypeServices_GetByID"
+                     Value="p_Cate_TouristAttractions_TypeServices_GetByID" />
 
-    <Procedure Name="Cate_ServicesForTourists_SaveCertificates" Value="p_Cate_ServicesForTourists_SaveCertificates" />
-    <Procedure Name="Cate_ServicesForTourists_GetCertificates" Value="p_Cate_ServicesForTourists_GetCertificates" />
-    <Procedure Name="Cate_ServicesForTourists_GetHRInformations" Value="p_Cate_ServicesForTourists_GetHRInformations" />
-    <Procedure Name="Cate_ServicesForTourists_SaveHRInformations" Value="p_Cate_ServicesForTourists_SaveHRInformations" />
-    <Procedure Name="Cate_ServicesForTourists_GetInfrastructures" Value="p_Cate_ServicesForTourists_GetInfrastructures" />
-    <Procedure Name="Cate_ServicesForTourists_SaveInfrastructures"
-               Value="p_Cate_ServicesForTourists_SaveInfrastructures" />
-    <Procedure Name="Cate_ServicesForTourists_GetInfo" Value="p_Cate_ServicesForTourists_GetInfo" />
-    <Procedure Name="Cate_ServicesForTourists_SaveInfo" Value="p_Cate_ServicesForTourists_SaveInfo" />
+          <Procedure Name="Cate_ServicesForTourists_SaveCertificates" Value="p_Cate_ServicesForTourists_SaveCertificates" />
+          <Procedure Name="Cate_ServicesForTourists_GetCertificates" Value="p_Cate_ServicesForTourists_GetCertificates" />
+          <Procedure Name="Cate_ServicesForTourists_GetHRInformations" Value="p_Cate_ServicesForTourists_GetHRInformations" />
+          <Procedure Name="Cate_ServicesForTourists_SaveHRInformations" Value="p_Cate_ServicesForTourists_SaveHRInformations" />
+          <Procedure Name="Cate_ServicesForTourists_GetInfrastructures" Value="p_Cate_ServicesForTourists_GetInfrastructures" />
+          <Procedure Name="Cate_ServicesForTourists_SaveInfrastructures"
+                     Value="p_Cate_ServicesForTourists_SaveInfrastructures" />
+          <Procedure Name="Cate_ServicesForTourists_GetInfo" Value="p_Cate_ServicesForTourists_GetInfo" />
+          <Procedure Name="Cate_ServicesForTourists_SaveInfo" Value="p_Cate_ServicesForTourists_SaveInfo" />
 
-    <Procedure Name="Cate_EnterprisePermissions_Get" Value="p_Cate_EnterprisePermissions_Get" />
-    <Procedure Name="Cate_EnterprisePermissions_Detele" Value="p_Cate_EnterprisePermissions_Detele" />
-    <Procedure Name="Cate_EnterprisePermissions_Save" Value="p_Cate_EnterprisePermissions_Save" />
-  </StoredProcedures>
+          <Procedure Name="Cate_EnterprisePermissions_Get" Value="p_Cate_EnterprisePermissions_Get" />
+          <Procedure Name="Cate_EnterprisePermissions_Detele" Value="p_Cate_EnterprisePermissions_Detele" />
+          <Procedure Name="Cate_EnterprisePermissions_Save" Value="p_Cate_EnterprisePermissions_Save" />
+
+          <Procedure Name="Cate_BusinessIndustry_Get" Value="p_Cate_BusinessIndustry_Get" />
+          <Procedure Name="Cate_BusinessIndustry_Save" Value="p_Cate_BusinessIndustry_Save" />
+          <Procedure Name="Cate_BusinessIndustry_Delete" Value="p_Cate_BusinessIndustry_Delete" />
+          <Procedure Name="Cate_BusinessIndustry_GetByID" Value="p_Cate_BusinessIndustry_GetByID" />
+
+          <Procedure Name="Cate_BusinessProduct_Get" Value="p_Cate_BusinessProduct_Get" />
+          <Procedure Name="Cate_BusinessProduct_Save" Value="p_Cate_BusinessProduct_Save" />
+          <Procedure Name="Cate_BusinessProduct_Delete" Value="p_Cate_BusinessProduct_Delete" />
+          <Procedure Name="Cate_BusinessProduct_GetByID" Value="p_Cate_BusinessProduct_GetByID" />
+
+          <Procedure Name="Cate_EconomicSector_Get" Value="p_Cate_EconomicSector_Get" />
+          <Procedure Name="Cate_EconomicSector_Save" Value="p_Cate_EconomicSector_Save" />
+          <Procedure Name="Cate_EconomicSector_Delete" Value="p_Cate_EconomicSector_Delete" />
+          <Procedure Name="Cate_EconomicSector_GetByID" Value="p_Cate_EconomicSector_GetByID" />
+
+          <Procedure Name="Cate_EnterpriseStatus_Get" Value="p_Cate_EnterpriseStatus_Get" />
+          <Procedure Name="Cate_EnterpriseStatus_Save" Value="p_Cate_EnterpriseStatus_Save" />
+          <Procedure Name="Cate_EnterpriseStatus_Delete" Value="p_Cate_EnterpriseStatus_Delete" />
+          <Procedure Name="Cate_EnterpriseStatus_GetByID" Value="p_Cate_EnterpriseStatus_GetByID" />
+
+          <Procedure Name="Cate_EnterpriseType_Get" Value="p_Cate_EnterpriseType_Get" />
+          <Procedure Name="Cate_EnterpriseType_Save" Value="p_Cate_EnterpriseType_Save" />
+          <Procedure Name="Cate_EnterpriseType_Delete" Value="p_Cate_EnterpriseType_Delete" />
+          <Procedure Name="Cate_EnterpriseType_GetByID" Value="p_Cate_EnterpriseType_GetByID" />
+          
+     </StoredProcedures>
 
 </Provider>

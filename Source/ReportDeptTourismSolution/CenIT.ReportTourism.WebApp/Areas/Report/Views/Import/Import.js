@@ -110,18 +110,18 @@ function initTableDataImport() {
                             "&onMonth=" +
                             moment(row.ForMonth).format("YYYY-MM-DD"),
                             "",
-                            "Xem dữ liệu import",
+                            "Xem dữ liệu báo cáo",
                             "1024px");
 
-                        html += _renderButton(false,
-                            "DownloadSignedDoc",
-                            "fa fa-cloud-download btn bg-teal btn-form",
-                            "/Report/Import/DownloadSignedDoc?enterpriseId=" +
-                            row.EnterpriseId +
-                            "&onMonth=" +
-                            moment(row.ForMonth).format("YYYY-MM-DD"),
-                            "",
-                            "Tải báo cáo đã ký số");
+                        //html += _renderButton(false,
+                        //    "DownloadSignedDoc",
+                        //    "fa fa-cloud-download btn bg-teal btn-form",
+                        //    "/Report/Import/DownloadSignedDoc?enterpriseId=" +
+                        //    row.EnterpriseId +
+                        //    "&onMonth=" +
+                        //    moment(row.ForMonth).format("YYYY-MM-DD"),
+                        //    "",
+                        //    "Tải báo cáo đã ký số");
 
                         if (row.CanDelete) {
                             html += _renderButton(true,
