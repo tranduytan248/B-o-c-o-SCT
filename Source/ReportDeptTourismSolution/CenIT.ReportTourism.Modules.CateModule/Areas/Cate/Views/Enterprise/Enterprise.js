@@ -32,6 +32,12 @@ function initTableEnterprise() {
                         ? $("#Search select#ListWardId").val()
                         : "";
                 },
+                "TypeBusinessIds": function () {
+                    return $("#Search select#ListTypeBusinessId").val() != null &&
+                        $("#Search select#ListTypeBusinessId").val().length > 0
+                        ? $("#Search select#ListTypeBusinessId").val()
+                        : "";
+                },
                 "MainIndustryIds": function () {
                     return $("#Search select#ListMainIndustryId").val() != null &&
                         $("#Search select#ListMainIndustryId").val().length > 0

@@ -668,6 +668,12 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             dataImport.Columns.Add("TaxCode");
             dataImport.Columns.Add("OwnerEnterpriseName");
             dataImport.Columns.Add("BusinessName");
+            //
+            dataImport.Columns.Add("TypeBusinessName");
+            dataImport.Columns.Add("MainIndustryName");
+            dataImport.Columns.Add("EconomicSectorName");
+            dataImport.Columns.Add("EnterpriseTypeName");
+            //
             dataImport.Columns.Add("BusinessAddress");
             dataImport.Columns.Add("StreetName");
             dataImport.Columns.Add("WardName");

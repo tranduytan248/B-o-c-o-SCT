@@ -25,6 +25,8 @@
                Value="p_Report_Reports_02_ThongKeQuocTichKhachDuLich" />
     <Procedure Name="Report_Reports_03_DoanhNghiepChuaGuiBaoCao"
                Value="p_Report_Reports_03_DoanhNghiepChuaGuiBaoCao" />
+    <Procedure Name="Report_Reports_04_BaoCaoHoatDongDoanhNghiep"
+               Value="p_Report_Reports_04_BaoCaoHoatDongDoanhNghiep" />
 
     <Procedure Name="Report_Dashboard_StatisticEnterprise" Value="p_Report_Dashboard_StatisticEnterprise" />
     <Procedure Name="Report_Dashboard_StatisticTypeBusiness" Value="p_Report_Dashboard_StatisticTypeBusiness" />

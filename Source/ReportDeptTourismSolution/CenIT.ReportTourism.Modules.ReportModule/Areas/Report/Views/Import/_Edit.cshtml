@@ -105,22 +105,6 @@ type="text/css"
     }
 
     <script src="~/Areas/Report/Views/Import/_ReportBody.js"></script>
-    @{
-        if (Model.TypeReport == EnumTypeBusiness.Accommodation)
-        {
-            <script src="~/Areas/Report/Views/Import/_AccommodationService.js"></script>
-        }
-        else if (Model.TypeReport == EnumTypeBusiness.Traveling
-                 || Model.TypeReport == EnumTypeBusiness.TransportTourists)
-        {
-            <script src="~/Areas/Report/Views/Import/_TravelingService.js"></script>
-        }
-        else if (Model.TypeReport == EnumTypeBusiness.ServicesForTourists
-                 || Model.TypeReport == EnumTypeBusiness.TouristAttraction)
-        {
-            <script src="~/Areas/Report/Views/Import/_TouristAttractionService.js"></script>
-        }
-    }
 
     <script type="text/javascript">
         $('form#EditReport').ajaxForm({
