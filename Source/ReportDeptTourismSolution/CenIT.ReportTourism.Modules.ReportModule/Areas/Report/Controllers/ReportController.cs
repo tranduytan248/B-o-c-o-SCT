@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
+using System.Linq;
 using System.Web.Mvc;
+using CenIT.ReportTourism.Caches.Cate;
 using CenIT.ReportTourism.Core.Apps;
 using CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models;
 using CenIT.ReportTourism.Modules.ReportModule.Processor;
@@ -13,6 +15,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
     public class ReportController : AppController
     {
         private readonly string _reportTitle = AppProcessor.Messagor.GetMessage("Report_Title");
+        private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
 
         public ActionResult Index()
         {
@@ -36,6 +39,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ViewName = pReport.ViewName,
                 Reporter = User.FullName
             };
+            var enterprise = _enterpriseCache.GetViaUser(User.UserName).FirstOrDefault();
+            ViewBag.EnterpriseId = enterprise?.EnterpriseId;
+            ViewBag.EnterpriseName = enterprise?.BusinessName ?? User.FullName;
+            ViewBag.TaxCode = enterprise?.TaxCode ?? string.Empty;
             return await Task.Run(() => PartialView("_Report", reportModel));
         }
 

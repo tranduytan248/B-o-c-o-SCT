@@ -81,12 +81,12 @@ function initTableViewDataImport() {
                 "class": "text-center",
                 "defaultContent": "",
                 "render": function(data, type, row, meta) {
-                    if (data == null) return "";
+                    if (data == null || data.length === 0) return "";
                     return data.padStart(2, "0");
                 }
             },
             {
-                "data": "PerformPreviousPeriod",
+                "data": "AccumulatedBeginingOfYear",
                 "class": "text-right",
                 "defaultContent": "",
                 "render": function(data, type, row, meta) {
@@ -106,7 +106,7 @@ function initTableViewDataImport() {
                 }
             },
             {
-                "data": "PerformInPeriod",
+                "data": "PerformPreviousPeriod",
                 "class": "text-right",
                 "defaultContent": "",
                 "render": function(data, type, row, meta) {
@@ -146,7 +146,7 @@ function initTableViewDataImport() {
             //    }
             //},
             {
-                "data": "ComparedSamePeriodLastYear",
+                "data": "PerformInPeriod",
                 "class": "text-right",
                 "defaultContent": "",
                 "render": function(data, type, row, meta) {

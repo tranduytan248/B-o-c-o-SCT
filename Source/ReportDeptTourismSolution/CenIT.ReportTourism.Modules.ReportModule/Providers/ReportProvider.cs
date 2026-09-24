@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Data;
 using System.Linq;
 using System.Web;
 using CenIT.ReportTourism.Caches.Report;
@@ -15,11 +16,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Providers
             var pReport = ReportPlugableProvider.GetReportByKey(reportKey);
             var ps = pReport.CreateParams(form);
 
-            if (string.IsNullOrEmpty(pReport.StoreName)) return;
-            var lstParram = ps.ToList();
-            //lstParram.Insert(0, currentUser);
-
-            var data = _report.GetDataReport(pReport.StoreName, lstParram.ToArray());
+            var data = GetReportData(pReport.StoreName, ps);
             pReport.Export(reponse, data, urlPath);
         }
 
@@ -28,11 +25,16 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Providers
             var pReport = ReportPlugableProvider.GetReportByKey(reportKey);
             var ps = pReport.CreateParams(form);
 
-            var lstParram = ps.ToList();
-            //lstParram.Insert(0, currentUser);
-
-            var dataReport = _report.GetDataReport(pReport.StoreName, lstParram.ToArray());
+            var dataReport = GetReportData(pReport.StoreName, ps);
             return pReport.CreateReport(dataReport, urlPath);
+        }
+
+        private static DataTable GetReportData(string storeName, object[] parameters)
+        {
+            // A report may be purely informational and therefore have no stored procedure.
+            if (string.IsNullOrEmpty(storeName)) return new DataTable();
+
+            return _report.GetDataReport(storeName, parameters.ToList().ToArray());
         }
     }
 }
