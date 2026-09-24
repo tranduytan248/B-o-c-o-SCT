@@ -15,7 +15,7 @@
                 <div class="form-group">
                     @Html.TitleFor(model => model.EnterpriseId, new { @class = "control-label col-md-3" })
                     <div class="col-md-9">
-                        @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), new { @class = "col-md-7", onchange = "OnLoadEnterpriseInfo(this, '#EnterpriseInfo', '#TypeBusinessInfo');" })
+                        @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), new { @class = "col-md-11", onchange = "OnLoadEnterpriseInfo(this, '#EnterpriseInfo', '#TypeBusinessInfo');" })
                     </div>
                 </div>
             </div>

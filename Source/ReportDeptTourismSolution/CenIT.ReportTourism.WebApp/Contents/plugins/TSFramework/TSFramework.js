@@ -928,3 +928,7 @@ function preInitDatatable() {
             }
         });
 }
+
+function OnChangeCombo(cbb, eleName) {
+    $(eleName).val($(cbb).children("option:selected").text());
+}

@@ -17,13 +17,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 {
     public class PublicCateController : AppController
     {
-        private readonly CatePublicCateCache _publicCateCl;
+        private readonly CatePublicCateCache _publicCateCl = new CatePublicCateCache();
         private readonly string _publicCateTitle = AppProcessor.Messagor.GetMessage("PublicCate_Title");
-
-        public PublicCateController()
-        {
-            _publicCateCl = new CatePublicCateCache();
-        }
 
         // GET: Modules
         [ActionType(Type = EnumActionType.View)]

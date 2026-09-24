@@ -20,10 +20,30 @@
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             @Html.TitleFor(model => model.TaxCode, new { @class = "control-label" })
             @Html.TextBoxFor(model => model.TaxCode, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_TaxCode") })
             @Html.ValidationMessageFor(model => model.TaxCode, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-5">
+            @Html.TitleFor(model => model.MainIndustryId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.MainIndustryId, new SelectList(Model.ListBusinessIndustry, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#MainIndustryName');" })
+            <br /> @Html.ValidationMessageFor(model => model.MainIndustryId, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.MainIndustryName)
+        </div>
+        <div class="col-md-5">
+            @Html.TitleFor(model => model.EnterpriseTypeId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.EnterpriseTypeId, new SelectList(Model.ListEnterpriseType, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EnterpriseTypeName');" })
+            <br /> @Html.ValidationMessageFor(model => model.EnterpriseTypeId, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.EnterpriseTypeName)
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            @Html.TitleFor(model => model.EconomicSectorId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.EconomicSectorId, new SelectList(Model.ListEconomicSector, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EconomicSectorName');" })
+            <br /> @Html.ValidationMessageFor(model => model.EconomicSectorId, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.EconomicSectorName)
         </div>
         <div class="col-md-4">
             @Html.TitleFor(model => model.TypeBusiness, new { @class = "control-label" })
@@ -31,13 +51,19 @@
             <br /> @Html.ValidationMessageFor(model => model.TypeBusiness, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.TypeBusinessName)
         </div>
-        <div class="col-md-5">
+        <div class="col-md-3">
+            @Html.TitleFor(model => model.EnterpriseStatusId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.EnterpriseStatusId, new SelectList(Model.ListEnterpriseStatus, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EnterpriseStatusName');" })
+            <br /> @Html.ValidationMessageFor(model => model.EnterpriseStatusId, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.EnterpriseStatusName)
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
             @Html.TitleFor(model => model.Email, new { @class = "control-label" })
             @Html.TextBoxFor(model => model.Email, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Email") })
             @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
         </div>
-    </div>
-    <div class="form-group row">
         <div class="col-md-4">
             @Html.TitleFor(model => model.Website, new { @class = "control-label" })
             @Html.TextBoxFor(model => model.Website, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Website") })

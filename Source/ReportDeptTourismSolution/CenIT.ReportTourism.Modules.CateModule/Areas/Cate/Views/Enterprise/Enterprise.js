@@ -14,7 +14,7 @@ function initTableEnterprise() {
                 "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
         },
         "columnDefs": [
-            { targets: [0, 1, 2, 8, 13], visible: true },
+            { targets: [0, 1, 2, 10], visible: true },
             { targets: "_all", visible: false }
         ],
         "lengthChange": true,
@@ -26,18 +26,36 @@ function initTableEnterprise() {
             "type": "POST",
             "dataType": "JSON",
             "data": {
-                "TypeBusinessIds": function() {
-                    return $("#Search select#ListTypeBusinessId").val() != null &&
-                        $("#Search select#ListTypeBusinessId").val().length > 0
-                        ? $("#Search select#ListTypeBusinessId").val()
-                        : "";
-                },
                 "WardIds": function() {
                     return $("#Search select#ListWardId").val() != null &&
                         $("#Search select#ListWardId").val().length > 0
                         ? $("#Search select#ListWardId").val()
                         : "";
-                }
+                },
+                "MainIndustryIds": function () {
+                    return $("#Search select#ListMainIndustryId").val() != null &&
+                        $("#Search select#ListMainIndustryId").val().length > 0
+                        ? $("#Search select#ListMainIndustryId").val()
+                        : "";
+                },
+                "EnterpriseTypeIds": function () {
+                    return $("#Search select#ListEnterpriseTypeId").val() != null &&
+                        $("#Search select#ListEnterpriseTypeId").val().length > 0
+                        ? $("#Search select#ListEnterpriseTypeId").val()
+                        : "";
+                },
+                "EconomicSectorIds": function () {
+                    return $("#Search select#ListEconomicSectorId").val() != null &&
+                        $("#Search select#ListEconomicSectorId").val().length > 0
+                        ? $("#Search select#ListEconomicSectorId").val()
+                        : "";
+                },
+                "StatusIds": function () {
+                    return $("#Search select#ListStatusId").val() != null &&
+                        $("#Search select#ListStatusId").val().length > 0
+                        ? $("#Search select#ListStatusId").val()
+                        : "";
+                },
             }
         },
         "columns": [
@@ -61,14 +79,6 @@ function initTableEnterprise() {
                 "defaultContent": ""
             },
             {
-                "data": "BusinessAddress",
-                "defaultContent": ""
-            },
-            {
-                "data": "StreetName",
-                "defaultContent": ""
-            },
-            {
                 "data": "WardName",
                 "defaultContent": ""
             },
@@ -77,23 +87,19 @@ function initTableEnterprise() {
                 "defaultContent": ""
             },
             {
-                "data": "TypeBusinessName",
+                "data": "MainIndustryName",
                 "defaultContent": ""
             },
             {
-                "data": "LegalRepresentationName",
+                "data": "EnterpriseTypeName",
                 "defaultContent": ""
             },
             {
-                "data": "LegalRepresentationPhone",
+                "data": "EconomicSectorName",
                 "defaultContent": ""
             },
             {
-                "data": "LegalRepresentationEmail",
-                "defaultContent": ""
-            },
-            {
-                "data": "Website",
+                "data": "EnterpriseStatusName",
                 "defaultContent": ""
             },
             {
@@ -104,47 +110,6 @@ function initTableEnterprise() {
                     var html = "";
                     if (type === "display") {
                         if (row.IsActive) {
-                            if (row.TypeBusiness == 1) {
-                                html += _renderButton(true,
-                                    "EditEnterpriseAccommodation",
-                                    "fa fa-home btn btn-default btn-form bg-navy",
-                                    "/Cate/TypeAccommodation/Info?enterpriseId=" + data,
-                                    "",
-                                    "Thông tin Lĩnh vực Lưu trú",
-                                    1024);
-                            } else if (row.TypeBusiness == 2) {
-                                html += _renderButton(true,
-                                    "EditEnterpriseTraveling",
-                                    "fa fa-plane btn btn-default btn-form bg-teal",
-                                    "/Cate/TypeTraveling/Info?enterpriseId=" + data,
-                                    "",
-                                    "Thông tin Lĩnh vực Lữ hành",
-                                    1024);
-                            } else if (row.TypeBusiness == 3) {
-                                html += _renderButton(true,
-                                    "EditEnterpriseTransportTourists",
-                                    "fa fa-bus btn btn-default btn-form bg-purple",
-                                    "/Cate/TypeTransportTourists/Info?enterpriseId=" + data,
-                                    "",
-                                    "Thông tin Dịch vụ vận chuyển hành khách",
-                                    1024);
-                            } else if (row.TypeBusiness == 4) {
-                                html += _renderButton(true,
-                                    "EditEnterpriseTouristAttraction",
-                                    "fa fa-map-pin btn btn-default btn-form bg-orange",
-                                    "/Cate/TypeTouristAttraction/Info?enterpriseId=" + data,
-                                    "",
-                                    "Thông tin Lĩnh vực/Điểm du lịch",
-                                    1024);
-                            } else if (row.TypeBusiness == 5) {
-                                html += _renderButton(true,
-                                    "EditEnterpriseServicesForTourist",
-                                    "fa fa-wpbeginner btn btn-default btn-form bg-maroon",
-                                    "/Cate/TypeServicesForTourist/Info?enterpriseId=" + data,
-                                    "",
-                                    "Thông tin Dịch vụ phục vụ khách du lịch",
-                                    1024);
-                            }
                             html += _renderButton(true,
                                 "EditEnterprise",
                                 "fa fa-pencil btn btn-default btn-form",

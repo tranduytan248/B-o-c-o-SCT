@@ -12,7 +12,7 @@ namespace CenIT.ReportTourism.Models.Cate
     {
         public CateEnterpriseModel()
         {
-            ListWards = ListProvinces = ListTypeBusiness = new List<ListItem>();
+            ListWards = ListProvinces = new List<ListItem>();
         }
 
         public int EnterpriseId { get; set; }
@@ -52,12 +52,61 @@ namespace CenIT.ReportTourism.Models.Cate
         [CustomDisplayName("Enterprise_Label_Province")]
         public string ProvinceName { get; set; }
 
+        /// <summary>
+        /// Ngành công nghiệp chính
+        /// </summary>
+        [CustomDisplayName("Enterprise_MainIndustry")]
+        public int? MainIndustryId { get; set; }
+
+        public string MainIndustryCode { get; set; }
+
+        public string MainIndustryName { get; set; }
+
+        public List<ListItem> ListBusinessIndustry { get; set; } = new List<ListItem>();
+
+        /// <summary>
+        /// Loại hình doanh nghiệp
+        /// </summary>
+        [CustomDisplayName("Enterprise_EnterpriseType")]
+        public int? EnterpriseTypeId { get; set; }
+
+        public string EnterpriseTypeCode { get; set; }
+
+        public string EnterpriseTypeName { get; set; }
+
+        public List<ListItem> ListEnterpriseType { get; set; } = new List<ListItem>();
+
+        /// <summary>
+        /// Khu vực kinh tế
+        /// </summary>
+        [CustomDisplayName("Enterprise_EconomicSector")]
+        public int? EconomicSectorId { get; set; }
+
+        public string EconomicSectorCode { get; set; }
+
+        public string EconomicSectorName { get; set; }
+
+        public List<ListItem> ListEconomicSector { get; set; } = new List<ListItem>();
+
+        /// <summary>
+        /// Trạng thái doanh nghiệp
+        /// </summary>
+        [CustomDisplayName("Enterprise_Status")]
+        public int? EnterpriseStatusId { get; set; }
+
+        public string EnterpriseStatusName { get; set; }
+
+        public List<ListItem> ListEnterpriseStatus { get; set; } = new List<ListItem>();
+
         [CustomDisplayName("Enterprise_Label_TypeBusiness")]
         [CustomRequired]
         public int TypeBusiness { get; set; }
 
         [CustomDisplayName("Enterprise_Label_TypeBusiness")]
         public string TypeBusinessName { get; set; }
+
+        public List<ListItem> ListTypeBusiness { get; set; } = new List<ListItem>();
+
 
         [CustomDisplayName("Enterprise_Label_LegalRepresentationName")]
         public string LegalRepresentationName { get; set; }
@@ -99,9 +148,6 @@ namespace CenIT.ReportTourism.Models.Cate
         public string CreatedBy { get; set; }
 
         public DateTime CreatedDate { get; set; }
-
-        [CustomDisplayName("Enterprise_Label_TypeBusiness")]
-        public List<ListItem> ListTypeBusiness { get; set; }
 
         [CustomDisplayName("Enterprise_Label_Ward")]
         public List<ListItem> ListWards { get; set; }

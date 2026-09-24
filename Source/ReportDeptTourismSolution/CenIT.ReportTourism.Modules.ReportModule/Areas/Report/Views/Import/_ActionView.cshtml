@@ -10,9 +10,19 @@
     else if (DateTime.Now.Day <= Model.DayDeadlineSendReportLate && Model.ExistEnterpriseSubmitReportYet)
     {
         <div class="col-md-12 text-center">
-            @Html.Button(true, "ImportData", Url.Action("ImportData", new { area = "Report" }), "<i class='fa fa-cloud-upload'></i>", "Tải mẫu lên từ máy tính", new { @class = "btn btn-sm btn-success", data_width = "1024" })
+            <a type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <i class='fa fa-cloud-download'></i>&nbsp;Mẫu báo cáo
+                <span class="fa fa-caret-down"></span>
+            </a>
+            <ul class="dropdown-menu">
+                @*<li class="text-light-blue"><a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_LuuTru.xlsx" })">Mẫu kinh doanh Dịch vụ lưu trú</a></li>
+                <li class="text-light-blue"><a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_LuHanh.xlsx" })">Mẫu kinh doanh Dịch vụ lữ hành</a></li>
+                <li class="text-light-blue"><a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_KhuDuLich.xlsx" })">Mẫu kinh doanh Điểm/Khu du lịch</a></li>*@
+            </ul>
 
-            @Html.Button(true, "AddReport", Url.Action("Add", new { area = "Report" }), "<i class='fa fa-plus'></i>", "Nhập báo cáo trực tiếp", new { @class = "btn btn-sm btn-primary", data_width = "1024" })
+            @*@Html.Button(true, "ImportData", Url.Action("ImportData", new { area = "Report" }), "<i class='fa fa-cloud-upload'></i>", "Upload báo cáo", new { @class = "btn btn-sm btn-success", data_width = "1024" })*@
+
+            @Html.Button(true, "AddReport", Url.Action("Add", new { area = "Report" }), "<i class='fa fa-plus'></i>", "Nhập báo cáo", new { @class = "btn btn-sm btn-primary", data_width = "1024" })
 
             @*@Html.Button(true, "SignToken", Url.Action("SignToken", new { area = "Report" }), "<i class='fa fa-pencil'></i>", "Ký số VNPT Token", new { @class = "btn btn-sm bg-navy", data_width = "1024" })*@
         </div>

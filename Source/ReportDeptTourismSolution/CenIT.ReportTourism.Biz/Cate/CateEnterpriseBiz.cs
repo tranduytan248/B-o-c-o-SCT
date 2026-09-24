@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using CenIT.ReportTourism.Models.Cate;
-using CenIT.ReportTourism.Models.Sys;
+using CenIT.ReportTourism.Models.Search;
 using TSFramework.App.Processors;
 
 namespace CenIT.ReportTourism.Biz.Cate
@@ -26,10 +26,9 @@ namespace CenIT.ReportTourism.Biz.Cate
         private readonly string _cateEnterprisesSaveDocs = "Cate_Enterprises_SaveDocs";
         private readonly string _cateEnterprisesSearch = "Cate_Enterprises_Search";
 
-        public List<CateEnterpriseModel> Get(string forEmp, string typeBusinessIds, string districtIds, out int total,
-            SysSearchModel search)
+        public List<CateEnterpriseModel> Get(out int total, SearchEnterpriseModel search)
         {
-            search = search ?? new SysSearchModel
+            search = search ?? new SearchEnterpriseModel
             {
                 Search = null,
                 Order = "1",
@@ -39,7 +38,15 @@ namespace CenIT.ReportTourism.Biz.Cate
             };
             var dataEnterprise = AppProcessor.ProcedureProvider.ExecuteTypedList<CateEnterpriseModel>(
                 _cateEnterpriseGet, DATA_PROVIDER_NAME,
-                forEmp, typeBusinessIds, districtIds,
+                search.ForUser, 
+                search.TypeBusinessIds,
+                search.WardIds,
+                search.ProvinceIds,
+                search.MainIndustryIds,
+                search.EnterpriseTypeIds,
+                search.EconomicSectorIds,
+                search.StatusIds,
+                //
                 search.Search,
                 search.Order,
                 search.OrderDir,
@@ -51,10 +58,10 @@ namespace CenIT.ReportTourism.Biz.Cate
             return dataEnterprise;
         }
 
-        public List<CateEnterpriseModel> GetAll(string forEmp, int? cateTypeId = null, int? districtId = null)
+        public List<CateEnterpriseModel> GetAll(SearchEnterpriseModel search = null)
         {
             int total;
-            var listenterprises = Get(forEmp, cateTypeId?.ToString(), districtId?.ToString(), out total, null);
+            var listenterprises = Get(out total, search);
             return listenterprises;
         }
 
@@ -95,6 +102,12 @@ namespace CenIT.ReportTourism.Biz.Cate
                 model.WardName,
                 model.TypeBusiness,
                 model.TypeBusinessName,
+
+                model.MainIndustryId,
+                model.EnterpriseTypeId,
+                model.EconomicSectorId,
+                model.EnterpriseStatusId,
+
                 model.LegalRepresentationName,
                 model.LegalRepresentationPhone,
                 model.LegalRepresentationEmail,
@@ -120,6 +133,12 @@ namespace CenIT.ReportTourism.Biz.Cate
                 model.WardName,
                 model.TypeBusiness,
                 model.TypeBusinessName,
+                //
+                model.MainIndustryId,
+                model.EnterpriseTypeId,
+                model.EconomicSectorId,
+                model.EnterpriseStatusId,
+                //
                 model.LegalRepresentationName,
                 model.LegalRepresentationPhone,
                 model.LegalRepresentationEmail,

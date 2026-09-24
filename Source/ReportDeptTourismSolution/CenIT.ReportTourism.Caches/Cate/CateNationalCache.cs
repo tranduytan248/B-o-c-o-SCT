@@ -62,7 +62,7 @@ namespace CenIT.ReportTourism.Caches.Cate
         public CateNationalModel GetById(int? nationalid)
         {
             if (nationalid < 0) return null;
-            var rawKey = string.Concat("EnterpriseByID-", nationalid);
+            var rawKey = string.Concat("NationalByID-", nationalid);
             // See if the item is in the cache
             if (GetCacheItem(rawKey) is CateNationalModel national) return national;
             // Item not found in cache - retrieve it and insert it into the cache

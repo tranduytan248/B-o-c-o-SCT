@@ -4,19 +4,16 @@ namespace CenIT.ReportTourism.Core.Conts
 {
     public enum EnumTypeBusiness
     {
-        [Description("TypeBusiness_Title_Accommodation")]
-        Accommodation = 1,
+        /// <summary>
+        /// Doanh nghiệp sản xuất, kinh doanh
+        /// </summary>
+        [Description("TypeBusiness_Manufacturing")]
+        Manufacturing = 1,
 
-        [Description("TypeBusiness_Title_Traveling")]
-        Traveling = 2,
-
-        [Description("TypeBusiness_Title_TransportTourists")]
-        TransportTourists = 3,
-
-        [Description("TypeBusiness_Title_TouristAttractions")]
-        TouristAttraction = 4,
-
-        [Description("TypeBusiness_Title_ServicesForTourists")]
-        ServicesForTourists = 5
+        /// <summary>
+        /// Doanh nghiệp thương mại, dịch vụ
+        /// </summary>
+        [Description("TypeBusiness_Trading")]
+        Trading = 2
     }
 }

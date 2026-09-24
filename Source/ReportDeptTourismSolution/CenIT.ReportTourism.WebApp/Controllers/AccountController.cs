@@ -18,7 +18,6 @@ using CenIT.Libs.VNPTSmartCA.Services;
 using CenIT.ReportTourism.Caches.Cate;
 using CenIT.ReportTourism.Caches.Sys;
 using CenIT.ReportTourism.Core.Apps;
-using CenIT.ReportTourism.Core.Conts;
 using CenIT.ReportTourism.Core.Helpers;
 using CenIT.ReportTourism.Models.Cate;
 using CenIT.ReportTourism.Models.Sys;
@@ -28,7 +27,6 @@ using FastMember;
 using TSFramework.App.Attributes;
 using TSFramework.App.Processors;
 using TSFramework.Core.Enums;
-using TSFramework.Core.Helpers;
 using TSFramework.Core.Members.Mail;
 using TSFramework.Core.Providers;
 using TSFramework.Core.Utils;
@@ -423,11 +421,11 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 ListProvinces = _provinceCache.GetAll()
                     .OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList(),
-                ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
-                    .Cast<EnumTypeBusiness>()
-                    .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
-                        ((int)x).ToString()))
-                    .ToList(),
+                //ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
+                //    .Cast<EnumTypeBusiness>()
+                //    .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
+                //        ((int)x).ToString()))
+                //    .ToList(),
                 Reason = "Đăng ký Doanh nghiệp"
             };
             return PartialView("_Register", enterpriseModel);
@@ -446,11 +444,11 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 model.ListProvinces = _provinceCache.GetAll()
                     .OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
-                model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
-                    .Cast<EnumTypeBusiness>()
-                    .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
-                        ((int)x).ToString()))
-                    .ToList();
+                //model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
+                //    .Cast<EnumTypeBusiness>()
+                //    .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
+                //        ((int)x).ToString()))
+                //    .ToList();
 
                 return PartialView("_RegisterBox", model);
             }
@@ -468,8 +466,8 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 StreetName = model.StreetName,
                 WardId = model.WardId,
                 WardName = model.WardName,
-                TypeBusiness = model.TypeBusiness,
-                TypeBusinessName = model.TypeBusinessName,
+                //TypeBusiness = model.TypeBusiness,
+                //TypeBusinessName = model.TypeBusinessName,
                 LegalRepresentationName = model.LegalRepresentationName,
                 LegalRepresentationPhone = model.LegalRepresentationPhone,
                 LegalRepresentationEmail = model.LegalRepresentationEmail,

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using CenIT.ReportTourism.Biz.Cate;
 using CenIT.ReportTourism.Models.Cate;
-using CenIT.ReportTourism.Models.Sys;
+using CenIT.ReportTourism.Models.Search;
 using TSFramework.Core.Members.Caching;
 using TSFramework.Core.Utils;
 
@@ -20,23 +20,23 @@ namespace CenIT.ReportTourism.Caches.Cate
             { "EnterprisesCache", "DataImportCache", "DocsCache", "CENIT.APP.Cache" };
 
         [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public List<CateEnterpriseModel> GetAll(string forEmp = null, int? cateTypeId = null)
+        public List<CateEnterpriseModel> GetAll(SearchEnterpriseModel search = null)
         {
-            var rawKey = $"AllEnterprises-{forEmp}-{cateTypeId}";
+            var objectKey = EHashMD5.FromObject(search);
+            var rawKey = $"AllEnterprises-{objectKey}";
             // See if the item is in the cache
             if (GetCacheItem(rawKey) is List<CateEnterpriseModel> enterprises) return enterprises;
             // Item not found in cache - retrieve it and insert it into the cache
-            enterprises = Api.GetAll(forEmp, cateTypeId);
+            enterprises = Api.GetAll(search);
             AddCacheItem(rawKey, enterprises);
             return enterprises;
         }
 
         [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public List<CateEnterpriseModel> Get(string forEmp, string typeBusinessIds, string districtIds, out int total,
-            SysSearchModel search = null)
+        public List<CateEnterpriseModel> Get(out int total, SearchEnterpriseModel search = null)
         {
             var objectKey = EHashMD5.FromObject(search);
-            var rawKey = string.Concat($"ListEnterprisesForEmp-{forEmp}-{typeBusinessIds}-{districtIds}-", objectKey);
+            var rawKey = $"ListEnterprisesForEmp-{objectKey}";
             var rawKeyTotal = string.Concat(rawKey, "-Total");
             total = 0;
             var cacheTotal = (int?)GetCacheItem(rawKeyTotal);
@@ -44,7 +44,7 @@ namespace CenIT.ReportTourism.Caches.Cate
             // See if the item is in the cache
             if (GetCacheItem(rawKey) is List<CateEnterpriseModel> enterprises) return enterprises;
             // Item not found in cache - retrieve it and insert it into the cache
-            enterprises = Api.Get(forEmp, typeBusinessIds, districtIds, out total, search);
+            enterprises = Api.Get(out total, search);
             AddCacheItem(rawKey, enterprises);
             AddCacheItem(rawKeyTotal, total);
             return enterprises;

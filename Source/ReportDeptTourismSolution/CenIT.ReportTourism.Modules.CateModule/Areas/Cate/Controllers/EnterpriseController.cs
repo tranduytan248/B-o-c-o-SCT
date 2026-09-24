@@ -10,7 +10,7 @@ using CenIT.ReportTourism.Caches.Cate;
 using CenIT.ReportTourism.Core.Apps;
 using CenIT.ReportTourism.Core.Conts;
 using CenIT.ReportTourism.Models.Cate;
-using CenIT.ReportTourism.Models.Sys;
+using CenIT.ReportTourism.Models.Search;
 using CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Models;
 using ExcelDataReader;
 using FastMember;
@@ -26,8 +26,12 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
         private readonly CateProvinceCache _provinceCache = new CateProvinceCache();
         private readonly CateWardCache _wardCache = new CateWardCache();
+        private readonly CateBusinessIndustryCache _industryCache = new CateBusinessIndustryCache();
+        private readonly CateEnterpriseTypeCache _enterpriseTypeCache = new CateEnterpriseTypeCache();
+        private readonly CateEconomicSectorCache _economicSectorCache = new CateEconomicSectorCache();
+        private readonly CateEnterpriseStatusCache _enterpriseStatusCache = new CateEnterpriseStatusCache();
 
-        private int _defaultProvinceId = 23;
+        private readonly int _defaultProvinceId = 23;
         private readonly string _enterpriseFolder = "Enterprise";
         private readonly CateEnterpriseRegisterNotifyCache _enterpriseRegisterNotifyCache = new CateEnterpriseRegisterNotifyCache();
         private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Label");
@@ -42,16 +46,35 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            var searchModel = new EnterpriseSearchModel
+            var searchModel = new SearchEnterpriseModel
             {
-                ListWards = _wardCache.GetAll(_defaultProvinceId)
-                    .OrderBy(d => d.WardName)
-                    .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList(),
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
                         ((int)x).ToString()))
-                    .ToList()
+                    .ToList(),
+
+                ListWards = _wardCache.GetAll(_defaultProvinceId)
+                    .OrderBy(d => d.WardName)
+                    .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList(),
+
+                ListProvinces = _provinceCache.GetAll()
+                    .OrderBy(d => d.ProvinceName)
+                    .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList(),
+
+                ListMainIndustry = _industryCache.GetAll()
+                    .OrderBy(d => d.IndustryName)
+                    .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList(),
+
+                ListEnterpriseType = _enterpriseTypeCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseTypeId.ToString())).ToList(),
+                ListEconomicSector = _economicSectorCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EconomicSectorId.ToString())).ToList(),
+                ListStatus = _enterpriseStatusCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseStatusId.ToString())).ToList(),
             };
             return View(searchModel);
         }
@@ -61,7 +84,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
         [AjaxOnly]
         [HttpPost]
         [ActionType(Type = EnumActionType.View)]
-        public ActionResult Get(EnterpriseSearchModel searchModel)
+        public ActionResult Get(SearchEnterpriseModel searchModel)
         {
             var search = Request.Form.GetValues("search[value]")?[0];
             var draw = Request.Form.GetValues("draw")?[0];
@@ -69,20 +92,26 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
             var orderDir = Request.Form.GetValues("order[0][dir]")?[0];
             var startRec = Convert.ToInt32(Request.Form.GetValues("start")?[0]);
             var pageSize = Convert.ToInt32(Request.Form.GetValues("length")?[0]);
-            var dataSearch = new SysSearchModel
-            {
-                Search = string.IsNullOrEmpty(search) ? null : search,
-                Order = order,
-                OrderDir = orderDir,
-                StartIndex = startRec,
-                PageSize = pageSize
-            };
+
+            
+            searchModel.ForUser = User.UserName;
+            searchModel.Search = string.IsNullOrEmpty(search) ? null : search;
+            searchModel.Order = order;
+            searchModel.OrderDir = orderDir;
+            searchModel.StartIndex = startRec;
+            searchModel.PageSize = pageSize;
+
             searchModel.TypeBusinessIds =
                 string.IsNullOrEmpty(searchModel.TypeBusinessIds) ? null : searchModel.TypeBusinessIds;
             searchModel.WardIds = string.IsNullOrEmpty(searchModel.WardIds) ? null : searchModel.WardIds;
+            searchModel.ProvinceIds = string.IsNullOrEmpty(searchModel.ProvinceIds) ? null : searchModel.ProvinceIds;
+            searchModel.MainIndustryIds = string.IsNullOrEmpty(searchModel.MainIndustryIds) ? null : searchModel.MainIndustryIds;
+            searchModel.EnterpriseTypeIds = string.IsNullOrEmpty(searchModel.EnterpriseTypeIds) ? null : searchModel.EnterpriseTypeIds;
+            searchModel.EconomicSectorIds = string.IsNullOrEmpty(searchModel.EconomicSectorIds) ? null : searchModel.EconomicSectorIds;
+            searchModel.StatusIds = string.IsNullOrEmpty(searchModel.StatusIds) ? null : searchModel.StatusIds;
+
             int total;
-            var data = _enterpriseCache.Get(User.UserName, searchModel.TypeBusinessIds, searchModel.WardIds,
-                out total, dataSearch);
+            var data = _enterpriseCache.Get(out total, searchModel);
 
             var result = Json(
                 new { draw = Convert.ToInt32(draw), recordsTotal = total, recordsFiltered = total, data },
@@ -101,12 +130,28 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 ListProvinces = _provinceCache.GetAll()
                     .OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList(),
+
                 ListWards = new List<ListItem>(),
+
+                ListBusinessIndustry = _industryCache.GetAll()
+                    .OrderBy(d => d.IndustryName)
+                    .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList(),
+                ListEnterpriseType = _enterpriseTypeCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseTypeId.ToString())).ToList(),
+                ListEconomicSector = _economicSectorCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EconomicSectorId.ToString())).ToList(),
+                ListEnterpriseStatus = _enterpriseStatusCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseStatusId.ToString())).ToList(),
+
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
                         ((int)x).ToString()))
                     .ToList(),
+
                 Reason = "Thêm mới"
             };
             return PartialView("_Add", enterpriseModel);
@@ -122,12 +167,24 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                     .OrderBy(d => d.ProvinceName)
                     .Select(d => new ListItem(d.ProvinceName, d.ProvinceId.ToString())).ToList();
                 model.ListWards = new List<ListItem>();
+                model.ListBusinessIndustry = _industryCache.GetAll()
+                    .OrderBy(d => d.IndustryName)
+                    .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList();
+                model.ListEnterpriseType = _enterpriseTypeCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseTypeId.ToString())).ToList();
+                model.ListEconomicSector = _economicSectorCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EconomicSectorId.ToString())).ToList();
+                model.ListEnterpriseStatus = _enterpriseStatusCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseStatusId.ToString())).ToList();
+
                 model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
                         ((int)x).ToString()))
                     .ToList();
-
                 return PartialView("_Enterprise", model);
             }
 
@@ -141,8 +198,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 StreetName = model.StreetName,
                 WardId = model.WardId,
                 WardName = model.WardName,
-                TypeBusiness = model.TypeBusiness,
-                TypeBusinessName = model.TypeBusinessName,
+                
                 LegalRepresentationName = model.LegalRepresentationName,
                 LegalRepresentationPhone = model.LegalRepresentationPhone,
                 LegalRepresentationEmail = model.LegalRepresentationEmail,
@@ -150,6 +206,12 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 Phone = model.Phone,
                 Email = model.Email,
                 Reason = model.Reason,
+
+                MainIndustryId = model.MainIndustryId,
+                EnterpriseTypeId = model.EnterpriseTypeId,
+                EconomicSectorId = model.EconomicSectorId,
+                EnterpriseStatusId = model.EnterpriseStatusId,
+
                 SavedBy = User.Email
             });
 
@@ -210,6 +272,19 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
             }
 
+            model.ListBusinessIndustry = _industryCache.GetAll()
+                .OrderBy(d => d.IndustryName)
+                .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList();
+            model.ListEnterpriseType = _enterpriseTypeCache.GetAll()
+                .OrderBy(d => d.Name)
+                .Select(d => new ListItem(d.Name, d.EnterpriseTypeId.ToString())).ToList();
+            model.ListEconomicSector = _economicSectorCache.GetAll()
+                .OrderBy(d => d.Name)
+                .Select(d => new ListItem(d.Name, d.EconomicSectorId.ToString())).ToList();
+            model.ListEnterpriseStatus = _enterpriseStatusCache.GetAll()
+                .OrderBy(d => d.Name)
+                .Select(d => new ListItem(d.Name, d.EnterpriseStatusId.ToString())).ToList();
+
             model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                 .Cast<EnumTypeBusiness>()
                 .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -236,6 +311,19 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 model.ListWards = _wardCache.GetByProvinceId(model.ProvinceId).OrderBy(d => d.WardName)
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
 
+                model.ListBusinessIndustry = _industryCache.GetAll()
+                    .OrderBy(d => d.IndustryName)
+                    .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList();
+                model.ListEnterpriseType = _enterpriseTypeCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseTypeId.ToString())).ToList();
+                model.ListEconomicSector = _economicSectorCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EconomicSectorId.ToString())).ToList();
+                model.ListEnterpriseStatus = _enterpriseStatusCache.GetAll()
+                    .OrderBy(d => d.Name)
+                    .Select(d => new ListItem(d.Name, d.EnterpriseStatusId.ToString())).ToList();
+
                 model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -254,8 +342,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 StreetName = model.StreetName,
                 WardId = model.WardId,
                 WardName = model.WardName,
-                TypeBusiness = model.TypeBusiness,
-                TypeBusinessName = model.TypeBusinessName,
+                
                 LegalRepresentationName = model.LegalRepresentationName,
                 LegalRepresentationPhone = model.LegalRepresentationPhone,
                 LegalRepresentationEmail = model.LegalRepresentationEmail,
@@ -263,6 +350,12 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                 Phone = model.Phone,
                 Email = model.Email,
                 Reason = model.Reason,
+
+                MainIndustryId = model.MainIndustryId,
+                EnterpriseTypeId = model.EnterpriseTypeId,
+                EconomicSectorId = model.EconomicSectorId,
+                EnterpriseStatusId = model.EnterpriseStatusId,
+
                 SavedBy = User.Email
             });
 
@@ -397,6 +490,18 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString())).ToList();
             }
 
+            model.ListBusinessIndustry = _industryCache.GetAll()
+                .OrderBy(d => d.IndustryName)
+                .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList();
+            model.ListEnterpriseType = _enterpriseTypeCache.GetAll()
+                .OrderBy(d => d.Name)
+                .Select(d => new ListItem(d.Name, d.EnterpriseTypeId.ToString())).ToList();
+            model.ListEconomicSector = _economicSectorCache.GetAll()
+                .OrderBy(d => d.Name)
+                .Select(d => new ListItem(d.Name, d.EconomicSectorId.ToString())).ToList();
+            model.ListEnterpriseStatus = _enterpriseStatusCache.GetAll()
+                .OrderBy(d => d.Name)
+                .Select(d => new ListItem(d.Name, d.EnterpriseStatusId.ToString())).ToList();
             model.ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                 .Cast<EnumTypeBusiness>()
                 .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),

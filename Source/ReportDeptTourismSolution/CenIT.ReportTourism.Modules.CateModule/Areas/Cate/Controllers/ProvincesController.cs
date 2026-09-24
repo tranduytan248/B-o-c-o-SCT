@@ -12,13 +12,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 {
     public class ProvincesController : AppController
     {
-        private readonly CateProvinceCache _provinceCache;
+        private readonly CateProvinceCache _provinceCache = new CateProvinceCache();
         private readonly string _provinceTitle = AppProcessor.Messagor.GetMessage("Province_Title");
-
-        public ProvincesController()
-        {
-            _provinceCache = new CateProvinceCache();
-        }
 
         // GET: Cate/Province
         [ActionType(Type = EnumActionType.View)]

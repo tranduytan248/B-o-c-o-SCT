@@ -10,13 +10,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 {
     public class DocController : AppController
     {
-        private readonly CateDocCache _docCache;
+        private readonly CateDocCache _docCache = new CateDocCache();
         private readonly string _docTitle = AppProcessor.Messagor.GetMessage("CateDoc_Title");
-
-        public DocController()
-        {
-            _docCache = new CateDocCache();
-        }
 
         [HttpGet]
         [AjaxOnly]

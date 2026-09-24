@@ -17,13 +17,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Controllers
 {
     public class NationalController : AppController
     {
-        private readonly CateNationalCache _nationalCache;
+        private readonly CateNationalCache _nationalCache = new CateNationalCache();
         private readonly string _nationalTile = AppProcessor.Messagor.GetMessage("National_Title");
-
-        public NationalController()
-        {
-            _nationalCache = new CateNationalCache();
-        }
 
         // GET: Cate/National
         public ActionResult Index()

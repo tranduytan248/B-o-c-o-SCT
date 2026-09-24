@@ -55,28 +55,28 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         #region Mapping
 
-        private readonly Dictionary<int, string> _mappingReportTypeBiz = new Dictionary<int, string>{
-            {
-                (int)EnumTypeBusiness.Accommodation,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Accommodation))
-            },
-            {
-                (int)EnumTypeBusiness.Traveling,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
-            },
-            {
-                (int)EnumTypeBusiness.ServicesForTourists,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
-            },
-            {
-                (int)EnumTypeBusiness.TransportTourists,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
-            },
-            {
-                (int)EnumTypeBusiness.TouristAttraction,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
-            }
-        };
+        //private readonly Dictionary<int, string> _mappingReportTypeBiz = new Dictionary<int, string>{
+        //    {
+        //        (int)EnumTypeBusiness.Accommodation,
+        //        AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Accommodation))
+        //    },
+        //    {
+        //        (int)EnumTypeBusiness.Traveling,
+        //        AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
+        //    },
+        //    {
+        //        (int)EnumTypeBusiness.ServicesForTourists,
+        //        AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
+        //    },
+        //    {
+        //        (int)EnumTypeBusiness.TransportTourists,
+        //        AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
+        //    },
+        //    {
+        //        (int)EnumTypeBusiness.TouristAttraction,
+        //        AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
+        //    }
+        //};
 
         #endregion
 
@@ -451,10 +451,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 {
                     EnterpriseId = model.EnterpriseId,
                     ForMonth = model.ForMonth,
-                    TypeReport = enterpriseModel.TypeBusiness,
-                    TypeReportName =
-                        AppProcessor.Messagor.GetMessage(
-                            EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    //TypeReport = enterpriseModel.TypeBusiness,
+                    //TypeReportName =
+                    //    AppProcessor.Messagor.GetMessage(
+                    //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                     DataImport = dataImports,
                     ReportFile = fileNameSigned,
                     CreatedBy = User.UserName,
@@ -539,24 +539,24 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
                 #region Check Correct Type Template
 
-                logActions.AppendLine(
-                    $" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
-                logActions.AppendLine(" - Thực hiện kiểm tra nội dung báo cáo");
+                //logActions.AppendLine(
+                //    $" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+                //logActions.AppendLine(" - Thực hiện kiểm tra nội dung báo cáo");
 
-                if (!CheckCorrectTemplate(model.FileImport,
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
-                {
-                    logActions.AppendLine(" + Nội dung báo cáo không đúng định dạng");
-                    AppProcessor.Logger.Message(logActions.ToString());
+                //if (!CheckCorrectTemplate(model.FileImport,
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+                //{
+                //    logActions.AppendLine(" + Nội dung báo cáo không đúng định dạng");
+                //    AppProcessor.Logger.Message(logActions.ToString());
 
-                    string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
-                    return Json(new
-                    {
-                        status = false,
-                        message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
-                            EnumProcessType.NonFormat, EnumMsgIcon.Error)
-                    });
-                }
+                //    string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+                //    return Json(new
+                //    {
+                //        status = false,
+                //        message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
+                //            EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                //    });
+                //}
 
                 #endregion
 
@@ -755,10 +755,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 {
                     EnterpriseId = model.EnterpriseId,
                     ForMonth = model.ForMonth,
-                    TypeReport = enterpriseModel.TypeBusiness,
-                    TypeReportName =
-                        AppProcessor.Messagor.GetMessage(
-                            EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    //TypeReport = enterpriseModel.TypeBusiness,
+                    //TypeReportName =
+                    //    AppProcessor.Messagor.GetMessage(
+                    //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                     DataImport = dataImports,
                     ReportFile = fileNameSigned,
                     CreatedBy = User.UserName,
@@ -886,10 +886,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 EnterpriseId = model.EnterpriseId,
                 ForMonth = model.ForMonth,
-                TypeReport = enterpriseModel.TypeBusiness,
-                TypeReportName =
-                    AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                //TypeReport = enterpriseModel.TypeBusiness,
+                //TypeReportName =
+                //    AppProcessor.Messagor.GetMessage(
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 DataImport = dataImport,
                 CreatedBy = User.UserName,
                 Reason = model.Reason
@@ -941,17 +941,17 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 });
             }
 
-            if (!CheckCorrectTemplate(model.FileImport,
-                    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
-            {
-                string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
-                return Json(new
-                {
-                    status = false,
-                    message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
-                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
-                });
-            }
+            //if (!CheckCorrectTemplate(model.FileImport,
+            //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+            //{
+            //    string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+            //    return Json(new
+            //    {
+            //        status = false,
+            //        message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
+            //            EnumProcessType.NonFormat, EnumMsgIcon.Error)
+            //    });
+            //}
 
             #region Check Data Import
 
@@ -972,7 +972,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 status = true,
                 dataImport = lstDataImports.OrderBy(d => d.RowIndex),
-                typeReport = enterpriseModel.TypeBusiness,
+                //typeReport = enterpriseModel.TypeBusiness,
                 message = ""
             });
         }
@@ -1173,7 +1173,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 });
             }
 
-            logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+            //logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
             var dataReport = ReadFormData(Request.Form);
@@ -1293,10 +1293,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 EnterpriseId = model.EnterpriseId,
                 ForMonth = model.ForMonth,
-                TypeReport = enterpriseModel.TypeBusiness,
-                TypeReportName =
-                    AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                //TypeReport = enterpriseModel.TypeBusiness,
+                //TypeReportName =
+                //    AppProcessor.Messagor.GetMessage(
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 DataImport = dataReport,
                 ReportFile = fileNameSigned,
                 CreatedBy = User.UserName,
@@ -1380,9 +1380,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ForMonth = onMonth ?? DateTime.Now,
                 ListDataImports = dataImports,
                 EnterpriseName = enterpriseModel.BusinessName,
-                TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
-                TypeReportName = AppProcessor.Messagor.GetMessage(
-                    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                //TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
+                //TypeReportName = AppProcessor.Messagor.GetMessage(
+                //    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 IsEdit = true,
                 AccessToken = (string)Session[$"VNPT-SmartCA-{User?.UserName}-AccessToken"],
                 EnableSignDigitalDoc =
@@ -1441,9 +1441,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     ForMonth = model.ForMonth,
                     ListDataImports = dataImports,
                     EnterpriseName = enterpriseModel.BusinessName,
-                    TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
-                    TypeReportName = AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    //TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
+                    //TypeReportName = AppProcessor.Messagor.GetMessage(
+                    //    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                     IsEdit = true,
                     EnableSignDigitalDoc =
                         (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
@@ -1453,7 +1453,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             #endregion
 
-            logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+            //logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
             var dataReport = ReadFormData(Request.Form);
@@ -1577,10 +1577,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 EnterpriseId = model.EnterpriseId,
                 ForMonth = model.ForMonth,
-                TypeReport = enterpriseModel.TypeBusiness,
-                TypeReportName =
-                    AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                //TypeReport = enterpriseModel.TypeBusiness,
+                //TypeReportName =
+                //    AppProcessor.Messagor.GetMessage(
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 DataImport = dataReport,
                 CreatedBy = User.UserName,
                 Reason = "Cập nhật báo cáo"
@@ -1625,33 +1625,33 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         #region Other Function
 
-        [AjaxOnly]
-        [HttpGet]
-        [ActionType(Type = EnumActionType.View)]
-        public ActionResult LoadViewTypeReport(int? enterpriseId)
-        {
-            var enterpriseModel = _enterpriseCache.GetById(enterpriseId);
-            string partialView;
-            switch ((EnumTypeBusiness)enterpriseModel.TypeBusiness)
-            {
-                case EnumTypeBusiness.Accommodation:
-                    partialView = "_AccommodationService";
-                    break;
-                case EnumTypeBusiness.Traveling:
-                case EnumTypeBusiness.TransportTourists:
-                    partialView = "_TravelingService";
-                    break;
-                case EnumTypeBusiness.ServicesForTourists:
-                case EnumTypeBusiness.TouristAttraction:
-                    partialView = "_TouristAttractionService";
-                    break;
-                default:
-                    partialView = "_AccommodationService";
-                    break;
-            }
+        //[AjaxOnly]
+        //[HttpGet]
+        //[ActionType(Type = EnumActionType.View)]
+        //public ActionResult LoadViewTypeReport(int? enterpriseId)
+        //{
+        //    var enterpriseModel = _enterpriseCache.GetById(enterpriseId);
+        //    string partialView;
+        //    switch ((EnumTypeBusiness)enterpriseModel.TypeBusiness)
+        //    {
+        //        case EnumTypeBusiness.Accommodation:
+        //            partialView = "_AccommodationService";
+        //            break;
+        //        case EnumTypeBusiness.Traveling:
+        //        case EnumTypeBusiness.TransportTourists:
+        //            partialView = "_TravelingService";
+        //            break;
+        //        case EnumTypeBusiness.ServicesForTourists:
+        //        case EnumTypeBusiness.TouristAttraction:
+        //            partialView = "_TouristAttractionService";
+        //            break;
+        //        default:
+        //            partialView = "_AccommodationService";
+        //            break;
+        //    }
 
-            return PartialView(partialView);
-        }
+        //    return PartialView(partialView);
+        //}
 
         [AjaxOnly]
         [HttpGet]
@@ -2476,16 +2476,16 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             var arraBytes = Convert.FromBase64String(model.FileDataBase64);
             var streamDatas = new MemoryStream(arraBytes);
 
-            if (!CheckCorrectTemplate(streamDatas, EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
-            {
-                string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
-                return Json(new
-                {
-                    status = false,
-                    message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
-                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
-                });
-            }
+            //if (!CheckCorrectTemplate(streamDatas, EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+            //{
+            //    string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+            //    return Json(new
+            //    {
+            //        status = false,
+            //        message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
+            //            EnumProcessType.NonFormat, EnumMsgIcon.Error)
+            //    });
+            //}
 
             #region Check Data Import
 
@@ -2506,7 +2506,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 status = true,
                 dataImport = lstDataImports.OrderBy(d => d.RowIndex),
-                typeReport = enterpriseModel.TypeBusiness,
+                //typeReport = enterpriseModel.TypeBusiness,
                 message = ""
             });
         }
