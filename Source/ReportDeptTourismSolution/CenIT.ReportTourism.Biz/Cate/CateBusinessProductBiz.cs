@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using CenIT.ReportTourism.Models.Cate;
 using CenIT.ReportTourism.Models.Sys;
@@ -8,7 +8,7 @@ namespace CenIT.ReportTourism.Biz.Cate
 {
     public class CateBusinessProductBiz
     {
-        private const string DataProviderName = "SysProvider";
+        private const string DATA_PROVIDER_NAME = "SysProvider";
         private const string GetViaEnterpriseProcedure = "Cate_BusinessProducts_GetViaEnterprise";
         private const string GetByPrefixProcedure = "Cate_BusinessProducts_GetByPrefix";
         private const string GetUnconfiguredByPrefixProcedure = "Cate_BusinessProducts_GetUnconfiguredByPrefix";
@@ -20,19 +20,19 @@ namespace CenIT.ReportTourism.Biz.Cate
         public List<CateBusinessProductModel> GetViaEnterprise(int enterpriseId)
         {
             return AppProcessor.ProcedureProvider.ExecuteTypedList<CateBusinessProductModel>(
-                GetViaEnterpriseProcedure, DataProviderName, enterpriseId);
+                GetViaEnterpriseProcedure, DATA_PROVIDER_NAME, enterpriseId);
         }
 
         public List<CateBusinessProductModel> GetByPrefix(int enterpriseId, string productCodePrefix)
         {
             return AppProcessor.ProcedureProvider.ExecuteTypedList<CateBusinessProductModel>(
-                GetByPrefixProcedure, DataProviderName, enterpriseId, productCodePrefix);
+                GetByPrefixProcedure, DATA_PROVIDER_NAME, enterpriseId, productCodePrefix);
         }
 
         public List<CateBusinessProductModel> GetUnconfiguredByPrefix(int enterpriseId, string productCodePrefix)
         {
             return AppProcessor.ProcedureProvider.ExecuteTypedList<CateBusinessProductModel>(
-                GetUnconfiguredByPrefixProcedure, DataProviderName, enterpriseId, productCodePrefix);
+                GetUnconfiguredByPrefixProcedure, DATA_PROVIDER_NAME, enterpriseId, productCodePrefix);
         }
 
         public List<CateBusinessProductModel> Get(out int total, int? industryId, SysSearchModel search)
