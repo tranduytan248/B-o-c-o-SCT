@@ -42,9 +42,13 @@ function initTableViewDataImport() {
             { "width": "80px", "targets": [3, 4, 5] }
         ],
         "createdRow": function(row, data, dataIndex) {
-            if (data.TypeReport == 1) {
-                if ((data.Unit == null || typeof data.Unit == "undefined" || data.Unit.length == 0) &&
-                    (data.Code == null || typeof data.Code == "undefined" || data.Code.length == 0)) {
+            var summaryTargets = ["Tổng doanh thu", "Nộp ngân sách", "Kim ngạch xuất khẩu", "Kim ngạch nhập khẩu"];
+            if ($.inArray(data.Targets, summaryTargets) !== -1) {
+                $(row).addClass("business-product-summary");
+            }
+            if ((data.Unit == null || typeof data.Unit == "undefined" || data.Unit.length == 0) &&
+                (data.Code == null || typeof data.Code == "undefined" || data.Code.length == 0)) {
+                    $(row).addClass("business-product-category");
                     // Add COLSPAN attribute
                     $("td:eq(0)", row).attr("colspan", 6);
 
@@ -56,7 +60,6 @@ function initTableViewDataImport() {
                     $("td:eq(2)", row).remove();
                     $("td:eq(1)", row).remove();
                     //$('td:eq(3)', row).css('display', 'none');
-                }
             }
         },
         "columns": [

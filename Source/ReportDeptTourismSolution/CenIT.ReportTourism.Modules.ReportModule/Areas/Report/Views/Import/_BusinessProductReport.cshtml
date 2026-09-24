@@ -1,8 +1,34 @@
 ﻿@model List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
 
+@{
+    var exportBusinessProductOptions = ViewBag.ExportBusinessProductOptions as List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
+                                 ?? new List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>();
+    var importBusinessProductOptions = ViewBag.ImportBusinessProductOptions as List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
+                                 ?? new List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>();
+}
+
 <div class="row">
     <div class="col-md-12 table-responsive">
         <input type="hidden" name="BusinessProductReport" value="true" />
+        <style>
+            #DataReport tr.business-summary td { font-weight: 700; }
+        </style>
+        <div id="TradeProductTemplates" style="display: none;">
+            <select id="ExportProductTemplate">
+                <option value="">Chọn 1 giá trị</option>
+                @foreach (var option in exportBusinessProductOptions)
+                {
+                    <option value="@option.Code" data-unit="@option.Unit" data-name="@option.Targets">@option.Targets (@option.Code)</option>
+                }
+            </select>
+            <select id="ImportProductTemplate">
+                <option value="">Chọn 1 giá trị</option>
+                @foreach (var option in importBusinessProductOptions)
+                {
+                    <option value="@option.Code" data-unit="@option.Unit" data-name="@option.Targets">@option.Targets (@option.Code)</option>
+                }
+            </select>
+        </div>
         @if (!Model.Any())
         {
             <div class="alert alert-info">
@@ -33,22 +59,69 @@
                         var index = 1;
                         foreach (var product in Model)
                         {
-                            <tr>
+                            var productPosition = Model.IndexOf(product);
+                            var nextProduct = productPosition + 1 < Model.Count ? Model[productPosition + 1] : null;
+                            var isSummary = product.Targets == "Tổng doanh thu"
+                                            || product.Targets == "Nộp ngân sách"
+                                            || product.Targets == "Kim ngạch xuất khẩu"
+                                            || product.Targets == "Kim ngạch nhập khẩu";
+                            var isTradeHeader = product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu"
+                                                || product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu";
+                            <tr class="@(isSummary ? "business-summary" : "")">
                                 @if (string.IsNullOrEmpty(product.Code))
                                 {
                                     <td class="text-center">@index</td>
-                                    <td colspan="5" style="text-align: left !important;"><strong>@Html.Hidden($"Target_{index}", product.Targets)@Html.Hidden($"Unit_{index}", product.Unit)@Html.Hidden($"Code_{index}", product.Code)@product.Targets</strong></td>
+                                    <td colspan="5" style="text-align: left !important;">
+                                        <strong>@Html.Hidden($"Target_{index}", product.Targets)@Html.Hidden($"Unit_{index}", product.Unit)@Html.Hidden($"Code_{index}", product.Code)@product.Targets</strong>
+                                    </td>
                                 }
                                 else
                                 {
                                     <td class="text-center">@index</td>
-                                    <td style="text-align: left !important;">@Html.Hidden($"Target_{index}", product.Targets)@product.Targets</td>
-                                    <td>@Html.Hidden($"Unit_{index}", product.Unit)@product.Unit</td>
+                                    <td style="text-align: left !important;">
+                                        @Html.Hidden($"Target_{index}", product.Targets)
+                                        @if (isSummary) { <strong>@product.Targets</strong> } else { @product.Targets }
+                                    </td>
+                                    <td>
+                                        @Html.Hidden($"Unit_{index}", product.Unit)
+                                        @if (isSummary) { <strong>@product.Unit</strong> } else { @product.Unit }
+                                    </td>
                                     <td>@Html.TextBox($"AccumulatedBeginingOfYear_{index}", product.AccumulatedBeginingOfYear, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })</td>
                                     <td>@Html.TextBox($"PerformPreviousPeriod_{index}", product.PerformPreviousPeriod ?? product.ComparedSamePeriodLastYear, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })</td>
                                     <td>@Html.TextBox($"PerformInPeriod_{index}", product.PerformInPeriod, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })@Html.Hidden($"Code_{index}", product.Code)</td>
                                 }
                             </tr>
+                            var addTradePrefix = string.Empty;
+                            if (product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu" &&
+                                (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase))))
+                            {
+                                addTradePrefix = "XK";
+                            }
+                            else if ((product.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase) &&
+                                     (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase))))
+                            {
+                                addTradePrefix = "XK";
+                            }
+                            else if (product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu" &&
+                                     (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase))))
+                            {
+                                addTradePrefix = "NK";
+                            }
+                            else if ((product.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase) &&
+                                     (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase))))
+                            {
+                                addTradePrefix = "NK";
+                            }
+                            if (!string.IsNullOrEmpty(addTradePrefix))
+                            {
+                                <tr class="trade-add-row" data-prefix="@addTradePrefix">
+                                    <td colspan="6" class="text-left">
+                                        <button type="button" class="btn btn-sm btn-primary AddTradeProduct" data-prefix="@addTradePrefix">
+                                            <i class="fa fa-plus"></i> Thêm mặt hàng
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                             index++;
                         }
                     }
@@ -60,11 +133,72 @@
 
 <script type="text/javascript">
     function ValidForm() {
-        if ($("#DataImport #TypeReport input[name^='Target_']").length === 0) {
+        if ($("#DataReport input[name^='Target_']").length === 0) {
             alert("Doanh nghiệp chưa có chỉ tiêu để nhập báo cáo.");
             return false;
         }
 
-        return true;
+        var isValid = true;
+        $("#DataReport input[name^='Code_']").each(function () {
+            var index = this.name.replace("Code_", "");
+            if ($(this).val() && !$.trim($("#Target_" + index).val())) {
+                TooltipErrInput($("#Target_" + index), "Vui lòng nhập tên chỉ tiêu.");
+                isValid = false;
+            }
+        });
+
+        return isValid;
     }
+</script>
+
+<script type="text/javascript">
+    function AddTradeProduct(button, prefix) {
+        var indices = $("#DataReport input[name^='Target_']").map(function () {
+            return parseInt(this.name.replace("Target_", ""), 10) || 0;
+        }).get();
+        var index = (indices.length ? Math.max.apply(null, indices) : 0) + 1;
+        var input = function (name, type, css) {
+            return $("<input />", { id: name, name: name, type: type, "class": css });
+        };
+        var row = $("<tr class='business-product-custom'></tr>");
+        row.append($("<td class='text-center'></td>").text(index));
+        var templateId = prefix === "XK"
+            ? "#ExportProductTemplate"
+            : "#ImportProductTemplate";
+
+        var select = $("<select></select>")
+            .addClass("form-control TradeProductSelect");
+
+        $(templateId).find("option").each(function () {
+            select.append($(this).clone());
+        });
+        var select = $(templateId).clone().removeAttr("id").addClass("form-control TradeProductSelect");
+        var target = $("<input />", { id: "Target_" + index, name: "Target_" + index, type: "hidden" });
+        var unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden" });
+        var unitText = $("<span></span>");
+        row.append($("<td style='text-align:left !important;'></td>").append(target).append(select));
+        row.append($("<td></td>").append(unit).append(unitText));
+        row.append($("<td></td>").append(input("AccumulatedBeginingOfYear_" + index, "number", "form-control text-right").attr("min", "0")));
+        row.append($("<td></td>").append(input("PerformPreviousPeriod_" + index, "number", "form-control text-right").attr("min", "0")));
+        row.append($("<td></td>")
+            .append(input("PerformInPeriod_" + index, "number", "form-control text-right").attr("min", "0"))
+            .append($("<input />", { id: "Code_" + index, name: "Code_" + index, type: "hidden" })));
+        select.on("change", function () {
+            var selected = $(this).find("option:selected");
+            var sourceCode = selected.val();
+            if (sourceCode && $("#DataReport input[name^='Code_']").not("#Code_" + index).filter(function () { return $(this).val() === sourceCode; }).length) {
+                alert("Sản phẩm này đã có trong nhóm.");
+                $(this).val("");
+                return;
+            }
+            target.val(selected.data("name") || "");
+            unit.val(selected.data("unit") || "");
+            unitText.text(selected.data("unit") || "");
+            $("#Code_" + index).val(sourceCode || "");
+        });
+        $(button).closest("tr").before(row);
+        select.trigger("focus");
+    }
+
+    $(".AddTradeProduct").off("click").on("click", function () { AddTradeProduct(this, $(this).data("prefix")); });
 </script>

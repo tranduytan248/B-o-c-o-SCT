@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -50,6 +49,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         private readonly ReportDataImportCache _importCache;
         private readonly string _importTile = AppProcessor.Messagor.GetMessage("ReportDataImport_Title");
         private readonly CateNationalCache _nationalCache;
+        private readonly CateBusinessProductCache _businessProductCache;
 
         private readonly string _templateImportPathFolder =
             ConfigurationManager.AppSettings["Modules_Report_TemplateImportFolderPath"] ??
@@ -58,26 +58,26 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         #region Mapping
 
         private readonly Dictionary<int, string> _mappingReportTypeBiz = new Dictionary<int, string>{
-            {
-                (int)EnumTypeBusiness.Accommodation,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Accommodation))
-            },
-            {
-                (int)EnumTypeBusiness.Traveling,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
-            },
-            {
-                (int)EnumTypeBusiness.ServicesForTourists,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
-            },
-            {
-                (int)EnumTypeBusiness.TransportTourists,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
-            },
-            {
-                (int)EnumTypeBusiness.TouristAttraction,
-                AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
-            }
+            //{
+            //    (int)EnumTypeBusiness.Accommodation,
+            //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Accommodation))
+            //},
+            //{
+            //    (int)EnumTypeBusiness.Traveling,
+            //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
+            //},
+            //{
+            //    (int)EnumTypeBusiness.ServicesForTourists,
+            //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
+            //},
+            //{
+            //    (int)EnumTypeBusiness.TransportTourists,
+            //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.Traveling))
+            //},
+            //{
+            //    (int)EnumTypeBusiness.TouristAttraction,
+            //    AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(EnumTypeBusiness.TouristAttraction))
+            //}
         };
 
         #endregion
@@ -88,6 +88,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             _enterpriseCache = new CateEnterpriseCache();
             _configCache = new SysConfigsCache();
             _nationalCache = new CateNationalCache();
+            _businessProductCache = new CateBusinessProductCache();
         }
 
         // GET: Cate/ReportDataImport
@@ -1024,6 +1025,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var draw = Request.Form.GetValues("draw")?[0];
             var data = _importCache.GetViaEnterpriseOnMonth(searchModel.EnterpriseId, searchModel.ForMonth);
+            var catalogResult = LoadViewTypeReport(searchModel.EnterpriseId) as PartialViewResult;
+            var catalog = catalogResult?.Model as List<ReportDataImportModel>;
+            if (catalog != null && catalog.Any())
+                data = MergeBusinessProductData(catalog, data);
             var total = data.Count;
             var result = Json(
                 new { draw = Convert.ToInt32(draw), recordsTotal = total, recordsFiltered = total, data },
@@ -1372,12 +1377,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             // Báo cáo chỉ tiêu công nghiệp không lưu các dòng tiêu đề nhóm. Khi sửa,
             // dựng lại toàn bộ khung từ danh mục rồi gắn số liệu đã lưu theo chỉ tiêu.
-            if (enterpriseModel.TypeBusiness == 0)
+            // Không dùng TypeBusiness để nhận diện vì doanh nghiệp có thể có TypeBusiness = 1.
+            var catalogResult = LoadViewTypeReport(enterpriseId) as PartialViewResult;
+            var catalog = catalogResult?.Model as List<ReportDataImportModel>;
+            if (catalog != null && catalog.Any())
             {
-                var catalogResult = LoadViewTypeReport(enterpriseId) as PartialViewResult;
-                var catalog = catalogResult?.Model as List<ReportDataImportModel>;
-                if (catalog != null && catalog.Any())
-                    dataImports = MergeBusinessProductData(catalog, dataImports);
+                dataImports = MergeBusinessProductData(catalog, dataImports);
+                ViewBag.IsBusinessProductReport = true;
             }
 
             var reportModel = new TourismReportModel
@@ -1643,6 +1649,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         public ActionResult LoadViewTypeReport(int? enterpriseId)
         {
             var products = new List<ReportDataImportModel>();
+            var mainProducts = new List<ReportDataImportModel>();
+            var exportProductOptions = new List<ReportDataImportModel>();
+            var importProductOptions = new List<ReportDataImportModel>();
             if (!enterpriseId.HasValue)
             {
                 return PartialView("_BusinessProductReport", products);
@@ -1654,68 +1663,84 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 return PartialView("_BusinessProductReport", products);
             }
 
-            const string sql = @"
-SELECT CategoryOrder, CategoryName, ProductName, Unit, ProductCode, DisplayOrder, ProductId
-FROM
-(
-    SELECT 1 AS CategoryOrder, N'Sản phẩm công nghiệp chủ yếu' AS CategoryName,
-           bp.ProductName, bp.Unit, bp.ProductCode, bp.DisplayOrder, bp.ProductId
-    FROM dbo.Cate_BusinessEnterprise AS be
-    INNER JOIN dbo.Cate_BusinessIndustry AS bi ON bi.IndustryId = be.MainIndustryId
-    INNER JOIN dbo.Cate_BusinessProduct AS bp ON bp.IndustryId = bi.IndustryId
-    WHERE be.EnterpriseId = @EnterpriseId
-    UNION ALL
-    SELECT 2, N'Kim ngạch xuất khẩu', iv.ImportValueName, iv.Unit, iv.ImportValueCode,
-           iv.DisplayOrder, iv.ImportValueId
-    FROM dbo.Cate_BusinessEnterprise AS be
-    INNER JOIN dbo.Cate_BusinessProductImportValue AS iv ON iv.IndustryId = be.MainIndustryId
-    WHERE be.EnterpriseId = @EnterpriseId
-    UNION ALL
-    SELECT 3, N'Kim ngạch nhập khẩu', ev.ExportValueName, ev.Unit, ev.ExportValueCode,
-           ev.DisplayOrder, ev.ExportValueId
-    FROM dbo.Cate_BusinessEnterprise AS be
-    INNER JOIN dbo.Cate_BusinessProductExportValue AS ev ON ev.IndustryId = be.MainIndustryId
-    WHERE be.EnterpriseId = @EnterpriseId
-) AS source
-ORDER BY CategoryOrder, ISNULL(DisplayOrder, 0), ProductId";
-
-            var connectionString = ConfigurationManager.ConnectionStrings["BaseApp"]?.ConnectionString;
-            if (!string.IsNullOrWhiteSpace(connectionString))
-            {
-                using (var connection = new SqlConnection(connectionString))
-                using (var command = new SqlCommand(sql, connection))
+            mainProducts = _businessProductCache.GetViaEnterprise(enterpriseId.Value)
+                .Select(product => new ReportDataImportModel
                 {
-                    command.Parameters.Add("@EnterpriseId", SqlDbType.BigInt).Value = enterpriseId.Value;
-                    connection.Open();
-                    using (var reader = command.ExecuteReader())
-                    {
-                        var currentCategory = -1;
-                        while (reader.Read())
-                        {
-                            var category = Convert.ToInt32(reader["CategoryOrder"]);
-                            if (category != currentCategory)
-                            {
-                                products.Add(new ReportDataImportModel { Targets = Convert.ToString(reader["CategoryName"]) });
-                                currentCategory = category;
-                            }
+                    Targets = product.ProductName,
+                    Unit = product.Unit,
+                    Code = !string.IsNullOrWhiteSpace(product.ProductCode)
+                        ? product.ProductCode.Trim()
+                        : string.Format("02{0:D4}", product.ProductId)
+                }).ToList();
 
-                            products.Add(new ReportDataImportModel
-                            {
-                                Targets = Convert.ToString(reader["ProductName"]),
-                                Unit = Convert.ToString(reader["Unit"]),
-                                Code = Convert.ToString(reader["ProductCode"]).Trim()
-                            });
-                        }
-                    }
-                }
-            }
+            var exportProducts = _businessProductCache.GetByPrefix(enterpriseId.Value, "XK")
+                .Select(product => new ReportDataImportModel
+                {
+                    Targets = product.ProductName,
+                    Unit = product.Unit,
+                    Code = product.ProductCode
+                }).ToList();
+
+            var importProducts = _businessProductCache.GetByPrefix(enterpriseId.Value, "NK")
+                .Select(product => new ReportDataImportModel
+                {
+                    Targets = product.ProductName,
+                    Unit = product.Unit,
+                    Code = product.ProductCode
+                }).ToList();
+
+            exportProductOptions = _businessProductCache.GetUnconfiguredByPrefix(enterpriseId.Value, "XK")
+                .Select(product => new ReportDataImportModel
+                {
+                    Targets = product.ProductName,
+                    Unit = product.Unit,
+                    Code = product.ProductCode
+                }).ToList();
+
+            importProductOptions = _businessProductCache.GetUnconfiguredByPrefix(enterpriseId.Value, "NK")
+                .Select(product => new ReportDataImportModel
+                {
+                    Targets = product.ProductName,
+                    Unit = product.Unit,
+                    Code = product.ProductCode
+                }).ToList();
+
+            // Khung chỉ tiêu theo mẫu báo cáo doanh nghiệp hằng tháng.
+            products.Add(CreateBusinessProductLine("Tổng doanh thu", "Tỷ đồng", "01"));
+            products.Add(CreateBusinessProductLine("Trong đó doanh thu công nghiệp", "Tỷ đồng", "0101"));
+            products.Add(CreateBusinessProductHeader("Sản phẩm công nghiệp chủ yếu"));
+            products.AddRange(mainProducts);
+            products.Add(CreateBusinessProductHeader("Lao động - Thu nhập"));
+            products.Add(CreateBusinessProductLine("Tổng số lao động", "Người", "03A"));
+            products.Add(CreateBusinessProductLine("Thu nhập bình quân/người/tháng", "Tr.đồng", "03B"));
+            products.Add(CreateBusinessProductLine("Nộp ngân sách", "Tr.đồng", "05"));
+            products.Add(CreateBusinessProductLine("Kim ngạch xuất khẩu", "1.000 USD", "06"));
+            products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng xuất khẩu chủ yếu"));
+            products.AddRange(exportProducts);
+            products.Add(CreateBusinessProductLine("Kim ngạch nhập khẩu", "1.000 USD", "07"));
+            products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng nhập khẩu chủ yếu"));
+            products.AddRange(importProducts);
+            ViewBag.ExportBusinessProductOptions = exportProductOptions;
+            ViewBag.ImportBusinessProductOptions = importProductOptions;
+            ViewBag.BusinessProductEnterpriseId = enterpriseId.Value;
 
             return PartialView("_BusinessProductReport", products);
+        }
+
+        private static ReportDataImportModel CreateBusinessProductHeader(string targets)
+        {
+            return new ReportDataImportModel { Targets = targets };
+        }
+
+        private static ReportDataImportModel CreateBusinessProductLine(string targets, string unit, string code)
+        {
+            return new ReportDataImportModel { Targets = targets, Unit = unit, Code = code };
         }
 
         private static List<ReportDataImportModel> MergeBusinessProductData(
             List<ReportDataImportModel> catalog, List<ReportDataImportModel> savedData)
         {
+            savedData = savedData ?? new List<ReportDataImportModel>();
             foreach (var item in catalog.Where(x => !string.IsNullOrWhiteSpace(x.Code)))
             {
                 // Mã sản phẩm có thể trùng giữa ba nhóm danh mục, nên ưu tiên tên và đơn vị.
@@ -1735,7 +1760,25 @@ ORDER BY CategoryOrder, ISNULL(DisplayOrder, 0), ProductId";
                 item.ComparedSamePeriodLastYear = saved.ComparedSamePeriodLastYear;
             }
 
+            InsertTradeIndicators(catalog, savedData, "Nhóm/mặt hàng xuất khẩu chủ yếu", "XK");
+            InsertTradeIndicators(catalog, savedData, "Nhóm/mặt hàng nhập khẩu chủ yếu", "NK");
+
             return catalog;
+        }
+
+        private static void InsertTradeIndicators(List<ReportDataImportModel> catalog,
+            List<ReportDataImportModel> savedData, string header, string codePrefix)
+        {
+            var configuredCodes = new HashSet<string>(catalog
+                .Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
+                            x.Code.StartsWith(codePrefix, StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.Code.Trim()), StringComparer.OrdinalIgnoreCase);
+            var rows = savedData.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
+                                            x.Code.StartsWith(codePrefix, StringComparison.OrdinalIgnoreCase) &&
+                                            !configuredCodes.Contains(x.Code.Trim())).ToList();
+            if (!rows.Any()) return;
+            var headerIndex = catalog.FindIndex(x => x.Targets == header && string.IsNullOrWhiteSpace(x.Code));
+            if (headerIndex >= 0) catalog.InsertRange(headerIndex + 1, rows);
         }
 
         [AjaxOnly]
