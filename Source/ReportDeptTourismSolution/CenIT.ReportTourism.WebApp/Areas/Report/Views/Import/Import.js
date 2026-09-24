@@ -168,6 +168,10 @@ function initTableDataImport() {
 
 function DataImport_OnProcessSuccess(response, formId) {
     if (response.status != undefined) {
+        if (!response.status) {
+            eval(response.message);
+            return;
+        }
         $("#ModalContent #modal_" + formId).modal("hide");
         $("#ModalContent #modal_" + formId).on("hidden.bs.modal",
             function() {

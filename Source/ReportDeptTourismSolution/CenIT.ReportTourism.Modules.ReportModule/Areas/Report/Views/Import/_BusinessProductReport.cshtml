@@ -1,0 +1,70 @@
+﻿@model List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
+
+<div class="row">
+    <div class="col-md-12 table-responsive">
+        <input type="hidden" name="BusinessProductReport" value="true" />
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                Doanh nghiệp này chưa được cấu hình chỉ tiêu trong danh mục BusinessProduct.
+            </div>
+        }
+        else
+        {
+            <table id="DataReport" class="table table-bordered table-striped" width="100%">
+                <thead>
+                    <tr>
+                        <th rowspan="2" width="5%">TT</th>
+                        <th rowspan="2" width="33%">Chỉ tiêu</th>
+                        <th rowspan="2" width="11%">Đơn vị tính</th>
+                        <th rowspan="2" width="13%">Kế hoạch năm báo cáo</th>
+                        <th colspan="2">Năm báo cáo</th>
+                    </tr>
+                    <tr>
+                        <th>Thực hiện tháng trước</th>
+                        <th>Ước thực hiện tháng báo cáo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="text-center">
+                        <td>1</td><td>2</td><td>3</td><td>4</td><td>7</td><td>8</td>
+                    </tr>
+                    @{
+                        var index = 1;
+                        foreach (var product in Model)
+                        {
+                            <tr>
+                                @if (string.IsNullOrEmpty(product.Code))
+                                {
+                                    <td class="text-center">@index</td>
+                                    <td colspan="5" style="text-align: left !important;"><strong>@Html.Hidden($"Target_{index}", product.Targets)@Html.Hidden($"Unit_{index}", product.Unit)@Html.Hidden($"Code_{index}", product.Code)@product.Targets</strong></td>
+                                }
+                                else
+                                {
+                                    <td class="text-center">@index</td>
+                                    <td style="text-align: left !important;">@Html.Hidden($"Target_{index}", product.Targets)@product.Targets</td>
+                                    <td>@Html.Hidden($"Unit_{index}", product.Unit)@product.Unit</td>
+                                    <td>@Html.TextBox($"AccumulatedBeginingOfYear_{index}", product.AccumulatedBeginingOfYear, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })</td>
+                                    <td>@Html.TextBox($"PerformPreviousPeriod_{index}", product.PerformPreviousPeriod ?? product.ComparedSamePeriodLastYear, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })</td>
+                                    <td>@Html.TextBox($"PerformInPeriod_{index}", product.PerformInPeriod, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })@Html.Hidden($"Code_{index}", product.Code)</td>
+                                }
+                            </tr>
+                            index++;
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ValidForm() {
+        if ($("#DataImport #TypeReport input[name^='Target_']").length === 0) {
+            alert("Doanh nghiệp chưa có chỉ tiêu để nhập báo cáo.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
