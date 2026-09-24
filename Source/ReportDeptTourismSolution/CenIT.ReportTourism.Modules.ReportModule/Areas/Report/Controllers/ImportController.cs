@@ -53,7 +53,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         private readonly string _templateImportPathFolder =
             ConfigurationManager.AppSettings["Modules_Report_TemplateImportFolderPath"] ??
-            @"/Contents/Modules/Report/Templates/";
+            "/Contents/Modules/Report/Templates/";
 
         #region Mapping
 
@@ -2058,7 +2058,7 @@ ORDER BY CategoryOrder, ISNULL(DisplayOrder, 0), ProductId";
 
         private readonly string _signedFilesPathFolder =
             ConfigurationManager.AppSettings["Modules_Sys_SignedDoc_FolderPath"] ??
-            @"/Contents/Modules/Report/ReportSignedDocs/";
+            "/Contents/Modules/Report/ReportSignedDocs/";
 
         #endregion
 

@@ -1,5 +1,5 @@
 ﻿@using TSFramework.App.Processors
-@model CenIT.ReportTourism.Modules.CateModule.Areas.Cate.Models.EnterpriseSearchModel
+@model CenIT.ReportTourism.Models.Search.SearchEnterpriseModel
 
 <div class="box box-primary">
     <div class="box-header with-border">
@@ -12,14 +12,33 @@
     </div>
     <div class="box-body with-border" id="Search">
         <div class="form-group row">
-            <div class="col-md-6">
-                @Html.TitleFor(model => model.ListTypeBusinessId, new { @class = "control-label" })
-                @Html.DropDownListFor(model => model.ListTypeBusinessId, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
-            </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 @Html.TitleFor(model => model.ListWardId, new { @class = "control-label" })
                 @Html.DropDownListFor(model => model.ListWardId, new SelectList(Model.ListWards, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
             </div>
+            <div class="col-md-4">
+                @Html.TitleFor(model => model.ListStatusId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListStatusId, new SelectList(Model.ListStatus, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+            </div>
+            <div class="col-md-4">
+                @Html.TitleFor(model => model.ListTypeBusinessId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListTypeBusinessId, new SelectList(Model.ListTypeBusiness, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-4">
+                @Html.TitleFor(model => model.ListEnterpriseTypeId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListEnterpriseTypeId, new SelectList(Model.ListEnterpriseType, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+            </div>
+            <div class="col-md-4">
+                @Html.TitleFor(model => model.ListMainIndustryId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListMainIndustryId, new SelectList(Model.ListMainIndustry, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+            </div>
+            <div class="col-md-4">
+                @Html.TitleFor(model => model.ListEconomicSectorId, new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.ListEconomicSectorId, new SelectList(Model.ListEconomicSector, "Value", "Text"), "", new { multiple = true, @class = "col-md-12 form-controler chosen-select", data_placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select") })
+            </div>
+
         </div>
     </div>
     <div class="box-footer">

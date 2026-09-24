@@ -19,25 +19,22 @@
 @Html.Hidden("ID", id)
 <div id="Message">
     <div class="form-group">
-        @Html.TitleFor(model => model.LangCode, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.LangCode, new { @class = "col-md-3", placeholder = AppProcessor.Messagor.GetMessage("Message_Label_LangCode") })
+        <div class="col-md-3">
+            @Html.TitleFor(model => model.LangCode, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.LangCode, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Message_Label_LangCode") })
             @Html.ValidationMessageFor(model => model.LangCode, "", new { @class = "text-danger" })
         </div>
-    </div>
-
-    <div class="form-group">
-        @Html.TitleFor(model => model.LabelKey, new { @class = "control-label col-md-3" })
         <div class="col-md-9">
-            @Html.TextBoxFor(model => model.LabelKey, new { @class = "col-md-7", placeholder = AppProcessor.Messagor.GetMessage("Message_Label_LabelKey") })
+            @Html.TitleFor(model => model.LabelKey, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.LabelKey, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Message_Label_LabelKey") })
             @Html.ValidationMessageFor(model => model.LabelKey, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="form-group">
-        @Html.TitleFor(model => model.Message, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextAreaFor(model => model.Message, new { rows = "3", @class = "col-md-7", placeholder = AppProcessor.Messagor.GetMessage("Message_Label_Message") })
+        <div class="col-md-12">
+            @Html.TitleFor(model => model.Message, new { @class = "control-label" })
+            @Html.TextAreaFor(model => model.Message, new { rows = "2", @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Message_Label_Message") })
             @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger" })
         </div>
     </div>
