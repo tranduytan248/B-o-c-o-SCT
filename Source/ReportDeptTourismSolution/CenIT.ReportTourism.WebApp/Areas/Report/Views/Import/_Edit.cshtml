@@ -106,17 +106,16 @@ type="text/css"
 
     <script src="~/Areas/Report/Views/Import/_ReportBody.js"></script>
     @{
-        if (Model.TypeReport == EnumTypeBusiness.Accommodation)
+        // Các giá trị enum du lịch cũ không còn tồn tại trong EnumTypeBusiness.
+        if ((int)Model.TypeReport == 1)
         {
             <script src="~/Areas/Report/Views/Import/_AccommodationService.js"></script>
         }
-        else if (Model.TypeReport == EnumTypeBusiness.Traveling
-                 || Model.TypeReport == EnumTypeBusiness.TransportTourists)
+        else if ((int)Model.TypeReport == 2 || (int)Model.TypeReport == 3)
         {
             <script src="~/Areas/Report/Views/Import/_TravelingService.js"></script>
         }
-        else if (Model.TypeReport == EnumTypeBusiness.ServicesForTourists
-                 || Model.TypeReport == EnumTypeBusiness.TouristAttraction)
+        else if ((int)Model.TypeReport == 4 || (int)Model.TypeReport == 5)
         {
             <script src="~/Areas/Report/Views/Import/_TouristAttractionService.js"></script>
         }
