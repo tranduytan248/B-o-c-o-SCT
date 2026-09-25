@@ -172,7 +172,6 @@
         $(templateId).find("option").each(function () {
             select.append($(this).clone());
         });
-        var select = $(templateId).clone().removeAttr("id").addClass("form-control TradeProductSelect");
         var target = $("<input />", { id: "Target_" + index, name: "Target_" + index, type: "hidden" });
         var unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden" });
         var unitText = $("<span></span>");
@@ -197,6 +196,14 @@
             $("#Code_" + index).val(sourceCode || "");
         });
         $(button).closest("tr").before(row);
+        if ($.fn.select2) {
+            select.select2({
+                allowClear: true,
+                placeholder: "Chọn 1 giá trị",
+                width: "element",
+                dropdownParent: select.parent()
+            });
+        }
         select.trigger("focus");
     }
 
