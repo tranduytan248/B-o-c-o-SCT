@@ -9,11 +9,6 @@ namespace CenIT.ReportTourism.Models.Report
 {
     public class ReportDataImportModel
     {
-        public ReportDataImportModel()
-        {
-            ListEnterprises = new List<ListItem>();
-        }
-
         public long RowIndex { get; set; }
 
         public long ReportId { get; set; }
@@ -30,7 +25,7 @@ namespace CenIT.ReportTourism.Models.Report
         public DateTime? ForMonth { get; set; } = DateTime.Now;
 
         [CustomDisplayName("DataImport_Label_TypeReport")]
-        public int? TypeReport { get; set; }
+        public int TypeReport { get; set; }
 
         [CustomDisplayName("DataImport_Label_TypeReport")]
         public string TypeReportName { get; set; }
@@ -83,7 +78,7 @@ namespace CenIT.ReportTourism.Models.Report
 
         public string SavedBy { get; set; }
 
-        public List<ListItem> ListEnterprises { get; set; }
+        public List<ListItem> ListEnterprises { get; set; } = new List<ListItem>();
 
         public string AccessToken { get; set; }
 

@@ -155,8 +155,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 WardId = model.WardId,
                 WardName = model.WardName,
 
-                TypeBusiness = model.TypeBusiness,
-                TypeBusinessName = model.TypeBusinessName,
+                //TypeBusiness = model.TypeBusiness,
+                //TypeBusinessName = model.TypeBusinessName,
                 
                 LegalRepresentationName = model.LegalRepresentationName,
                 LegalRepresentationPhone = model.LegalRepresentationPhone,
@@ -166,7 +166,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 Email = model.Email,
                 Reason = model.Reason,
 
-                MainIndustryId = model.MainIndustryId,
+                TypeBusiness = model.ListTypeBusinessId != null && model.ListTypeBusinessId.Count > 0 ? string.Join(",", model.ListTypeBusinessId) : null,
+                IndustryIds = model.ListIndustryId != null && model.ListIndustryId.Count > 0 ? string.Join(",", model.ListIndustryId) : null,
                 EnterpriseTypeId = model.EnterpriseTypeId,
                 EconomicSectorId = model.EconomicSectorId,
                 EnterpriseStatusId = model.EnterpriseStatusId,

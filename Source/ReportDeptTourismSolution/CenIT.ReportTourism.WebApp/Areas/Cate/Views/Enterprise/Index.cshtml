@@ -11,11 +11,11 @@
 @section Action
 {
     <div class="col-md-12 text-center">
-        <a class="btn btn-sm bg-navy" href="@Url.Action("DownloadTemplate", "Enterprise")"><i class="fa fa-cloud-download"></i>&nbsp;Mẫu import</a>
+        @*<a class="btn btn-sm bg-navy" href="@Url.Action("DownloadTemplate", "Enterprise")"><i class="fa fa-cloud-download"></i>&nbsp;Mẫu import</a>*@
 
         @Html.Button(true, "AddEnterprise", Url.Action("Add", new { area = "Cate" }), "<i class='fa fa-plus'></i>", AppProcessor.Messagor.GetMessage("Button_Add"), new { @class = "btn btn-sm btn-success", data_width = "1024px" })
 
-        @Html.Button(true, "ImportEnterprise", Url.Action("Import", new { area = "Cate" }), "<i class='fa fa-cloud-upload'></i>", AppProcessor.Messagor.GetMessage("Button_Import"), new { @class = "btn btn-sm btn-primary", data_width = "1024px" })
+        @*@Html.Button(true, "ImportEnterprise", Url.Action("Import", new { area = "Cate" }), "<i class='fa fa-cloud-upload'></i>", AppProcessor.Messagor.GetMessage("Button_Import"), new { @class = "btn btn-sm btn-primary", data_width = "1024px" })*@
     </div>
 }
 

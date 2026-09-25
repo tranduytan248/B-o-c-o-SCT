@@ -161,6 +161,9 @@
           <Procedure Name="Cate_BusinessProduct_Save" Value="p_Cate_BusinessProduct_Save" />
           <Procedure Name="Cate_BusinessProduct_Delete" Value="p_Cate_BusinessProduct_Delete" />
           <Procedure Name="Cate_BusinessProduct_GetByID" Value="p_Cate_BusinessProduct_GetByID" />
+          <Procedure Name="Cate_BusinessProducts_GetViaEnterprise" Value="p_Cate_BusinessProducts_GetViaEnterprise" />
+          <Procedure Name="Cate_BusinessProducts_GetByPrefix" Value="p_Cate_BusinessProducts_GetByPrefix" />
+          <Procedure Name="Cate_BusinessProducts_GetUnconfiguredByPrefix" Value="p_Cate_BusinessProducts_GetUnconfiguredByPrefix" />
 
           <Procedure Name="Cate_EconomicSector_Get" Value="p_Cate_EconomicSector_Get" />
           <Procedure Name="Cate_EconomicSector_Save" Value="p_Cate_EconomicSector_Save" />

@@ -457,10 +457,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 {
                     EnterpriseId = model.EnterpriseId,
                     ForMonth = model.ForMonth,
-                    TypeReport = enterpriseModel.TypeBusiness,
-                    TypeReportName =
-                        AppProcessor.Messagor.GetMessage(
-                            EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    TypeReport = model.TypeReport,
+                    TypeReportName = model.TypeReportName,
+                    //TypeReport = enterpriseModel.TypeBusiness,
+                    //TypeReportName =
+                    //    AppProcessor.Messagor.GetMessage(
+                    //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                     DataImport = dataImports,
                     ReportFile = fileNameSigned,
                     CreatedBy = User.UserName,
@@ -545,17 +547,21 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
                 #region Check Correct Type Template
 
+                //logActions.AppendLine(
+                //    $" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+
                 logActions.AppendLine(
-                    $" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+                    $" - [{User.UserName}] thực hiện gửi báo cáo [{model.TypeReportName}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
                 logActions.AppendLine(" - Thực hiện kiểm tra nội dung báo cáo");
 
-                if (!CheckCorrectTemplate(model.FileImport,
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+                //if (!CheckCorrectTemplate(model.FileImport, EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+                if (!CheckCorrectTemplate(model.FileImport, model.TypeReportName))
                 {
                     logActions.AppendLine(" + Nội dung báo cáo không đúng định dạng");
                     AppProcessor.Logger.Message(logActions.ToString());
 
-                    string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+                    //string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+                    string sTypeBiz = _mappingReportTypeBiz[model.TypeReport];
                     return Json(new
                     {
                         status = false,
@@ -761,10 +767,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 {
                     EnterpriseId = model.EnterpriseId,
                     ForMonth = model.ForMonth,
-                    TypeReport = enterpriseModel.TypeBusiness,
-                    TypeReportName =
-                        AppProcessor.Messagor.GetMessage(
-                            EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    TypeReport = model.TypeReport,
+                    TypeReportName = model.TypeReportName,
+                    //TypeReport = enterpriseModel.TypeBusiness,
+                    //TypeReportName =
+                    //    AppProcessor.Messagor.GetMessage(
+                    //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                     DataImport = dataImports,
                     ReportFile = fileNameSigned,
                     CreatedBy = User.UserName,
@@ -892,10 +900,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 EnterpriseId = model.EnterpriseId,
                 ForMonth = model.ForMonth,
-                TypeReport = enterpriseModel.TypeBusiness,
-                TypeReportName =
-                    AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                TypeReport = model.TypeReport,
+                TypeReportName = model.TypeReportName,
+                //TypeReport = enterpriseModel.TypeBusiness,
+                //TypeReportName =
+                //    AppProcessor.Messagor.GetMessage(
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 DataImport = dataImport,
                 CreatedBy = User.UserName,
                 Reason = model.Reason
@@ -947,10 +957,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 });
             }
 
-            if (!CheckCorrectTemplate(model.FileImport,
-                    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+            //if (!CheckCorrectTemplate(model.FileImport, EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+            if (!CheckCorrectTemplate(model.FileImport, model.TypeReportName))
             {
-                string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+                //string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+                string sTypeBiz = _mappingReportTypeBiz[model.TypeReport];
                 return Json(new
                 {
                     status = false,
@@ -1183,7 +1194,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 });
             }
 
-            logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+            //logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+
+            logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{model.TypeReportName}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
             var dataReport = ReadFormData(Request.Form);
@@ -1303,10 +1316,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 EnterpriseId = model.EnterpriseId,
                 ForMonth = model.ForMonth,
-                TypeReport = enterpriseModel.TypeBusiness,
-                TypeReportName =
-                    AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                TypeReport = (int)model.TypeReport,
+                TypeReportName = model.TypeReportName,
+                //TypeReport = enterpriseModel.TypeBusiness,
+                //TypeReportName =
+                //    AppProcessor.Messagor.GetMessage(
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 DataImport = dataReport,
                 ReportFile = fileNameSigned,
                 CreatedBy = User.UserName,
@@ -1401,9 +1416,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ForMonth = onMonth ?? DateTime.Now,
                 ListDataImports = dataImports,
                 EnterpriseName = enterpriseModel.BusinessName,
-                TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
-                TypeReportName = AppProcessor.Messagor.GetMessage(
-                    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                TypeReport = EnumTypeBusiness.Manufacturing,
+                TypeReportName = EnumHelper.GetDescription(EnumTypeBusiness.Manufacturing),
+                //TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
+                //TypeReportName = AppProcessor.Messagor.GetMessage(
+                //    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 IsEdit = true,
                 AccessToken = (string)Session[$"VNPT-SmartCA-{User?.UserName}-AccessToken"],
                 EnableSignDigitalDoc =
@@ -1462,9 +1479,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     ForMonth = model.ForMonth,
                     ListDataImports = dataImports,
                     EnterpriseName = enterpriseModel.BusinessName,
-                    TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
-                    TypeReportName = AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    TypeReport = model.TypeReport,
+                    TypeReportName = model.TypeReportName,
+                    //TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
+                    //TypeReportName = AppProcessor.Messagor.GetMessage(
+                    //    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                     IsEdit = true,
                     EnableSignDigitalDoc =
                         (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
@@ -1474,7 +1493,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             #endregion
 
-            logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+            //logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
+            logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{model.TypeReportName}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
             var dataReport = ReadFormData(Request.Form);
@@ -1598,10 +1618,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 EnterpriseId = model.EnterpriseId,
                 ForMonth = model.ForMonth,
-                TypeReport = enterpriseModel.TypeBusiness,
-                TypeReportName =
-                    AppProcessor.Messagor.GetMessage(
-                        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                TypeReport = (int)model.TypeReport,
+                TypeReportName = model.TypeReportName,
+                //TypeReport = enterpriseModel.TypeBusiness,
+                //TypeReportName =
+                //    AppProcessor.Messagor.GetMessage(
+                //        EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
                 DataImport = dataReport,
                 CreatedBy = User.UserName,
                 Reason = "Cập nhật báo cáo"
@@ -2590,66 +2612,66 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             return PartialView("_SignToken", serialKeyVNPTToken);
         }
 
-        [AjaxOnly]
-        [HttpPost]
-        [ActionType(Type = EnumActionType.Add)]
-        public ActionResult CheckDataFileSignToken(DataFileSignTokenModel model)
-        {
-            if (model.FileDataBase64 == null)
-            {
-                return Json(new
-                {
-                    status = false,
-                    message = string.Empty
-                });
-            }
+        //[AjaxOnly]
+        //[HttpPost]
+        //[ActionType(Type = EnumActionType.Add)]
+        //public ActionResult CheckDataFileSignToken(DataFileSignTokenModel model)
+        //{
+        //    if (model.FileDataBase64 == null)
+        //    {
+        //        return Json(new
+        //        {
+        //            status = false,
+        //            message = string.Empty
+        //        });
+        //    }
 
-            var enterpriseModel = _enterpriseCache.GetById(model.EnterpriseId);
-            if (enterpriseModel == null)
-                return Json(new
-                {
-                    status = false,
-                    message = CreateMessage($"{_enterpriseTitle}",
-                        EnumProcessType.DataNotExist, EnumMsgIcon.Error)
-                });
+        //    var enterpriseModel = _enterpriseCache.GetById(model.EnterpriseId);
+        //    if (enterpriseModel == null)
+        //        return Json(new
+        //        {
+        //            status = false,
+        //            message = CreateMessage($"{_enterpriseTitle}",
+        //                EnumProcessType.DataNotExist, EnumMsgIcon.Error)
+        //        });
 
-            var arraBytes = Convert.FromBase64String(model.FileDataBase64);
-            var streamDatas = new MemoryStream(arraBytes);
+        //    var arraBytes = Convert.FromBase64String(model.FileDataBase64);
+        //    var streamDatas = new MemoryStream(arraBytes);
 
-            if (!CheckCorrectTemplate(streamDatas, EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
-            {
-                string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
-                return Json(new
-                {
-                    status = false,
-                    message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
-                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
-                });
-            }
+        //    if (!CheckCorrectTemplate(streamDatas, EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)))
+        //    {
+        //        string sTypeBiz = _mappingReportTypeBiz[enterpriseModel.TypeBusiness];
+        //        return Json(new
+        //        {
+        //            status = false,
+        //            message = CreateMessage($"Tệp dữ liệu import không đúng loại báo cáo thuộc [{sTypeBiz}]",
+        //                EnumProcessType.NonFormat, EnumMsgIcon.Error)
+        //        });
+        //    }
 
-            #region Check Data Import
+        //    #region Check Data Import
 
-            bool isSuccessImport;
-            var dataImports = ReadDataImports(streamDatas, model.FileExt, out isSuccessImport);
-            if (!isSuccessImport)
-                return Json(new
-                {
-                    status = false,
-                    message = CreateMessage(AppProcessor.Messagor.GetMessage("ImportData_Message_Fail"),
-                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
-                });
-            var lstDataImports = ModelProvider.CreateListFromTable<ReportDataImportModel>(dataImports);
+        //    bool isSuccessImport;
+        //    var dataImports = ReadDataImports(streamDatas, model.FileExt, out isSuccessImport);
+        //    if (!isSuccessImport)
+        //        return Json(new
+        //        {
+        //            status = false,
+        //            message = CreateMessage(AppProcessor.Messagor.GetMessage("ImportData_Message_Fail"),
+        //                EnumProcessType.NonFormat, EnumMsgIcon.Error)
+        //        });
+        //    var lstDataImports = ModelProvider.CreateListFromTable<ReportDataImportModel>(dataImports);
 
-            #endregion
+        //    #endregion
 
-            return Json(new
-            {
-                status = true,
-                dataImport = lstDataImports.OrderBy(d => d.RowIndex),
-                typeReport = enterpriseModel.TypeBusiness,
-                message = ""
-            });
-        }
+        //    return Json(new
+        //    {
+        //        status = true,
+        //        dataImport = lstDataImports.OrderBy(d => d.RowIndex),
+        //        typeReport = enterpriseModel.TypeBusiness,
+        //        message = ""
+        //    });
+        //}
 
         #endregion
     }

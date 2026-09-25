@@ -53,14 +53,16 @@ namespace CenIT.ReportTourism.Models.Cate
         public string ProvinceName { get; set; }
 
         /// <summary>
-        /// Ngành công nghiệp chính
+        /// Ngành công nghiệp
         /// </summary>
-        [CustomDisplayName("Enterprise_MainIndustry")]
-        public int? MainIndustryId { get; set; }
+        [CustomDisplayName("Enterprise_Industry")]
+        public List<int?> ListIndustryId { get; set; }
 
-        public string MainIndustryCode { get; set; }
+        [CustomDisplayName("Enterprise_Industry")]
+        public string IndustryIds { get; set; }
+        //public string MainIndustryCode { get; set; }
 
-        public string MainIndustryName { get; set; }
+        //public string MainIndustryName { get; set; }
 
         public List<ListItem> ListBusinessIndustry { get; set; } = new List<ListItem>();
 
@@ -100,10 +102,13 @@ namespace CenIT.ReportTourism.Models.Cate
 
         [CustomDisplayName("Enterprise_Label_TypeBusiness")]
         [CustomRequired]
-        public int TypeBusiness { get; set; }
+        public List<int> ListTypeBusinessId { get; set; }
 
         [CustomDisplayName("Enterprise_Label_TypeBusiness")]
-        public string TypeBusinessName { get; set; }
+        public string TypeBusiness { get; set; }
+
+        //[CustomDisplayName("Enterprise_Label_TypeBusiness")]
+        //public string TypeBusinessName { get; set; }
 
         public List<ListItem> ListTypeBusiness { get; set; } = new List<ListItem>();
 

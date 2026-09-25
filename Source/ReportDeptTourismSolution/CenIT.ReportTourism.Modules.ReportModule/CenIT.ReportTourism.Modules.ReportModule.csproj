@@ -154,7 +154,6 @@
     <Content Include="App_Data\Modules\Report_StoredProcedures.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Areas\Report\Views\ExtendInfo\ExtendInfo.js" />
     <Content Include="Areas\Report\Views\Home\Home.js" />
     <Content Include="Areas\Report\Views\Import\Import.js" />
     <Content Include="Areas\Report\Views\Import\ViewDataImport.js" />
@@ -180,7 +179,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Report\Controllers\DashboardController.cs" />
-    <Compile Include="Areas\Report\Controllers\ExtendInfoController.cs" />
     <Compile Include="Areas\Report\Controllers\HomeController.cs" />
     <Compile Include="Areas\Report\Controllers\ImportController.cs" />
     <Compile Include="Areas\Report\Controllers\ReportController.cs" />
@@ -258,10 +256,6 @@
     <Content Include="Areas\Report\Views\Dashboard\_StatisticVisitor.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticMapVisitor.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticIncome.cshtml" />
-    <Content Include="Areas\Report\Views\ExtendInfo\_Add.cshtml" />
-    <Content Include="Areas\Report\Views\ExtendInfo\_Edit.cshtml" />
-    <Content Include="Areas\Report\Views\ExtendInfo\_ExtendInfos.cshtml" />
-    <Content Include="Areas\Report\Views\ExtendInfo\Index.cshtml" />
     <Content Include="Contents\Modules\Report\Templates\_01UocKetQuaHoatDongKinhDoanh.xsc">
       <DependentUpon>_01UocKetQuaHoatDongKinhDoanh.xsd</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

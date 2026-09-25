@@ -14,6 +14,13 @@ namespace CenIT.ReportTourism.Core.Conts
         /// Doanh nghiệp thương mại, dịch vụ
         /// </summary>
         [Description("TypeBusiness_Trading")]
-        Trading = 2
+        Trading = 2,
+
+        ///// <summary>
+        ///// Doanh nghiệp sản xuất, kinh doanh và thương mại, dịch vụ
+        ///// </summary>
+        //[Description("TypeBusiness_ManufacturingAndTrading")]
+        //ManufacturingAndTrading = 3
+
     }
 }
