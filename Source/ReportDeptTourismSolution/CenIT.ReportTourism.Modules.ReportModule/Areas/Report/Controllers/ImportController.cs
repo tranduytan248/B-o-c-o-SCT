@@ -1833,8 +1833,26 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [AjaxOnly]
         [HttpGet]
         [AllowAnyPermission]
-        public ActionResult LoadViewTypeReport(int? enterpriseId, DateTime? onMonth = null, string forMonth = null)
+        public ActionResult LoadViewTypeReport(int? enterpriseId, DateTime? onMonth = null, string forMonth = null, int? typeReport = null)
         {
+            if (typeReport.HasValue && typeReport.Value == (int)EnumTypeBusiness.Trading)
+            {
+                return PartialView("_NoTemplateReport");
+            }
+
+            if (!typeReport.HasValue && enterpriseId.HasValue && enterpriseId.Value > 0)
+            {
+                var ent = _enterpriseCache.GetById(enterpriseId.Value);
+                if (ent != null && !string.IsNullOrEmpty(ent.TypeBusiness))
+                {
+                    int biz;
+                    if (int.TryParse(ent.TypeBusiness.Split(',')[0], out biz) && biz == (int)EnumTypeBusiness.Trading)
+                    {
+                        return PartialView("_NoTemplateReport");
+                    }
+                }
+            }
+
             var products = new List<ReportDataImportModel>();
             var mainProducts = new List<ReportDataImportModel>();
             var exportProducts = new List<ReportDataImportModel>();

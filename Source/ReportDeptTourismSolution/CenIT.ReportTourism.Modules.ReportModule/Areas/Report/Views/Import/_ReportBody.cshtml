@@ -100,9 +100,14 @@
     $(document).ready(function() {
         var $container = $("#modal_AddReport").length ? $("#modal_AddReport") : $("#DataImport");
 
-        $container.find('#TypeReportSelect').on('change', function () {
+        $container.find('#TypeReportSelect').off('change.typeReport').on('change.typeReport', function () {
             var txt = $(this).find('option:selected').text();
             $container.find('#TypeReportName').val(txt);
+            var entId = $enterpriseSelect.val();
+            var entText = $enterpriseSelect.find('option:selected').text();
+            if (entId) {
+                triggerLoadReportForm(entId, entText);
+            }
         });
         if (!$container.find('#TypeReportName').val() || $container.find('#TypeReportName').val().indexOf('TypeBusiness_') !== -1) {
             $container.find('#TypeReportName').val($container.find('#TypeReportSelect option:selected').text());
@@ -164,7 +169,8 @@
         var lastLoadedKey = "";
         function triggerLoadReportForm(entId, entText) {
             var forMonthVal = $container.find("#ForMonth").val();
-            var currentKey = (entId || "") + "_" + (forMonthVal || "");
+            var typeReportVal = $container.find("#TypeReportSelect").val();
+            var currentKey = (entId || "") + "_" + (forMonthVal || "") + "_" + (typeReportVal || "");
             if (currentKey === lastLoadedKey && $container.find("#TypeReport").children().length > 0) {
                 return;
             }
@@ -180,7 +186,9 @@
                 return;
             }
 
-            if (isEnableSignDigitalDoc == 0 || isLoginSmartCA == 1) {
+            if (typeReportVal == "2") {
+                $('#modal_AddReport button[type="submit"]').prop('disabled', true);
+            } else if (isEnableSignDigitalDoc == 0 || isLoginSmartCA == 1) {
                 $('#modal_AddReport button[type="submit"]').removeAttr('disabled');
             }
 
@@ -188,7 +196,7 @@
                 $container.find('#EnterpriseName').val(entText);
             }
 
-            var urlLoadViewTypeReport = '@Url.Action("LoadViewTypeReport", "Import", new { area = "Report" })?enterpriseId=' + encodeURIComponent(entId) + (forMonthVal ? ("&forMonth=" + encodeURIComponent(forMonthVal)) : "");
+            var urlLoadViewTypeReport = '@Url.Action("LoadViewTypeReport", "Import", new { area = "Report" })?enterpriseId=' + encodeURIComponent(entId) + (forMonthVal ? ("&forMonth=" + encodeURIComponent(forMonthVal)) : "") + (typeReportVal ? ("&typeReport=" + encodeURIComponent(typeReportVal)) : "");
 
             $container.find("#TypeReport").html("<div class='text-center' style='padding:25px;'><i class='fa fa-spinner fa-spin fa-2x text-primary'></i><div style='margin-top:10px; font-weight:bold;'>Đang tải mẫu báo cáo...</div></div>");
 
@@ -196,6 +204,13 @@
                 if (status === "error") {
                     lastLoadedKey = "";
                     $container.find("#TypeReport").html("<div class='alert alert-danger'>Lỗi tải biểu mẫu (" + xhr.status + ": " + xhr.statusText + "). Vui lòng thử lại.</div>");
+                    $('#modal_AddReport button[type="submit"]').prop('disabled', true);
+                } else {
+                    if ($container.find("#TypeReportSelect").val() == "2") {
+                        $('#modal_AddReport button[type="submit"]').prop('disabled', true);
+                    } else if (isEnableSignDigitalDoc == 0 || isLoginSmartCA == 1) {
+                        $('#modal_AddReport button[type="submit"]').removeAttr('disabled');
+                    }
                 }
             });
         }
@@ -215,7 +230,9 @@
             if (e && e.params && e.params.data && e.params.data.typeBusiness) {
                 var bizVal = e.params.data.typeBusiness;
                 if ($container.find("#TypeReportSelect option[value='" + bizVal + "']").length > 0) {
-                    $container.find("#TypeReportSelect").val(bizVal).trigger('change');
+                    $container.find("#TypeReportSelect").val(bizVal);
+                    var txt = $container.find('#TypeReportSelect option:selected').text();
+                    $container.find('#TypeReportName').val(txt);
                 }
             }
             triggerLoadReportForm(entId, entText);
