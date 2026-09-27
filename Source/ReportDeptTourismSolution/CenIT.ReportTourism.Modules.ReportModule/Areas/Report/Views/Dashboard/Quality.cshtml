@@ -1,0 +1,91 @@
+@model CenIT.ReportTourism.Models.Report.DashboardQualityModel
+@using System.Web.Mvc
+@using System.Linq
+@{
+    ViewBag.Title = "Chất lượng và độ bao phủ dữ liệu";
+    var filed = Math.Max(1, Model.Submission.Submitted);
+    var metrics = new[]
+    {
+        new { Code = "0101", Label = "Doanh thu công nghiệp", Count = Model.IndustrialRevenueCoverage, Months = Model.IndustrialRevenueHistoryMonths },
+        new { Code = "06", Label = "Xuất khẩu", Count = Model.ExportCoverage, Months = Model.ExportHistoryMonths },
+        new { Code = "07", Label = "Nhập khẩu", Count = Model.ImportCoverage, Months = Model.ImportHistoryMonths }
+    };
+}
+
+@section Title { @ViewBag.Title }
+@section HeadCss {
+    <link rel="stylesheet" href="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css") + "?v=20260928-compact")" />
+}
+
+<div class="management-dashboard">
+    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Quality", Filters = Model.Filters })
+    <div class="dashboard-heading">
+        <div>
+            <h1 id="dashboard-content" tabindex="-1">Chất lượng và độ bao phủ dữ liệu</h1>
+            <p>Nhóm doanh nghiệp theo dõi đã phân loại · tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year <span class="scope-badge">Không phải toàn bộ doanh nghiệp Khánh Hòa</span></p>
+        </div>
+    </div>
+    @Html.Partial("_DashboardFilters", Model.FilterOptions)
+
+    <div class="quality-intro" role="note">
+        <i class="fa fa-info-circle" aria-hidden="true"></i>
+        Tệp báo cáo và dữ liệu chỉ tiêu là hai mức hoàn thành khác nhau. Chỉ tiêu dashboard yêu cầu đủ mã 0101, 06 và 07; giá trị 0 vẫn được tính là đã có dữ liệu.
+    </div>
+
+    <div class="row quality-kpis">
+        <div class="col-xs-6 col-md-3"><article class="dashboard-kpi kpi-blue"><div class="kpi-label">Nhóm dự kiến báo cáo</div><div class="kpi-value">@Model.Submission.TotalEnterprises</div><div class="kpi-note">Đang theo dõi và đã phân loại</div></article></div>
+        <div class="col-xs-6 col-md-3"><article class="dashboard-kpi kpi-green"><div class="kpi-label">Có tệp báo cáo</div><div class="kpi-value">@Model.Submission.Submitted</div><div class="kpi-note">@Model.Submission.NotSubmitted chưa nộp</div></article></div>
+        <div class="col-xs-6 col-md-3"><article class="dashboard-kpi kpi-green"><div class="kpi-label">Đủ ba chỉ tiêu</div><div class="kpi-value">@Model.Submission.CompleteIndicators</div><div class="kpi-note">Trong số tệp đã nộp</div></article></div>
+        <div class="col-xs-6 col-md-3"><article class="dashboard-kpi kpi-amber"><div class="kpi-label">Tệp còn thiếu chỉ tiêu</div><div class="kpi-value">@Model.Submission.MissingIndicators</div><div class="kpi-note">Cần bổ sung dữ liệu</div></article></div>
+    </div>
+
+    <div class="row dashboard-row">
+        <div class="col-md-7">
+            <section class="dashboard-panel quality-coverage-panel">
+                <header class="panel-heading"><div><h2>Độ phủ của từng chỉ tiêu</h2><p>Số doanh nghiệp có giá trị / số đã nộp tệp trong kỳ</p></div></header>
+                @if (Model.Submission.Submitted == 0) { <p class="dashboard-empty">Chưa có tệp báo cáo trong phạm vi lọc.</p> }
+                @foreach (var metric in metrics)
+                {
+                    var percent = metric.Count * 100m / filed;
+                    <div class="quality-metric-row">
+                        <div class="horizontal-share-heading"><strong>@metric.Label <small>(@metric.Code)</small></strong><span>@metric.Count / @Model.Submission.Submitted</span></div>
+                        <div class="ranked-bar-track"><span class="ranked-bar positive" style="width:@percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                    </div>
+                }
+            </section>
+        </div>
+        <div class="col-md-5">
+            <section class="dashboard-panel quality-history-panel">
+                <header class="panel-heading"><div><h2>Lịch sử để so sánh</h2><p>Số tháng có chỉ tiêu trong cửa sổ 12 tháng</p></div></header>
+                @foreach (var metric in metrics)
+                {
+                    <div class="quality-history-row"><span>@metric.Label</span><strong>@metric.Months / 12 tháng</strong></div>
+                }
+                <p class="quality-history-note">So sánh theo tháng cần cùng doanh nghiệp có dữ liệu ở tháng trước; so sánh cùng kỳ cần tháng tương ứng của năm trước.</p>
+                @if (metrics.Any(metric => metric.Months < 2))
+                {
+                    <p class="dashboard-empty">Chưa đủ lịch sử để kết luận xu hướng hoặc mức giảm. MoM/YoY chỉ hiển thị khi có kỳ đối chiếu hợp lệ.</p>
+                }
+            </section>
+        </div>
+    </div>
+
+    <div class="row dashboard-row">
+        <div class="col-xs-12">
+            <section class="dashboard-panel quality-missing-panel">
+                <header class="panel-heading"><div><h2>Tệp đã nộp còn thiếu chỉ tiêu</h2><p>Tối đa 12 đơn vị cần rà soát trong phạm vi lọc</p></div></header>
+                @if (Model.MissingIndicatorEnterprises.Count == 0) { <p class="dashboard-empty">Không có tệp thiếu chỉ tiêu bắt buộc trong phạm vi lọc.</p> }
+                <div class="quality-missing-grid">
+                    @foreach (var enterprise in Model.MissingIndicatorEnterprises)
+                    {
+                        <div class="quality-missing-item"><strong>@enterprise.Name</strong><span>Thiếu mã @enterprise.MissingCodes</span>@if (enterprise.IsLate) { <small>Nộp muộn</small> }</div>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+@section CustomJS {
+    <script src="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js") + "?v=20260928-responsive")"></script>
+}

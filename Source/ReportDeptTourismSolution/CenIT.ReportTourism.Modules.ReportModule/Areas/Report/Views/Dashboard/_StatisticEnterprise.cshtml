@@ -1,54 +1,24 @@
-﻿@model CenIT.ReportTourism.Models.Report.ReportStatisticEnterpriseModel
+﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
 
-<div class="box box-body no-footer no-header no-border">
-    <div class="row">
-        <div class="col-md-3 col-xs-6">
-            <div class="small-box bg-primary">
-                <div class="inner">
-                    <h3>@Model.TotalEnterprise</h3>
-                    <p>Tổng số Doanh nghiệp </p>
+<div class="row dashboard-kpis">
+    @foreach (var kpi in Model.Kpis)
+    {
+        <div class="col-xs-6 col-md-3">
+        <article class="dashboard-kpi kpi-@kpi.Tone">
+            <div class="kpi-label">@kpi.Label</div>
+            <div class="kpi-value">@kpi.Value @if (kpi.Value != "—") { <small>@kpi.Unit</small> }</div>
+            @if (kpi.Label == "Tỷ lệ báo cáo")
+            {
+                <div class="kpi-note"><i class="fa fa-check-circle" aria-hidden="true"></i> @kpi.Note</div>
+            }
+            else
+            {
+                <div class="kpi-changes">
+                    <span class="@(kpi.Mom.HasValue ? (kpi.Mom.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">Tháng @(kpi.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}", kpi.Mom.Value) + "%" : "chưa đủ lịch sử")</span>
+                    <span class="@(kpi.Yoy.HasValue ? (kpi.Yoy.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">Cùng kỳ @(kpi.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}", kpi.Yoy.Value) + "%" : "chưa đủ lịch sử")</span>
                 </div>
-                <div class="icon">
-                    <i class="fa fa-bank"></i>
-                </div>
-                <a href="#" class="small-box-footer">&nbsp;</a>
-            </div>
+            }
+        </article>
         </div>
-        <div class="col-md-3 col-xs-6">
-            <div class="small-box bg-green">
-                <div class="inner">
-                    <h3>@Model.TotalReportSubmited</h3>
-                    <p>Tổng số báo cáo</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-file-o"></i>
-                </div>
-                <a href="#" class="small-box-footer">&nbsp;</a>
-            </div>
-        </div>
-        <div class="col-md-3 col-xs-6">
-            <div class="small-box bg-yellow">
-                <div class="inner">
-                    <h3>@Model.TotalEnterpriseSubmitReportLate</h3>
-                    <p>Doanh nghiệp trễ hạn báo cáo</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-clock-o"></i>
-                </div>
-                <a href="#" class="small-box-footer">&nbsp;</a>
-            </div>
-        </div>
-        <div class="col-md-3 col-xs-6">
-            <div class="small-box bg-red">
-                <div class="inner">
-                    <h3>@Model.TotalEnterpriseNotSubmitReportYet</h3>
-                    <p>Doanh nghiệp chưa nộp báo cáo</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-close"></i>
-                </div>
-                <a href="@Url.Action("EnterpiseNotSendReportYet", "Dashboard", new { forMonth = Model.OnMonth.ToString("yyyy-MM-dd") })" class="small-box-footer">Chi tiết <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-    </div>
+    }
 </div>

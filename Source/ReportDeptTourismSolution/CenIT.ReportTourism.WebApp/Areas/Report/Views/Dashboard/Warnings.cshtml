@@ -1,0 +1,75 @@
+﻿@model CenIT.ReportTourism.Models.Report.DashboardWarningsModel
+
+@{
+    ViewBag.Title = "Cảnh báo doanh nghiệp";
+}
+
+@section Title { @ViewBag.Title }
+
+@section HeadCss {
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
+    <link rel="stylesheet" href="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css") + "?v=20260928-compact")" />
+}
+
+<div class="management-dashboard">
+    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Warnings", Filters = Model.Filters })
+    <div class="dashboard-heading"><div><h1 id="dashboard-content" tabindex="-1">Cảnh báo doanh nghiệp</h1><p>Doanh thu công nghiệp trong nhóm theo dõi so với tháng trước <span class="scope-badge">Cần hai kỳ có dữ liệu</span></p></div></div>
+    @Html.Partial("_DashboardFilters", Model.FilterOptions)
+    @if (!Model.HasComparisonData) { <p class="dashboard-empty">Chưa có hai tháng liên tiếp với doanh thu công nghiệp của cùng doanh nghiệp; chưa thể đánh giá mức giảm.</p> }
+
+    <div class="row warning-kpis">
+        <div class="col-xs-6 col-md-3"><article class="warning-kpi level-10"><span>Giảm trên 10%</span><strong>@(Model.HasComparisonData ? Model.Summary.DeclineOver10.ToString() : "—")</strong><small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small></article></div>
+        <div class="col-xs-6 col-md-3"><article class="warning-kpi level-20"><span>Giảm trên 20%</span><strong>@(Model.HasComparisonData ? Model.Summary.DeclineOver20.ToString() : "—")</strong><small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small></article></div>
+        <div class="col-xs-6 col-md-3"><article class="warning-kpi level-30"><span>Giảm trên 30%</span><strong>@(Model.HasComparisonData ? Model.Summary.DeclineOver30.ToString() : "—")</strong><small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small></article></div>
+        <div class="col-xs-6 col-md-3"><article class="warning-kpi level-urgent"><span>Cần làm việc ngay</span><strong>@(Model.HasComparisonData ? Model.Summary.UrgentEnterprises.ToString() : "—")</strong><small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small></article></div>
+    </div>
+
+    <div class="row dashboard-row">
+        <div class="col-md-4">
+            <section class="dashboard-panel severity-panel">
+                <header class="panel-heading"><div><h2>Mức độ cảnh báo</h2><p>Phân bố theo ngưỡng giảm</p></div></header>
+                @if (!Model.HasComparisonData) { <p class="dashboard-empty">Chưa có kỳ đối chiếu hợp lệ để phân loại mức giảm.</p> }
+                else if (Model.Summary.DeclineOver10 == 0) { <p class="dashboard-empty">Không có doanh nghiệp giảm trên 10% trong các cặp dữ liệu hợp lệ.</p> }
+                else { <div id="warning-severity-chart" class="severity-chart" role="img" aria-label="Phân bố mức độ cảnh báo"></div> }
+                <script type="application/json" class="md-chart-data" data-chart="severity">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.HasComparisonData ? new[] { new { label = "10–20%", value = Model.Summary.DeclineOver10 - Model.Summary.DeclineOver20 }, new { label = "20–30%", value = Model.Summary.DeclineOver20 - Model.Summary.DeclineOver30 }, new { label = "Trên 30%", value = Model.Summary.DeclineOver30 } } : new object[0]))</script>
+            </section>
+        </div>
+        <div class="col-md-8">
+            <section class="dashboard-panel warning-trend-panel">
+                <header class="panel-heading"><div><h2>Cảnh báo theo thời gian</h2><p>Số doanh nghiệp có mức giảm vượt ngưỡng</p></div></header>
+                @if (Model.Trend.Count < 2) { <p class="dashboard-empty">Chưa đủ tháng có cặp dữ liệu để hiển thị xu hướng cảnh báo.</p> }
+                else { <div id="warning-trend-chart" class="morris-chart warning-trend-chart" role="img" aria-label="Xu hướng cảnh báo theo tháng"></div> }
+                <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+            </section>
+        </div>
+    </div>
+
+    <div class="row dashboard-row">
+        <div class="col-md-5">
+            <section class="dashboard-panel">
+                <header class="panel-heading"><div><h2>Cảnh báo theo ngành</h2><p>Số trường hợp cần chú ý</p></div></header>
+                @if (Model.ByIndustry.Count == 0) { <p class="dashboard-empty">Chưa có cảnh báo theo ngành.</p> }
+                @foreach (var item in Model.ByIndustry)
+                {
+                    <div class="compact-impact-row"><span>@item.Name</span><div class="ranked-bar-track"><span class="ranked-bar warning" style="width:@Math.Min(100, item.Contribution * 7)%"></span></div><strong>@item.Contribution</strong></div>
+                }
+            </section>
+        </div>
+        <div class="col-md-7">
+            <section class="dashboard-panel">
+                <header class="panel-heading"><div><h2>Doanh nghiệp cần ưu tiên</h2><p>Xếp theo mức giảm và ảnh hưởng</p></div></header>
+                @if (Model.UrgentEnterprises.Count == 0) { <p class="dashboard-empty">Chưa có doanh nghiệp vượt ngưỡng cảnh báo.</p> }
+                @foreach (var item in Model.UrgentEnterprises)
+                {
+                    <div class="impact-enterprise-row"><div class="ranked-copy"><strong>@item.Name</strong><small>@item.Industry</small></div><div class="ranked-bar-track"><span class="ranked-bar negative" style="width:@Math.Min(100m, Math.Abs(item.Contribution) * 12m).ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div><strong class="text-negative">@item.ChangePercent%</strong></div>
+                }
+            </section>
+        </div>
+    </div>
+</div>
+
+@section CustomJS {
+    <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
+    <script src="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js") + "?v=20260928-responsive")"></script>
+}

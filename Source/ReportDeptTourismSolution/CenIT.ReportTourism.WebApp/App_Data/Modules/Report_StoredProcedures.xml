@@ -35,6 +35,7 @@
           <Procedure Name="Report_Dashboard_StatisticVisitor" Value="p_Report_Dashboard_StatisticVisitor" />
           <Procedure Name="Report_Dashboard_StatisticMapVisitor" Value="p_Report_Dashboard_StatisticMapVisitor" />
           <Procedure Name="Report_Dashboard_StatisticIncome" Value="p_Report_Dashboard_StatisticIncome" />
+          <Procedure Name="Report_Dashboard_IndustrialSnapshot" Value="p_Report_Dashboard_IndustrialSnapshot" />
 
           <Procedure Name="Report_ExtendInfos_Get" Value="p_Report_ExtendInfos_Get" />
           <Procedure Name="Report_ExtendInfos_Save" Value="p_Report_ExtendInfos_Save" />

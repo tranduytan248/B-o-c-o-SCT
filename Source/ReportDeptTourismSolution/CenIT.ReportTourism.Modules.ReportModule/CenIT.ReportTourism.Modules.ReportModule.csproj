@@ -165,6 +165,14 @@
     <Content Include="Contents\Modules\Report\plugins\jquery-confirm-v3.3.4\jquery-confirm.min.css" />
     <Content Include="Contents\Modules\Report\plugins\jquery-confirm-v3.3.4\jquery-confirm.min.js" />
     <Content Include="Contents\Modules\Report\plugins\maskMoney\jquery.maskMoney.min.js" />
+    <Content Include="..\CenIT.ReportTourism.WebApp\Contents\plugins\management-dashboard\management-dashboard.css">
+      <Link>Contents\plugins\management-dashboard\management-dashboard.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\CenIT.ReportTourism.WebApp\Contents\plugins\management-dashboard\management-dashboard.js">
+      <Link>Contents\plugins\management-dashboard\management-dashboard.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Contents\Modules\Report\plugins\vnpt-ca\base64.js" />
     <Content Include="Contents\Modules\Report\plugins\vnpt-ca\download.js" />
     <Content Include="Contents\Modules\Report\plugins\vnpt-ca\vnpt-plugin.js" />
@@ -246,6 +254,16 @@
     <Content Include="Areas\Report\Views\Report\Index.cshtml" />
     <Content Include="Areas\Report\Views\Report\_Report.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\Index.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Analysis.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Warnings.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Progress.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Quality.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardFilters.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardNavigation.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_EnterpriseMovement.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardAlerts.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardSubmissionDetails.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_ReportedReasons.cshtml" />
     <Content Include="Contents\Modules\Report\Templates\_02ThongKeQuocTichKhachDuLich.xsc">
       <DependentUpon>_02ThongKeQuocTichKhachDuLich.xsd</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -254,7 +272,6 @@
     <Content Include="Areas\Report\Views\Dashboard\_StatisticEnterprise.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticTypeBusiness.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticVisitor.cshtml" />
-    <Content Include="Areas\Report\Views\Dashboard\_StatisticMapVisitor.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticIncome.cshtml" />
     <Content Include="Contents\Modules\Report\Templates\_01UocKetQuaHoatDongKinhDoanh.xsc">
       <DependentUpon>_01UocKetQuaHoatDongKinhDoanh.xsd</DependentUpon>

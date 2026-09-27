@@ -1,0 +1,35 @@
+﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
+
+@using System.Linq
+<section class="dashboard-panel movement-panel">
+    <header class="panel-heading">
+        <div><h2>Doanh nghiệp tác động lớn</h2><p>Thay đổi doanh thu công nghiệp so với tháng trước</p></div>
+        <a class="panel-link" href="@Url.Action("Analysis", "Dashboard", new { Model.Filters.Year, Model.Filters.Month, Model.Filters.AreaId, Model.Filters.EconomicSectorId, Model.Filters.IndustryId, Model.Filters.EnterpriseId, metric = "industrial" })">Xem phân tích <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+    </header>
+    @if (!Model.IncreasingEnterprises.Any() && !Model.DecreasingEnterprises.Any()) { <p class="dashboard-empty">Chưa có tháng đối chiếu cho cùng doanh nghiệp.</p> }
+    @{ var maxImpact = Math.Max(1m, Model.IncreasingEnterprises.Concat(Model.DecreasingEnterprises).Select(x => Math.Abs(x.Contribution)).DefaultIfEmpty(1m).Max()); }
+    <div class="movement-columns">
+        <div>
+            <h3 class="movement-title positive-title">Tăng nhiều nhất</h3>
+            @foreach (var item in Model.IncreasingEnterprises)
+            {
+                <div class="ranked-item">
+                    <div class="ranked-copy"><strong>@item.Name</strong><small>@item.Industry · @item.PreviousValue → @item.CurrentValue</small></div>
+                    <div class="ranked-bar-track"><span class="ranked-bar positive" style="width:@((Math.Abs(item.Contribution) * 100m / maxImpact).ToString(System.Globalization.CultureInfo.InvariantCulture))%"></span></div>
+                    <b class="text-positive">+@item.Contribution.ToString("0.##")</b>
+                </div>
+            }
+        </div>
+        <div>
+            <h3 class="movement-title negative-title">Giảm nhiều nhất</h3>
+            @foreach (var item in Model.DecreasingEnterprises)
+            {
+                <div class="ranked-item">
+                    <div class="ranked-copy"><strong>@item.Name</strong><small>@item.Industry · @item.PreviousValue → @item.CurrentValue</small></div>
+                    <div class="ranked-bar-track"><span class="ranked-bar negative" style="width:@((Math.Abs(item.Contribution) * 100m / maxImpact).ToString(System.Globalization.CultureInfo.InvariantCulture))%"></span></div>
+                    <b class="text-negative">@item.Contribution.ToString("0.##")</b>
+                </div>
+            }
+        </div>
+    </div>
+</section>

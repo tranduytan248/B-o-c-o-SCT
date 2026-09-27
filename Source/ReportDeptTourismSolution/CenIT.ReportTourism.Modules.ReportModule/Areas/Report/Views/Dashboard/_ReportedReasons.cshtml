@@ -1,0 +1,12 @@
+﻿@model IList<string>
+
+<section class="dashboard-panel reason-panel">
+    <header class="panel-heading"><div><h2>Doanh nghiệp cho biết</h2><p>Lý do được báo cáo gần đây</p></div></header>
+    <div class="reason-chips">
+        @if (Model.Count == 0) { <p class="dashboard-empty">Chưa có lý do được gửi trong kỳ.</p> }
+        @foreach (var reason in Model)
+        {
+            <span class="reason-chip">@reason</span>
+        }
+    </div>
+</section>
