@@ -1612,6 +1612,16 @@
     <Content Include="Areas\Cate\Views\web.config" />
     <Content Include="Areas\Cate\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\Index.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Analysis.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Warnings.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Progress.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\Quality.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardNavigation.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardFilters.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardAlerts.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardSubmissionDetails.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_EnterpriseMovement.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_ReportedReasons.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_Dashboard.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticEnterprise.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_StatisticIncome.cshtml" />

@@ -96,7 +96,11 @@
 
             <hr/>
 
-            @if (ViewBag.IsBusinessProductReport == true)
+            @if (Model.TypeReport == EnumTypeBusiness.Trading)
+            {
+                @Html.Partial("_NoTemplateReport")
+            }
+            else if (ViewBag.IsBusinessProductReport == true)
             {
                 @Html.Partial("_BusinessProductReport", Model.ListDataImports)
             }
@@ -161,9 +165,6 @@
         });
 
         $(document).ready(function() {
-            $('input[type="number"]').focusout(function() {
-                ValidMinNumber(this);
-            });
 
             @{
                 if (string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)

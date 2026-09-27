@@ -1,0 +1,15 @@
+@model CenIT.ReportTourism.Models.Report.DashboardNavigationModel
+@{
+    var filters = Model.Filters ?? new CenIT.ReportTourism.Models.Report.DashboardFilters();
+    var route = new { year = filters.Year, month = filters.Month, areaId = filters.AreaId,
+        economicSectorId = filters.EconomicSectorId, industryId = filters.IndustryId,
+        enterpriseId = filters.EnterpriseId, metric = filters.Metric };
+}
+
+<a class="dashboard-skip" href="#dashboard-content">Chuyển đến nội dung dashboard</a>
+<nav class="dashboard-tabs" aria-label="Các trang dashboard">
+    <a class="@(Model.Active == "Overview" ? "active" : "")" aria-current="@(Model.Active == "Overview" ? "page" : null)" href="@Url.Action("Index", "Dashboard", route)"><i class="fa fa-bar-chart" aria-hidden="true"></i> Tổng quan</a>
+    <a class="@(Model.Active == "Analysis" ? "active" : "")" aria-current="@(Model.Active == "Analysis" ? "page" : null)" href="@Url.Action("Analysis", "Dashboard", route)"><i class="fa fa-sitemap" aria-hidden="true"></i> Phân tích chỉ tiêu</a>
+    <a class="@(Model.Active == "Warnings" ? "active" : "")" aria-current="@(Model.Active == "Warnings" ? "page" : null)" href="@Url.Action("Warnings", "Dashboard", route)"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Cảnh báo</a>
+    <a class="@(Model.Active == "Progress" ? "active" : "")" aria-current="@(Model.Active == "Progress" ? "page" : null)" href="@Url.Action("Progress", "Dashboard", route)"><i class="fa fa-check-square-o" aria-hidden="true"></i> Tiến độ</a>
+</nav>

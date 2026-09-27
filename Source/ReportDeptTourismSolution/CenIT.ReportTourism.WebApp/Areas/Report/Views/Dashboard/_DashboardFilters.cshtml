@@ -1,0 +1,42 @@
+@model CenIT.ReportTourism.Models.Report.DashboardFilterOptions
+@using System.Web.Mvc
+
+<form class="dashboard-filters" method="get" action="@Url.Action(Model.Action, "Dashboard")" aria-label="Lọc nhóm doanh nghiệp theo dõi" autocomplete="off">
+    <div class="row">
+        @if (Model.Metrics.Count > 0)
+        {
+            <div class="filter-field col-xs-6 col-sm-4 col-md-2">
+                <label for="metric">Chỉ tiêu</label>
+                @Html.DropDownList("metric", new SelectList(Model.Metrics, "Value", "Text", Model.Filters.Metric), new { @class = "form-control select2", id = "metric" })
+            </div>
+        }
+        <div class="filter-field col-xs-6 col-sm-2 col-md-1">
+            <label for="year">Năm</label>
+            @Html.DropDownList("year", new SelectList(Model.Years, "Value", "Text", Model.Filters.Year.ToString()), new { @class = "form-control select2", id = "year" })
+        </div>
+        <div class="filter-field col-xs-6 col-sm-2 col-md-1">
+            <label for="month">Tháng</label>
+            @Html.DropDownList("month", new SelectList(Model.Months, "Value", "Text", Model.Filters.Month.ToString()), new { @class = "form-control select2", id = "month" })
+        </div>
+        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
+            <label for="areaId">Phường / xã</label>
+            @Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", Model.Filters.AreaId), new { @class = "form-control select2", id = "areaId" })
+        </div>
+        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
+            <label for="economicSectorId">Khu vực kinh tế</label>
+            @Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", Model.Filters.EconomicSectorId), new { @class = "form-control select2", id = "economicSectorId" })
+        </div>
+        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
+            <label for="industryId">Ngành chính</label>
+            @Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", Model.Filters.IndustryId), new { @class = "form-control select2", id = "industryId" })
+        </div>
+        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
+            <label for="enterpriseId">Doanh nghiệp</label>
+            @Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", Model.Filters.EnterpriseId), new { @class = "form-control select2", id = "enterpriseId" })
+        </div>
+        <div class="filter-actions col-xs-12 col-sm-4 col-md-2">
+            <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Lọc</button>
+            <a class="btn btn-default" href="@Url.Action(Model.Action, "Dashboard")">Đặt lại</a>
+        </div>
+    </div>
+</form>

@@ -29,14 +29,14 @@
         </style>
         <div id="TradeProductTemplates" style="display: none;">
             <select id="ExportProductTemplate" class="none-select2">
-                <option value="">Chọn 1 giá trị</option>
+                <option value=""></option>
                 @foreach (var option in exportBusinessProductOptions)
                 {
                     <option value="@option.Code" data-unit="@option.Unit" data-name="@option.Targets">@option.Targets (@option.Code)</option>
                 }
             </select>
             <select id="ImportProductTemplate" class="none-select2">
-                <option value="">Chọn 1 giá trị</option>
+                <option value=""></option>
                 @foreach (var option in importBusinessProductOptions)
                 {
                     <option value="@option.Code" data-unit="@option.Unit" data-name="@option.Targets">@option.Targets (@option.Code)</option>
@@ -446,18 +446,59 @@
         }
     });
 
-    $(document).off("blur.revenueCheck input.revenueCheck", "tr[data-role='total-revenue'] input, tr[data-role='industry-revenue'] input")
-        .on("blur.revenueCheck input.revenueCheck", "tr[data-role='total-revenue'] input, tr[data-role='industry-revenue'] input", function () {
-            validateRevenueConstraint(false);
+    $(document).off("input.clearRevenueErr", "tr[data-role='total-revenue'] input, tr[data-role='industry-revenue'] input")
+        .on("input.clearRevenueErr", "tr[data-role='total-revenue'] input, tr[data-role='industry-revenue'] input", function () {
+            ClearTooltipErrInput(this);
         });
 
     $(document).off("click.removeTrade", ".btn-remove-trade").on("click.removeTrade", ".btn-remove-trade", function () {
         var $row = $(this).closest("tr");
         var group = $row.data("group");
+        var $sel = $row.find("select.TradeProductSelect");
+        if ($sel.length && $sel.data("select2")) {
+            $sel.select2("destroy");
+        }
         $row.remove();
         if (group) {
             recalculateTradeSummary(group);
         }
+    });
+
+    if ($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.prototype.enforceFocus) {
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+    }
+    $(document).off("focusin.bs.modal");
+
+    $(document).off("click.s2forceOpen", ".select2-container").on("click.s2forceOpen", ".select2-container", function (e) {
+        var $sel = $(this).prev("select.TradeProductSelect");
+        if (!$sel.length) {
+            $sel = $(this).siblings("select.TradeProductSelect");
+        }
+        if ($sel.length && $sel.data("select2")) {
+            if (!$sel.data("select2").isOpen()) {
+                $sel.select2("open");
+            }
+        }
+    });
+
+    $(document).off("select2:open.fixModalScroll").on("select2:open.fixModalScroll", function (e) {
+        var s2 = $(e.target).data("select2");
+        var id = s2 ? s2.id : "";
+        setTimeout(function () {
+            $(e.target).parents().off("scroll.select2." + id).off("scroll.select2");
+            $(".modal").off("scroll.select2." + id).off("scroll.select2");
+            $(window).off("scroll.select2." + id).off("scroll.select2");
+            $(document).off("focusin.bs.modal");
+        }, 0);
+    });
+
+    $(document).off("scroll.closeS2", ".modal").on("scroll.closeS2", ".modal", function () {
+        $("select.TradeProductSelect").each(function () {
+            var s2 = $(this).data("select2");
+            if (s2 && s2.isOpen()) {
+                $(this).select2("close");
+            }
+        });
     });
 
     function AddTradeProduct(button, prefix) {
@@ -484,7 +525,10 @@
             ? "#ExportProductTemplate"
             : "#ImportProductTemplate";
 
+        var selectId = "TradeProductSelect_" + prefix + "_" + index;
         var select = $("<select></select>")
+            .attr("id", selectId)
+            .attr("name", selectId)
             .addClass("form-control TradeProductSelect");
 
         $(templateId).find("option").each(function () {
@@ -507,12 +551,16 @@
             .append(input("PerformInPeriod_" + index, "form-control text-right number-separator"))
             .append($("<input />", { id: "Code_" + index, name: "Code_" + index, type: "hidden" })));
 
-        select.on("change", function () {
+        select.on("change select2:select", function () {
             var selected = $(this).find("option:selected");
             var sourceCode = selected.val();
             if (sourceCode && $("#DataReport input[name^='Code_']").not("#Code_" + index).filter(function () { return $(this).val() === sourceCode; }).length) {
                 alert("Sản phẩm này đã có trong nhóm.");
-                $(this).val("");
+                $(this).val("").trigger("change.select2");
+                target.val("");
+                unit.val("");
+                unitText.text("");
+                $("#Code_" + index).val("");
                 return;
             }
             target.val(selected.data("name") || "");
@@ -521,16 +569,25 @@
             $("#Code_" + index).val(sourceCode || "");
         });
 
+        select.on("select2:open", function () {
+            var s2 = $(this).data("select2");
+            var id = s2 ? s2.id : "";
+            $(".modal").off("scroll.select2." + id).off("scroll.select2");
+            $(window).off("scroll.select2." + id).off("scroll.select2");
+            $(this).parents().off("scroll.select2." + id).off("scroll.select2");
+            $(document).off("focusin.bs.modal");
+        });
+
         $(button).closest("tr").before(row);
+        var $modalContent = select.closest(".modal-content");
         if ($.fn.select2) {
             select.select2({
                 allowClear: true,
                 placeholder: "Chọn 1 giá trị",
                 width: "100%",
-                dropdownParent: select.closest(".modal").length ? select.closest(".modal") : select.parent()
+                dropdownParent: $modalContent.length ? $modalContent : select.parent()
             });
         }
-        select.trigger("focus");
         recalculateTradeSummary(prefix);
     }
 
@@ -541,5 +598,9 @@
     $(document).ready(function () {
         recalculateTradeSummary("XK");
         recalculateTradeSummary("NK");
+        if ($('#ButtonLoginSmartCA').hasClass('hidden') || !$('#ButtonLoginSmartCA').length) {
+            $('#modal_AddReport button[type="submit"], #modal_EditReport button[type="submit"]').removeAttr('disabled');
+        }
     });
 </script>
+

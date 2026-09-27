@@ -1,20 +1,31 @@
-﻿@model List<CenIT.ReportTourism.Models.Report.ReportStatisticTypeBusinessModel>
+﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
 
-<div class="box box-body no-footer no-header no-border">
-    <p class="text-center">
-        <strong>Thống kê Doanh nghiệp theo lĩnh vực</strong>
-    </p>
-    @{
-        foreach (var typeBiz in Model)
-        {
-            double percent = typeBiz.TotalEnterpiseViaType * 100 / typeBiz.TotalEnterpise;
-            <div class="progress-group">
-                <span class="progress-text">@typeBiz.TypeBusinessName</span>
-                <span class="progress-number"><b>@typeBiz.TotalEnterpiseViaType</b>/@typeBiz.TotalEnterpise</span>
-                <div class="progress sm">
-                    <div class="progress-bar progress-bar-@(typeBiz.MainColor.ToLower())" style="width: @(percent)%"></div>
-                </div>
+@using System.Linq
+<section class="dashboard-panel sector-panel">
+    <header class="panel-heading">
+        <div><h2>Khu vực kinh tế</h2><p>Tỷ trọng trong số giá trị có chỉ tiêu, không đại diện toàn tỉnh</p></div>
+        <i class="fa fa-pie-chart panel-icon" aria-hidden="true"></i>
+    </header>
+    @if (!Model.SectorContributions.Any()) { <p class="dashboard-empty">Chưa có giá trị dương theo khu vực kinh tế.</p> }
+    @foreach (var metric in new[] { new { Name = "Doanh thu công nghiệp", Key = "industrial" }, new { Name = "Xuất khẩu", Key = "export" }, new { Name = "Nhập khẩu", Key = "import" } })
+    {
+        if (!Model.SectorContributions.Any(s => (metric.Key == "industrial" ? s.GtsXcnShare : metric.Key == "export" ? s.ExportShare : s.ImportShare) > 0)) { continue; }
+        <div class="sector-metric">
+            <div class="sector-metric-heading"><strong>@metric.Name</strong><span>100%</span></div>
+            <div class="sector-stack" role="img" aria-label="@metric.Name theo khu vực kinh tế">
+                @foreach (var sector in Model.SectorContributions)
+                {
+                    var width = metric.Key == "industrial" ? sector.GtsXcnShare : metric.Key == "export" ? sector.ExportShare : sector.ImportShare;
+                    <span class="sector-segment" style="width:@width.ToString(System.Globalization.CultureInfo.InvariantCulture)%" title="@sector.Name: @width%"></span>
+                }
             </div>
-        }
+            <div class="sector-values">
+                @foreach (var sector in Model.SectorContributions)
+                {
+                    var value = metric.Key == "industrial" ? sector.GtsXcnShare : metric.Key == "export" ? sector.ExportShare : sector.ImportShare;
+                    <span>@sector.Name <b>@value%</b></span>
+                }
+            </div>
+        </div>
     }
-</div>
+</section>
