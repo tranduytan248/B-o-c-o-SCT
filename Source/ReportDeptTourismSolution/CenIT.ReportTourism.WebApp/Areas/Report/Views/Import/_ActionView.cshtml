@@ -1,37 +1,20 @@
 ﻿@model CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models.ReportDataImportSearchModel
 
 @{
-    if (DateTime.Now.Day > Model.DayDeadlineSendReportLate)
+    if (!Model.ExistEnterpriseSubmitReportYet)
     {
-        <button type="button" class="btn btn-danger btn-flat"><i class="icon fa fa-lock"></i>&nbsp;Đã hết hạn nộp báo cáo. Chức năng đã bị khoá!</button>
-
-        @Html.Button(true, "SignToken", Url.Action("SignToken", new { area = "Report" }), "<i class='fa fa-pencil'></i>", "Ký số VNPT Token", new { @class = "btn btn-sm bg-navy", data_width = "1024" })
+        <span style="display: inline-block; padding: 6px 14px; font-size: 13px; font-weight: 600; color: #1e7e34; background-color: #eaf6ea; border: 1px solid #c3e6cb; border-radius: 4px; pointer-events: none; user-select: none;">
+            <i class="fa fa-check-circle" style="color: #28a745; margin-right: 5px;"></i>Đã gửi báo cáo
+        </span>
     }
-    else if (DateTime.Now.Day <= Model.DayDeadlineSendReportLate && Model.ExistEnterpriseSubmitReportYet)
+    else if (DateTime.Now.Day > Model.DayDeadlineSendReportLate)
     {
-        <div class="col-md-12 text-center">
-            <a type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <i class='fa fa-cloud-download'></i>&nbsp;Mẫu báo cáo
-                <span class="fa fa-caret-down"></span>
-            </a>
-            <ul class="dropdown-menu">
-                @*<li class="text-light-blue"><a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_LuuTru.xlsx" })">Mẫu kinh doanh Dịch vụ lưu trú</a></li>
-                <li class="text-light-blue"><a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_LuHanh.xlsx" })">Mẫu kinh doanh Dịch vụ lữ hành</a></li>
-                <li class="text-light-blue"><a href="@Url.Action("DownloadTemplate", "Import", new { templateName = "Template_KhuDuLich.xlsx" })">Mẫu kinh doanh Điểm/Khu du lịch</a></li>*@
-            </ul>
-
-            @*@Html.Button(true, "ImportData", Url.Action("ImportData", new { area = "Report" }), "<i class='fa fa-cloud-upload'></i>", "Upload báo cáo", new { @class = "btn btn-sm btn-success", data_width = "1024" })*@
-
-            @Html.Button(true, "AddReport", Url.Action("Add", new { area = "Report" }), "<i class='fa fa-plus'></i>", "Nhập báo cáo", new { @class = "btn btn-sm btn-primary", data_width = "1024" })
-
-            @*@Html.Button(true, "SignToken", Url.Action("SignToken", new { area = "Report" }), "<i class='fa fa-pencil'></i>", "Ký số VNPT Token", new { @class = "btn btn-sm bg-navy", data_width = "1024" })*@
-        </div>
+        <span style="display: inline-block; padding: 6px 14px; font-size: 13px; font-weight: 600; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; pointer-events: none; user-select: none;">
+            <i class="fa fa-lock" style="color: #dc3545; margin-right: 5px;"></i>Đã hết hạn nộp báo cáo. Chức năng đã bị khoá!
+        </span>
     }
     else
     {
-        <button type="button" class="btn bg-olive btn-flat"><i class="fa fa-check"></i>&nbsp;Đã gửi báo cáo</button>
-
-        @Html.Button(true, "SignToken", Url.Action("SignToken", new { area = "Report" }), "<i class='fa fa-pencil'></i>", "Ký số VNPT Token", new { @class = "btn btn-sm bg-navy", data_width = "1024" })
+        @Html.Button(true, "AddReport", Url.Action("Add", new { area = "Report" }), "<i class='fa fa-plus'></i>", "Nhập báo cáo", new { @class = "btn btn-sm btn-primary", data_width = "1024" })
     }
-
 }

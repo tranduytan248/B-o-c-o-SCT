@@ -1,0 +1,74 @@
+﻿@using TSFramework.App.Processors
+@model CenIT.ReportTourism.Models.Sys.SysFunctionModel
+
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.HiddenFor(model => model.FunctionId)
+
+<div id="Function">
+    @*<div class="form-group">
+            @Html.TitleFor(model => model.CodeTypes, new { @class = "control-label" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.CodeType, new SelectList(Model.CodeTypes, "Value", "Text"), new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Function_Label_CodeType") })
+                @Html.ValidationMessageFor(model => model.CodeType, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+    <div class="form-group">
+        <div class="col-md-4">
+            @Html.TitleFor(model => model.ModuleId, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.ModuleId, new SelectList(Model.Modules, "Value", "Text"), AppProcessor.Messagor.GetMessage("AppModule_Label_ModuleName"), new { @class = "col-md-12 form-control" })
+            @Html.ValidationMessageFor(model => model.ModuleId, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-3">
+            @Html.TitleFor(model => model.Area, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Area, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Function_Label_Area") })
+            @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-9">
+            @Html.TitleFor(model => model.Name, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Name, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Function_Label_Function") })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            @Html.TitleFor(model => model.Description, new { @class = "control-label" })
+            @Html.TextAreaFor(model => model.Description, new { rows = "2", @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Function_Label_Description") })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group" id="actions">
+        @Html.HiddenFor(model => model.SelectedActions)
+        <div class="col-md-12">
+            <label class="control-label">@AppProcessor.Messagor.GetMessage("Function_Label_Action") </label>
+            <div class="col-md-12 row">
+                @foreach (var item in Model.Actions)
+                {
+                    <div class="checkbox col-md-3">
+                        <input id="@item.Value" type="checkbox" aria-label="@item.Value" onclick="OnEventActionChecked(this)" value="@item.Value" />
+                        <label class="lbl" style="padding-left: 5px;" for="@item.Value">@item.Text</label>
+                    </div>
+                }
+                @Html.ValidationMessageFor(model => model.Actions, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#actions input[type=checkbox]').each(function () {
+                var actions = $('input[type="hidden"][id="SelectedActions"]').val().split(',');
+
+                var idrole = $(this).val();
+                var index = actions.indexOf(idrole);
+
+                if (index > -1) {
+                    this.checked = true;
+                }
+            });
+        });
+
+    </script>
+</div>

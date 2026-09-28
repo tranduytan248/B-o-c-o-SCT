@@ -84,7 +84,7 @@
             </div>
             <div class="col-md-9">
                 @Html.LabelFor(model => model.EnterpriseId, new { @class = "control-label" })
-                @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), new { @class = "col-md-12 form-control" })
+                @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text", Model.EnterpriseId), "", new { @class = "col-md-12 form-control none-select2", style = "width: 100%;" })
                 @Html.ValidationMessageFor(model => model.EnterpriseId, "", new { @class = "text-danger" })
             </div>
             @Html.HiddenFor(model => model.EnterpriseName)
@@ -214,12 +214,58 @@
             $("#FormUpload").removeClass('hidden');
             $("#LoginSmartCA").addClass('hidden');
         }
-        $("#DataImport select#EnterpriseId").select2();
+        initImportEnterpriseSelect2();
+    }
+
+    function initImportEnterpriseSelect2() {
+        var $select = $("#DataImport select#EnterpriseId");
+        if ($select.length === 0) return;
+        if ($select.data("select2")) {
+            $select.select2("destroy");
+        }
+        $select.select2({
+            placeholder: "-- Chọn hoặc tìm kiếm doanh nghiệp --",
+            allowClear: true,
+            language: "vi",
+            width: "100%",
+            dropdownParent: $("#modal_ImportData"),
+            ajax: {
+                url: "/Report/Import/SearchEnterprisesSelect2",
+                dataType: "json",
+                delay: 300,
+                data: function (params) {
+                    return {
+                        q: params.term || "",
+                        typeBusiness: "",
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination ? data.pagination.more : false
+                        }
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+
+        $select.off('select2:open').on('select2:open', function () {
+            setTimeout(function () {
+                var $searchField = $('.select2-container--open .select2-search__field');
+                if ($searchField.length > 0 && !$searchField.val()) {
+                    $searchField.trigger('input');
+                }
+            }, 50);
+        });
     }
 
     $(function() {
-        $("#modal_ImportData").on("shown.bs.modal",
-            function() {
+        initImportEnterpriseSelect2();
 
                 $('#DataImport select#EnterpriseId').on("change",
                     function() {
@@ -313,7 +359,7 @@
                                 $("#LoginSmartCA").addClass('hidden');
                                 $("#UserInfo").load("@Url.Action("UserInfo")");
                                 $("#FormUpload").removeClass('hidden');
-                                $("#DataImport select#EnterpriseId").select2();
+                                initImportEnterpriseSelect2();
                             }
                             response.status = undefined;
                         }

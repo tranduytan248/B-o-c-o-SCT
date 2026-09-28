@@ -43,27 +43,38 @@
         </div>
     </div>
 
-    <div class="form-group row">
-        <div class="col-md-3">
-        @Html.LabelFor(model => model.ForMonth, new { @class = "control-label" })
-            <div class="input-group">
-                <div class="input-group-addon">
-                    <i class="fa fa-calendar"></i>
-                </div>
-                @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @class = "col-md-12 form-control", placeholder = "MM/yyyy" })
-            </div>
-        </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.EnterpriseId, new { @class = "control-label col-md-3" })
         <div class="col-md-9">
-            @Html.LabelFor(model => model.EnterpriseId, new { @class = "control-label" })
-            @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text"), "", new { @class = "col-md-12 form-control" })
-            @Html.ValidationMessageFor(model => model.EnterpriseId, "", new { @class = "text-danger" })
+            <div class="col-md-10" style="padding-left: 0; padding-right: 0;">
+                @Html.DropDownListFor(model => model.EnterpriseId, new SelectList(Model.ListEnterprises, "Value", "Text", Model.EnterpriseId), "", new { @class = "form-control none-select2", style = "width: 100%;" })
+                @Html.ValidationMessageFor(model => model.EnterpriseId, "", new { @class = "text-danger" })
+            </div>
         </div>
         @Html.HiddenFor(model => model.EnterpriseName)
     </div>
 
+    <div class="form-group">
+        @Html.LabelFor(model => model.TypeReport, new { @class = "control-label col-md-3" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(model => model.TypeReport, new SelectList(Model.ListTypeBusiness ?? new List<System.Web.UI.WebControls.ListItem>(), "Value", "Text", (int)Model.TypeReport), new { @class = "form-control col-md-12 none-select2", id = "TypeReportSelect", style = "width: 100%;" })
+            @Html.HiddenFor(model => model.TypeReportName, new { id = "TypeReportName" })
+        </div>
+        @Html.LabelFor(model => model.ForMonth, new { @class = "control-label col-md-2" })
+        <div class="col-md-3">
+            <div class="input-group col-md-7">
+                <div class="input-group-addon" style="background-color: #eee; cursor: not-allowed;">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" id="ForMonthDisplay" class="form-control" value="@Model.ForMonth.ToString("MM/yyyy")" disabled="disabled" style="cursor: not-allowed; background-color: #eee;" placeholder="MM/yyyy" />
+                @Html.HiddenFor(model => model.ForMonth, new { id = "ForMonth" })
+            </div>
+        </div>
+    </div>
+
     <hr/>
 
-    <div class="form-group row">
+    <div class="form-group">
         @Html.HiddenFor(model => model.IsEdit)
 
         @{
@@ -87,40 +98,140 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $("#DataImport #ForMonth").datepicker("remove");
-        $("#DataImport #ForMonth").datepicker({
-            format: "mm/yyyy",
-            viewMode: "months",
-            minViewMode: "months",
-            autoclose: true,
-            startDate: new Date(),
-            endDate: new Date()
+        var $container = $("#modal_AddReport").length ? $("#modal_AddReport") : $("#DataImport");
+
+        $container.find('#TypeReportSelect').on('change', function () {
+            var txt = $(this).find('option:selected').text();
+            $container.find('#TypeReportName').val(txt);
         });
-        $("#DataImport #ForMonth").datepicker().trigger("update");
+        if (!$container.find('#TypeReportName').val() || $container.find('#TypeReportName').val().indexOf('TypeBusiness_') !== -1) {
+            $container.find('#TypeReportName').val($container.find('#TypeReportSelect option:selected').text());
+        }
+
         @{
             if (string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)
             {
-                @Html.Raw($"var a = document.createElement('a');a.style.display = 'none';a.href = '{Url.Action("LoginSmartCA")}';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
+                @Html.Raw("var a = document.createElement('a');a.style.display = 'none';a.href = '" + Url.Action("LoginSmartCA") + "';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
                 @Html.Raw("$('#modal_AddReport button[type=\"submit\"]').prop('disabled', true);")
                 ;
             }
         }
-        $("select#EnterpriseId").change(function() {
+        var $enterpriseSelect = $container.find("select#EnterpriseId");
+        if ($enterpriseSelect.data("select2")) {
+            $enterpriseSelect.select2("destroy");
+        }
+        var $modalContainer = $enterpriseSelect.closest(".modal");
+        $enterpriseSelect.select2({
+            placeholder: "-- Chọn hoặc tìm kiếm doanh nghiệp --",
+            allowClear: true,
+            language: "vi",
+            width: "100%",
+            dropdownParent: $modalContainer.length ? $modalContainer : $("#modal_AddReport"),
+            ajax: {
+                url: "@Url.Action("SearchEnterprisesSelect2", "Import", new { area = "Report" })",
+                dataType: "json",
+                delay: 300,
+                data: function (params) {
+                    return {
+                        q: params.term || "",
+                        typeBusiness: "",
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination ? data.pagination.more : false
+                        }
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+
+        $enterpriseSelect.off('select2:open').on('select2:open', function () {
+            setTimeout(function () {
+                var $searchField = $('.select2-container--open .select2-search__field');
+                if ($searchField.length > 0 && !$searchField.val()) {
+                    $searchField.trigger('input');
+                }
+            }, 50);
+        });
+
+        var lastLoadedKey = "";
+        function triggerLoadReportForm(entId, entText) {
+            var forMonthVal = $container.find("#ForMonth").val();
+            var currentKey = (entId || "") + "_" + (forMonthVal || "");
+            if (currentKey === lastLoadedKey && $container.find("#TypeReport").children().length > 0) {
+                return;
+            }
+            lastLoadedKey = currentKey;
+
             var isEnableSignDigitalDoc = @(Model.EnableSignDigitalDoc ? "1" : "0");
             var isLoginSmartCA = @(string.IsNullOrEmpty(Model.AccessToken) ? "0" : "1");
 
-            if (isEnableSignDigitalDoc == 0 || isLoginSmartCA == 1) {
-                $('button[type="submit"]').removeAttrs('disabled');
+            if (!entId || entId === "") {
+                $container.find('#EnterpriseName').val("");
+                $container.find("#TypeReport").empty();
+                $('#modal_AddReport button[type="submit"]').prop('disabled', true);
+                return;
             }
 
-            $('#EnterpriseName').val($(this).children("option:selected").text());
+            if (isEnableSignDigitalDoc == 0 || isLoginSmartCA == 1) {
+                $('#modal_AddReport button[type="submit"]').removeAttr('disabled');
+            }
 
-            var enterpriseId = $(this).val();
-            var urlLoadViewTypeReport = "/Report/Import/LoadViewTypeReport?enterpriseId=" + enterpriseId;
+            if (entText) {
+                $container.find('#EnterpriseName').val(entText);
+            }
 
-            $("#DataImport #TypeReport").load(urlLoadViewTypeReport);
+            var urlLoadViewTypeReport = '@Url.Action("LoadViewTypeReport", "Import", new { area = "Report" })?enterpriseId=' + encodeURIComponent(entId) + (forMonthVal ? ("&forMonth=" + encodeURIComponent(forMonthVal)) : "");
 
+            $container.find("#TypeReport").html("<div class='text-center' style='padding:25px;'><i class='fa fa-spinner fa-spin fa-2x text-primary'></i><div style='margin-top:10px; font-weight:bold;'>Đang tải mẫu báo cáo...</div></div>");
+
+            $container.find("#TypeReport").load(urlLoadViewTypeReport, function(response, status, xhr) {
+                if (status === "error") {
+                    lastLoadedKey = "";
+                    $container.find("#TypeReport").html("<div class='alert alert-danger'>Lỗi tải biểu mẫu (" + xhr.status + ": " + xhr.statusText + "). Vui lòng thử lại.</div>");
+                }
+            });
+        }
+
+        $enterpriseSelect.off("change.report select2:select.report").on("change.report select2:select.report", function(e) {
+            var entId = $(this).val();
+            var entText = $(this).find("option:selected").text();
+            if ((!entId || entId === "") && e && e.params && e.params.data) {
+                entId = e.params.data.id;
+                entText = e.params.data.text;
+                if (!$(this).find("option[value='" + entId + "']").length) {
+                    var newOption = new Option(entText, entId, true, true);
+                    $(this).append(newOption);
+                }
+                $(this).val(entId);
+            }
+            if (e && e.params && e.params.data && e.params.data.typeBusiness) {
+                var bizVal = e.params.data.typeBusiness;
+                if ($container.find("#TypeReportSelect option[value='" + bizVal + "']").length > 0) {
+                    $container.find("#TypeReportSelect").val(bizVal).trigger('change');
+                }
+            }
+            triggerLoadReportForm(entId, entText);
         });
+
+        $enterpriseSelect.off("select2:clear.report").on("select2:clear.report", function() {
+            triggerLoadReportForm("", "");
+        });
+
+        var selectedEntVal = $enterpriseSelect.val();
+        if (selectedEntVal && selectedEntVal !== "") {
+            var selectedEntText = $enterpriseSelect.find("option:selected").text();
+            triggerLoadReportForm(selectedEntVal, selectedEntText);
+        } else {
+            $('#modal_AddReport button[type="submit"]').prop('disabled', true);
+        }
     });
 
     String.format = function() {

@@ -1,0 +1,55 @@
+## =====================================================================
+## .gitignore cho ReportDeptTourismSolution (.NET Framework / ASP.NET MVC)
+##
+## LƯU Ý QUAN TRỌNG:
+## - KHÔNG dùng rule [Ll]og/ : sẽ ignore nhầm source
+##   TSFramework.Core/Members/Log/LogModel.cs, LogWriter.cs (lý do nhánh main không build được).
+## - KHÔNG ignore *.csproj, *.sln, Web.config, app.config, packages.config, libs/ : bắt buộc để build.
+## - KHÔNG ignore *.pdb toàn cục: libs/TiSun/TiSun.pdb là file bên thứ ba.
+## =====================================================================
+
+## ---------- Build output ----------
+[Bb]in/
+[Oo]bj/
+
+## ---------- NuGet packages (VS tự restore khi build, ~500MB) ----------
+## Chỉ ignore thư mục packages của solution, không ảnh hưởng packages.config
+Source/ReportDeptTourismSolution/packages/
+*.nupkg
+
+## ---------- Visual Studio cache / cấu hình cá nhân ----------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.pubxml.user
+*.cache
+_ReSharper*/
+*.DotSettings.user
+
+## ---------- Log runtime của WebApp (chỉ thư mục Logs của WebApp) ----------
+Source/ReportDeptTourismSolution/CenIT.ReportTourism.WebApp/Logs/
+*.log
+
+## ---------- File dump database lớn ở thư mục solution (SqlScripts/ vẫn được giữ) ----------
+Source/ReportDeptTourismSolution/*.sql
+
+## ---------- File tạm / hệ điều hành ----------
+*.tmp
+*.bak
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## ---------- Claude Code (file cục bộ) ----------
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+## ---------- Luôn giữ các file bắt buộc (phòng khi rule khác match) ----------
+!Source/ReportDeptTourismSolution/libs/**
+!**/*.csproj
+!**/*.sln
+!**/packages.config
+!**/Web.config
+!**/app.config
