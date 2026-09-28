@@ -1,0 +1,30 @@
+﻿@using TSFramework.App.Processors
+@{
+    Layout = "";
+    var fileUrl = ViewBag.FileUrl as string;
+}
+<div class="modal-header bg-primary">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title"><i class="fa fa-book"></i>&nbsp;@ViewBag.Title</h4>
+</div>
+<div class="modal-body" style="padding: 0;">
+    @if (!string.IsNullOrEmpty(fileUrl))
+    {
+        <iframe src="@fileUrl" title="@ViewBag.Title" style="border: 0; display: block; height: calc(100vh - 130px); width: 100%;"></iframe>
+    }
+    else
+    {
+        <div class="callout callout-warning" style="margin: 15px;">
+            <p><i class="fa fa-info-circle"></i>&nbsp;Tài liệu hướng dẫn đang được cập nhật.</p>
+        </div>
+    }
+</div>
+<div class="modal-footer">
+    @if (!string.IsNullOrEmpty(fileUrl))
+    {
+        <a class="btn btn-primary pull-left" href="@fileUrl" target="_blank" rel="noopener noreferrer"><i class="fa fa-external-link"></i>&nbsp;Mở trong tab mới</a>
+    }
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Close")</button>
+</div>

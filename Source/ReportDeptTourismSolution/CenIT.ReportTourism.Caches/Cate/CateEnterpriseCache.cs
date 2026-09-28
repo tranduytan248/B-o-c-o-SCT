@@ -99,6 +99,16 @@ namespace CenIT.ReportTourism.Caches.Cate
             return enterpriseId;
         }
 
+        [DataObjectMethod(DataObjectMethodType.Update, false)]
+        public int SaveInfo(CateEnterpriseModel model)
+        {
+            var enterpriseId = Api.SaveInfo(model);
+            if (enterpriseId > 0)
+                // Invalidate the cache
+                InvalidateCache();
+            return enterpriseId;
+        }
+
         [DataObjectMethod(DataObjectMethodType.Insert, false)]
         public int Register(CateEnterpriseModel model)
         {

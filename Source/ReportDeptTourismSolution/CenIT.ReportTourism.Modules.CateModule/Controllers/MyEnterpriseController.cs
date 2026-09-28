@@ -108,6 +108,34 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
         [ActionType(Type = EnumActionType.Edit)]
         public ActionResult Info(CateEnterpriseModel model)
         {
+            // Tạm thời bỏ ràng buộc bắt buộc nhập "Lý do"
+            RemoveModelState("Reason");
+
+            // Các trường bị khóa (disabled) trên form không được gửi lên => lấy lại giá trị hiện tại để không bị ghi đè rỗng
+            var current = _enterpriseCache.GetById(model.EnterpriseId);
+            if (current == null || current.EnterpriseId <= 0)
+                return Json(new
+                {
+                    status = true,
+                    message = CreateMessage($"{_enterpriseTitle}",
+                        EnumProcessType.DataNotExist, EnumMsgIcon.Error)
+                });
+
+            RemoveModelState("TaxCode", "BusinessAddress", "StreetName", "ProvinceId", "ProvinceName", "WardId",
+                "WardName", "ListIndustryId", "IndustryIds", "ListTypeBusinessId", "TypeBusiness");
+            var currentProvince = _provinceCache.GetViaWard(current.WardId);
+            model.TaxCode = current.TaxCode;
+            model.BusinessAddress = current.BusinessAddress;
+            model.StreetName = current.StreetName;
+            model.WardId = current.WardId;
+            model.WardName = current.WardName;
+            model.ProvinceId = currentProvince?.ProvinceId ?? current.ProvinceId;
+            model.ProvinceName = currentProvince?.ProvinceName ?? current.ProvinceName;
+            model.IndustryIds = current.IndustryIds;
+            model.TypeBusiness = current.TypeBusiness;
+            model.ListIndustryId = SplitIds(current.IndustryIds).Select(id => (int?)id).ToList();
+            model.ListTypeBusinessId = SplitIds(current.TypeBusiness);
+
             if (!ModelState.IsValid)
             {
                 model.ListProvinces = _provinceCache.GetAll()
@@ -144,7 +172,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 return PartialView("_Info", model);
             }
 
-            var enterpriseId = _enterpriseCache.Save(new CateEnterpriseModel
+            // SaveInfo (p_Cate_Enterprises_Save_BK_C): giữ nguyên Tỉnh khi doanh nghiệp chưa có Xã/Phường
+            var enterpriseId = _enterpriseCache.SaveInfo(new CateEnterpriseModel
             {
                 EnterpriseId = model.EnterpriseId,
                 OwnerEnterpriseName = model.OwnerEnterpriseName,
@@ -200,6 +229,29 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 EnumProcessType.Edit,
                 enterpriseId > 0 ? EnumMsgIcon.Success : EnumMsgIcon.Error);
             return Json(new { status = true, message = response }, JsonRequestBehavior.AllowGet);
+        }
+
+        private void RemoveModelState(params string[] propertyNames)
+        {
+            foreach (var propertyName in propertyNames)
+            {
+                var keys = ModelState.Keys.Where(k => k == propertyName
+                                                      || k.StartsWith(propertyName + "[")
+                                                      || k.StartsWith(propertyName + ".")).ToList();
+                foreach (var key in keys) ModelState.Remove(key);
+            }
+        }
+
+        private static List<int> SplitIds(string ids)
+        {
+            var result = new List<int>();
+            if (string.IsNullOrEmpty(ids)) return result;
+            foreach (var item in ids.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                int id;
+                if (int.TryParse(item.Trim(), out id)) result.Add(id);
+            }
+            return result;
         }
 
         //[AjaxOnly]

@@ -135,8 +135,8 @@ namespace CenIT.ReportTourism.WebApp.Controllers
 
             _userCache.SaveLogin(model.UserName, true, model.SenderIP, model.SenderHeader);
 
-            if (!Url.IsLocalUrl(returnUrl))
-                returnUrl = Url.Action("Index", "MyEnterprise"); // RedirectToAction("Index", "MyEnterprise");
+            if (IsDefaultLandingUrl(returnUrl))
+                returnUrl = GetDefaultLandingUrl(model.Email);
 
             return Json(new
             {
@@ -145,6 +145,42 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 message = CreateMessage("Đăng nhập thành công.",
                     EnumProcessType.NonFormat, EnumMsgIcon.Success)
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        ///     returnUrl rỗng/không hợp lệ hoặc trỏ về trang chủ (/, /Home, /MyEnterprise) thì dùng trang mặc định sau đăng nhập
+        /// </summary>
+        private bool IsDefaultLandingUrl(string returnUrl)
+        {
+            if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl)) return true;
+
+            var path = returnUrl.Split('?', '#')[0].TrimEnd('/');
+            return path.Length == 0
+                   || path.Equals("/Home", StringComparison.OrdinalIgnoreCase)
+                   || path.Equals("/Home/Index", StringComparison.OrdinalIgnoreCase)
+                   || path.Equals("/MyEnterprise", StringComparison.OrdinalIgnoreCase)
+                   || path.Equals("/MyEnterprise/Index", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        ///     Trang mặc định sau đăng nhập: menu "Gửi báo cáo" (/Report/Import) nếu có quyền, ngược lại về trang chủ.
+        ///     Lưu ý: User của request đăng nhập chưa được gán nên phải kiểm tra quyền theo tài khoản vừa đăng nhập.
+        /// </summary>
+        private string GetDefaultLandingUrl(string userName)
+        {
+            var canSendReport = false;
+            try
+            {
+                canSendReport = AppProcessor.Author.IsAllow(userName, "Report", "Import", "View");
+            }
+            catch (Exception ex)
+            {
+                AppProcessor.Logger.Error(ex);
+            }
+
+            return canSendReport
+                ? Url.Action("Index", "Import", new { area = "Report" })
+                : Url.Action("Index", "MyEnterprise", new { area = "" });
         }
 
         [HttpGet]

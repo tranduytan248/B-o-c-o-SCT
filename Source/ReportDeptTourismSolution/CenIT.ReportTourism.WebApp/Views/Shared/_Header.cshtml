@@ -68,6 +68,9 @@
                             @Html.Button(true, "TestUser", Url.Action("TestUser", "SysConfigs", new { area = "Sys" }), "<i class='fa fa-user-circle-o'></i>", "", new { data_toggle = "tooltip", title = "Giả lập tài khoản" })
                         </li>
                     }
+                    <li>
+                        <a data-modal="true" data-modal-id="UserGuide" href="@Url.Action("UserGuide", "Home", new { area = "" })" title="Hướng dẫn sử dụng"><i class='fa fa-question-circle'></i>&nbsp;</a>
+                    </li>
                     if (AppProcessor.Author.IsAllow(User.UserName, null, "Notification", "View"))
                     {
                         <li class="dropdown notifications-menu" id="NotificationEnterprise">
