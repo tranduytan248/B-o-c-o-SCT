@@ -13,6 +13,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
 
         #region Enterprise
 
+        public int? TypeReport { get; set; } = 1;
+
         [CustomDisplayName("Enterprise_Title")]
         public int? EnterpriseId { get; set; }
 

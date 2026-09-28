@@ -10,7 +10,7 @@ using CenIT.ReportTourism.Core.Attributes;
 using CenIT.ReportTourism.Core.Interfaces;
 using Microsoft.Reporting.WebForms;
 
-namespace BaoCao.TinhHinhHoatDong.SXKD.TongHop
+namespace _02.BaoCao.TinhHinhHoatDong.SXKD.TongHop
 {
     [ReportPlugin("_2BaoCao.TinhHinhHoatDong.SXKD.TongHop", "02 - Báo cáo tổng hợp tình hình hoạt động sản xuất, kinh doanh",
         "02 - Báo cáo tổng hợp tình hình hoạt động sản xuất, kinh doanh")]
