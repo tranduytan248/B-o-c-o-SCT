@@ -35,6 +35,7 @@
 
           <Procedure Name="Cate_Enterprises_Get" Value="p_Cate_Enterprises_Get" />
           <Procedure Name="Cate_Enterprises_Save" Value="p_Cate_Enterprises_Save" />
+          <Procedure Name="Cate_Enterprises_SaveInfo" Value="p_Cate_Enterprises_SaveInfo" />
           <Procedure Name="Cate_Enterprises_Delete" Value="p_Cate_Enterprises_Delete" />
           <Procedure Name="Cate_Enterprises_GetByID" Value="p_Cate_Enterprises_GetByID" />
           <Procedure Name="Cate_Enterprises_SaveDocs" Value="p_Cate_Enterprises_SaveDocs" />

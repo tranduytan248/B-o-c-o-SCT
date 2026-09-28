@@ -1,5 +1,6 @@
-﻿@{
-    ViewBag.Title = $"Phân quyền doanh nghiệp - [{Model.UserName}]";
+﻿@model CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models.EnterpriseUserModel
+@{
+    ViewBag.Title = $"Phân quyền doanh nghiệp - [{Model.FullName}]";
     Layout = "~/Views/Shared/_Form.cshtml";
 }
 
@@ -18,7 +19,7 @@
         OnSuccess = "User_OnProcessSuccess(data, 'EnterprisesUser')"
     }, new { @class = "form-horizontal" }))
     {
-        <div class="modal-body" id="PermissionModule">
+        <div class="modal-body" id="PermissionEnterprise">
             @Html.Partial("_EnterpriseUser")
         </div>
     }

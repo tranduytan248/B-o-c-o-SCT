@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using CenIT.ReportTourism.Caches.Cate;
 using CenIT.ReportTourism.Core.Apps;
 using CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models;
@@ -31,18 +32,26 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var pReport = ReportProcessor.GetReportByKey(report);
             ViewBag.Title = pReport.ReportName;
+            var listEnterprise = _enterpriseCache.GetViaUser(User.UserName);
 
             var reportModel = new ReportViewModel
             {
                 ReportKey = pReport.ReportKey,
                 ReportName = pReport.ReportName,
                 ViewName = pReport.ViewName,
-                Reporter = User.FullName
+                Reporter = User.FullName,
+                ListEnterprises = listEnterprise.Select(x => new ListItem
+                {
+                    Text = x.BusinessName,
+                    Value = x.EnterpriseId.ToString()
+                }).ToList()
             };
-            var enterprise = _enterpriseCache.GetViaUser(User.UserName).FirstOrDefault();
-            ViewBag.EnterpriseId = enterprise?.EnterpriseId;
-            ViewBag.EnterpriseName = enterprise?.BusinessName ?? User.FullName;
-            ViewBag.TaxCode = enterprise?.TaxCode ?? string.Empty;
+
+            //var enterprise = listEnterprise.FirstOrDefault();
+            //ViewBag.EnterpriseId = enterprise?.EnterpriseId;
+            //ViewBag.EnterpriseName = enterprise?.BusinessName ?? User.FullName;
+            //ViewBag.TaxCode = enterprise?.TaxCode ?? string.Empty;
+
             return await Task.Run(() => PartialView("_Report", reportModel));
         }
 
@@ -58,6 +67,15 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ReportProvider.CreateViewExport(sReportKey, Request.Form,
                     Server.MapPath("~/Contents/Modules/Report/Templates/"));
             return await Task.Run(() => PartialView("_Viewer"));
+        }
+
+        [AjaxOnly]
+        [HttpGet]
+        [ActionType(Type = EnumActionType.View)]
+        public ActionResult GetEnterpriseInfo(int enterpriseId = 0)
+        {
+            var enterpriseInfo = _enterpriseCache.GetById(enterpriseId);
+            return Json(new { Info = enterpriseInfo });
         }
     }
 }
