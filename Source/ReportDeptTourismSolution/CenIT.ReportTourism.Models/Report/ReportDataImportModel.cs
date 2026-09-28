@@ -11,6 +11,17 @@ namespace CenIT.ReportTourism.Models.Report
     {
         public long RowIndex { get; set; }
 
+        /// <summary>
+        /// Thứ tự dòng dữ liệu được lưu trong báo cáo (đánh số từ 0).
+        /// Không áp dụng cho các dòng tiêu đề nhóm.
+        /// </summary>
+        public int? Index { get; set; }
+
+        /// <summary>
+        /// Số thứ tự hiển thị theo phân cấp, ví dụ: 1, 1.1, 2.1.
+        /// </summary>
+        public string Level { get; set; }
+
         public long ReportId { get; set; }
 
         [CustomDisplayName("DataImport_Label_Enterprise")]

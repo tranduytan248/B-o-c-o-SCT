@@ -15,7 +15,9 @@
     <i class="fa fa-plus"></i>
 }
 
-type="text/css"
+@section SubmitControl{
+    <button type="submit" id="btnSave" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;Lưu &amp; gửi báo cáo</button>
+}
 
 @section FormBody{
     @*<link href="~/Areas/Report/Views/Import/_Import.css" rel="stylesheet" type="text/css" />*@
@@ -67,6 +69,7 @@ type="text/css"
             @Html.HiddenFor(model => model.ForMonth)
             @Html.HiddenFor(model => model.EnterpriseId)
             @Html.HiddenFor(model => model.EnterpriseName)
+            @Html.HiddenFor(model => model.TypeReport)
 
             <div class="form-group">
                 @Html.LabelFor(model => model.EnterpriseName, new { @class = "control-label col-md-3" })
@@ -78,22 +81,26 @@ type="text/css"
             <div class="form-group">
                 @Html.LabelFor(model => model.TypeReport, new { @class = "control-label col-md-3" })
                 <div class="col-md-4">
-                    @Html.TextBoxFor(model => model.TypeReportName, new { @readonly = true, @class = "col-md-12" })
+                    @Html.TextBoxFor(model => model.TypeReportName, new { @readonly = true, @class = "col-md-12", style = "background-color: #eee; cursor: not-allowed;" })
                 </div>
                 @Html.LabelFor(model => model.ForMonth, new { @class = "control-label col-md-2" })
                 <div class="col-md-3">
                     <div class="input-group col-md-7">
-                        <div class="input-group-addon">
+                        <div class="input-group-addon" style="background-color: #eee; cursor: not-allowed;">
                             <i class="fa fa-calendar"></i>
                         </div>
-                        @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @readonly = true, @class = "form-control", placeholder = "MM/yyyy" })
+                        <input type="text" class="form-control" value="@Model.ForMonth.ToString("MM/yyyy")" disabled="disabled" style="cursor: not-allowed; background-color: #eee;" placeholder="MM/yyyy" />
                     </div>
                 </div>
             </div>
 
             <hr/>
 
-            @if (ViewBag.IsBusinessProductReport == true)
+            @if (Model.TypeReport == EnumTypeBusiness.Trading)
+            {
+                @Html.Partial("_NoTemplateReport")
+            }
+            else if (ViewBag.IsBusinessProductReport == true)
             {
                 @Html.Partial("_BusinessProductReport", Model.ListDataImports)
             }
@@ -158,14 +165,11 @@ type="text/css"
         });
 
         $(document).ready(function() {
-            $('input[type="number"]').focusout(function() {
-                ValidMinNumber(this);
-            });
 
             @{
                 if (string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)
                 {
-                    @Html.Raw($"var a = document.createElement('a');a.style.display = 'none';a.href = '{Url.Action("LoginSmartCA")}';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
+                    @Html.Raw("var a = document.createElement('a');a.style.display = 'none';a.href = '" + Url.Action("LoginSmartCA") + "';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
                     @Html.Raw("$('#modal_EditReport button[type=\"submit\"]').prop('disabled', true);")
                     ;
                 }

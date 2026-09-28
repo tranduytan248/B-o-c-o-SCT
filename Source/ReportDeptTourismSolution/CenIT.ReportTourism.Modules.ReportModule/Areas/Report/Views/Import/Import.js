@@ -5,6 +5,7 @@ var _tableDataImport;
 
 $(document).ready(function() {
     initTableDataImport();
+    initSearchEnterpriseSelect2();
 });
 
 function initTableDataImport() {
@@ -189,4 +190,48 @@ function DataImport_OnProcessSuccess(response, formId) {
 
 function OnChangeCombo(cbb, eleName) {
     $(eleName).val($(cbb).children("option:selected").text());
+}
+
+function initSearchEnterpriseSelect2() {
+    var $select = $("#SearchDataReport select#ListEnterpriseId");
+    if ($select.length === 0) return;
+
+    $select.select2({
+        placeholder: "-- Chọn hoặc tìm kiếm doanh nghiệp --",
+        allowClear: true,
+        language: "vi",
+        width: "100%",
+        ajax: {
+            url: "/Report/Import/SearchEnterprisesSelect2",
+            dataType: "json",
+            delay: 300,
+            data: function (params) {
+                return {
+                    q: params.term || "",
+                    typeBusiness: "",
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.results,
+                    pagination: {
+                        more: data.pagination ? data.pagination.more : false
+                    }
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+    $select.off('select2:open').on('select2:open', function () {
+        setTimeout(function () {
+            var $searchField = $('.select2-container--open .select2-search__field');
+            if ($searchField.length > 0 && !$searchField.val()) {
+                $searchField.trigger('input');
+            }
+        }, 50);
+    });
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -99,18 +99,18 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
             var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
-            var lstEnterpriseOther = lstEnterpisePermits
-                .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
+            var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
+                .Where(e => lstReportsViaUsers == null || !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
 
             var searchModel = new ReportDataImportSearchModel
             {
-                ListEnterprises = lstEnterpisePermits
+                ListEnterprises = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                     .Select(e => new ListItem(e.BusinessName, e.EnterpriseId.ToString())).ToList(),
                 DayDeadlineSendReport =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue ?? "0"),
                 DayDeadlineSendReportLate =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
-                ExistEnterpriseSubmitReportYet = lstEnterpriseOther.Count > 0,
+                ExistEnterpriseSubmitReportYet = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0 ? lstEnterpriseOther.Count > 0 : true),
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -120,6 +120,87 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
             };
             return View(searchModel);
+        }
+
+        [HttpGet]
+        [AllowAnyPermission]
+        public ActionResult SearchEnterprisesSelect2(string q = null, string typeBusiness = null, int page = 1)
+        {
+            try
+            {
+                var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+                if (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0)
+                {
+                    var filtered = lstEnterpisePermits.Where(e =>
+                        (string.IsNullOrEmpty(typeBusiness) || e.TypeBusiness == typeBusiness) &&
+                        (string.IsNullOrEmpty(q) ||
+                         (!string.IsNullOrEmpty(e.BusinessName) && e.BusinessName.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                         (!string.IsNullOrEmpty(e.TaxCode) && e.TaxCode.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0))
+                    ).ToList();
+
+                    var results = filtered.Select(e => new
+                    {
+                        id = e.EnterpriseId,
+                        text = string.IsNullOrEmpty(e.TaxCode) ? e.BusinessName : string.Format("{0} - {1}", e.BusinessName, e.TaxCode),
+                        typeBusiness = e.TypeBusiness
+                    }).ToList();
+
+                    return Json(new
+                    {
+                        results = results,
+                        pagination = new { more = false }
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    int pageSize = 20;
+                    int pageIndex = page > 0 ? page - 1 : 0;
+                    var keyword = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
+                    var typeBiz = string.IsNullOrWhiteSpace(typeBusiness) ? null : typeBusiness.Trim();
+
+                    List<CateEnterpriseModel> list = null;
+                    try
+                    {
+                        list = AppProcessor.ProcedureProvider.ExecuteTypedList<CateEnterpriseModel>(
+                            "Cate_Enterprises_SearchSelect2", "SysProvider",
+                            keyword, typeBiz, pageIndex, pageSize);
+                    }
+                    catch (Exception exSp)
+                    {
+                        AppProcessor.Logger.Message("ExecuteTypedList error in SearchEnterprisesSelect2: " + exSp.Message);
+                    }
+
+
+                    int total = 0;
+                    if (list != null && list.Count > 0)
+                    {
+                        total = list.First().TotalRow.GetValueOrDefault(0);
+                    }
+
+                    var results = (list ?? new List<CateEnterpriseModel>()).Select(e => new
+                    {
+                        id = e.EnterpriseId,
+                        text = string.IsNullOrEmpty(e.TaxCode) ? e.BusinessName : string.Format("{0} - {1}", e.BusinessName, e.TaxCode),
+                        typeBusiness = e.TypeBusiness
+                    }).ToList();
+
+                    bool more = (pageIndex + 1) * pageSize < total;
+                    return Json(new
+                    {
+                        results = results,
+                        pagination = new { more = more }
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppProcessor.Logger.Message("General error in SearchEnterprisesSelect2: " + ex.Message);
+                return Json(new
+                {
+                    results = new object[0],
+                    pagination = new { more = false }
+                }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         [AjaxOnly]
@@ -281,18 +362,18 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
             var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
-            var lstEnterpriseOther = lstEnterpisePermits
-                .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
+            var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
+                .Where(e => lstReportsViaUsers == null || !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
 
             var searchModel = new ReportDataImportSearchModel
             {
-                ListEnterprises = lstEnterpisePermits
+                ListEnterprises = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                     .Select(e => new ListItem(e.BusinessName, e.EnterpriseId.ToString())).ToList(),
                 DayDeadlineSendReport =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue ?? "0"),
                 DayDeadlineSendReportLate =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
-                ExistEnterpriseSubmitReportYet = lstEnterpriseOther.Count > 0,
+                ExistEnterpriseSubmitReportYet = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0 ? lstEnterpriseOther.Count > 0 : true),
                 EnableSignDigitalDoc =
                     (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
             };
@@ -315,6 +396,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 ListEnterprises = lstEnterpriseOther.OrderBy(e => e.BusinessName)
                     .Select(e => new ListItem(e.BusinessName, e.EnterpriseId.ToString())).ToList(),
+                EnterpriseId = lstEnterpriseOther.Count == 1 ? lstEnterpriseOther[0].EnterpriseId : (int?)null,
+                EnterpriseName = lstEnterpriseOther.Count == 1 ? lstEnterpriseOther[0].BusinessName : null,
                 DayDeadlineSendReport =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue ?? "0"),
                 DayDeadlineSendReportLate =
@@ -1133,28 +1216,43 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         public ActionResult Add()
         {
             var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
-            var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
             var lstEnterpriseOther = lstEnterpisePermits
-                .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
+                .Where(e => e.TypeBusiness == "1").ToList();
+
+            EnumTypeBusiness defaultType = EnumTypeBusiness.Manufacturing;
+            if (lstEnterpriseOther.Count == 1)
+            {
+                int tbVal;
+                if (int.TryParse(lstEnterpriseOther[0].TypeBusiness, out tbVal) && Enum.IsDefined(typeof(EnumTypeBusiness), tbVal))
+                {
+                    defaultType = (EnumTypeBusiness)tbVal;
+                }
+            }
 
             var reportModel = new TourismReportModel
             {
                 ListEnterprises = lstEnterpriseOther.OrderBy(e => e.BusinessName)
                     .Select(e => new ListItem(e.BusinessName, e.EnterpriseId.ToString())).ToList(),
+                EnterpriseId = lstEnterpriseOther.Count == 1 ? lstEnterpriseOther[0].EnterpriseId : (int?)null,
+                EnterpriseName = lstEnterpriseOther.Count == 1 ? lstEnterpriseOther[0].BusinessName : null,
                 DayDeadlineSendReport =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue ?? "0"),
                 DayDeadlineSendReportLate =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
                 AccessToken = (string)Session[$"VNPT-SmartCA-{User?.UserName}-AccessToken"],
                 EnableSignDigitalDoc =
-                    (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
+                    (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0",
+                ForMonth = DateTime.Now,
+                TypeReport = defaultType,
+                TypeReportName = GetTypeBusinessDisplayName(defaultType),
+                ListTypeBusiness = GetListTypeBusinessItems()
             };
             return PartialView("_Add", reportModel);
         }
 
         [AjaxOnly]
         [HttpPost]
-        [ActionType(Type = EnumActionType.Delete)]
+        [ActionType(Type = EnumActionType.Add)]
         public ActionResult Add(TourismReportModel model)
         {
             StringBuilder logActions = new StringBuilder();
@@ -1163,9 +1261,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             if (!ModelState.IsValid)
             {
                 var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
-                var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
                 var lstEnterpriseOther = lstEnterpisePermits
-                    .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
+                    .Where(e => e.TypeBusiness == "1").ToList();
 
                 var reportModel = new TourismReportModel
                 {
@@ -1176,7 +1273,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     DayDeadlineSendReportLate =
                         int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
                     EnableSignDigitalDoc =
-                        (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
+                        (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0",
+                    ForMonth = model.ForMonth,
+                    TypeReport = model.TypeReport,
+                    TypeReportName = string.IsNullOrWhiteSpace(model.TypeReportName) || model.TypeReportName.StartsWith("TypeBusiness_") ? GetTypeBusinessDisplayName(model.TypeReport) : model.TypeReportName,
+                    ListTypeBusiness = GetListTypeBusinessItems()
                 };
                 return PartialView("_Add", reportModel);
             }
@@ -1200,6 +1301,22 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
             var dataReport = ReadFormData(Request.Form);
+
+            if (string.Equals(Request.Form["BusinessProductReport"], "true", StringComparison.OrdinalIgnoreCase))
+            {
+                string revenueError;
+                if (!ValidateRevenueConstraint(dataReport, out revenueError))
+                {
+                    logActions.AppendLine(" - Lỗi: " + revenueError);
+                    AppProcessor.Logger.Message(logActions.ToString());
+                    return Json(new
+                    {
+                        status = false,
+                        errorCode = 1,
+                        message = CreateMessage(revenueError, EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                    });
+                }
+            }
 
             #region Create File Report And Path
 
@@ -1312,6 +1429,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 logActions.AppendLine($" - Thực hiện {_digitalSignTitle} dữ liệu báo cáo thành công");
                 System.IO.File.WriteAllBytes(fileSignedFullPath, dataImports);
             }
+
+            if (string.IsNullOrWhiteSpace(model.TypeReportName) || model.TypeReportName.StartsWith("TypeBusiness_"))
+            {
+                model.TypeReportName = GetTypeBusinessDisplayName(model.TypeReport);
+            }
+
             var enterpriseId = _importCache.Import(new ReportDataImportModel
             {
                 EnterpriseId = model.EnterpriseId,
@@ -1396,18 +1519,40 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             // Báo cáo chỉ tiêu công nghiệp không lưu các dòng tiêu đề nhóm. Khi sửa,
             // dựng lại toàn bộ khung từ danh mục rồi gắn số liệu đã lưu theo chỉ tiêu.
             // Không dùng TypeBusiness để nhận diện vì doanh nghiệp có thể có TypeBusiness = 1.
-            var catalogResult = LoadViewTypeReport(enterpriseId) as PartialViewResult;
+            var catalogResult = LoadViewTypeReport(enterpriseId, onMonth) as PartialViewResult;
             var catalog = catalogResult?.Model as List<ReportDataImportModel>;
             if (catalog != null && catalog.Any())
             {
                 dataImports = MergeBusinessProductData(catalog, dataImports);
                 ViewBag.IsBusinessProductReport = true;
             }
+            if (catalogResult != null)
+            {
+                ViewBag.ExportBusinessProductOptions = catalogResult.ViewData["ExportBusinessProductOptions"];
+                ViewBag.ImportBusinessProductOptions = catalogResult.ViewData["ImportBusinessProductOptions"];
+                ViewBag.BusinessProductEnterpriseId = catalogResult.ViewData["BusinessProductEnterpriseId"];
+                ViewBag.ForMonth = catalogResult.ViewData["ForMonth"] ?? (onMonth ?? DateTime.Now);
+            }
+
+            EnumTypeBusiness selectedType = EnumTypeBusiness.Manufacturing;
+            var savedTypeVal = dataImports?.FirstOrDefault(d => d.TypeReport > 0)?.TypeReport;
+            if (savedTypeVal.HasValue && Enum.IsDefined(typeof(EnumTypeBusiness), savedTypeVal.Value))
+            {
+                selectedType = (EnumTypeBusiness)savedTypeVal.Value;
+            }
+            else if (!string.IsNullOrEmpty(enterpriseModel.TypeBusiness))
+            {
+                int entType;
+                if (int.TryParse(enterpriseModel.TypeBusiness.Split(',')[0], out entType) && Enum.IsDefined(typeof(EnumTypeBusiness), entType))
+                {
+                    selectedType = (EnumTypeBusiness)entType;
+                }
+            }
+
+            var typeReportName = GetTypeBusinessDisplayName(selectedType);
 
             var reportModel = new TourismReportModel
             {
-                //ListEnterprises = lstEnterpriseOther.OrderBy(e => e.BusinessName)
-                //    .Select(e => new ListItem(e.BusinessName, e.EnterpriseId.ToString())).ToList(),
                 DayDeadlineSendReport =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue ?? "0"),
                 DayDeadlineSendReportLate =
@@ -1416,11 +1561,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ForMonth = onMonth ?? DateTime.Now,
                 ListDataImports = dataImports,
                 EnterpriseName = enterpriseModel.BusinessName,
-                TypeReport = EnumTypeBusiness.Manufacturing,
-                TypeReportName = EnumHelper.GetDescription(EnumTypeBusiness.Manufacturing),
-                //TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
-                //TypeReportName = AppProcessor.Messagor.GetMessage(
-                //    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                TypeReport = selectedType,
+                TypeReportName = typeReportName,
+                ListTypeBusiness = GetListTypeBusinessItems(),
                 IsEdit = true,
                 AccessToken = (string)Session[$"VNPT-SmartCA-{User?.UserName}-AccessToken"],
                 EnableSignDigitalDoc =
@@ -1480,15 +1623,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     ListDataImports = dataImports,
                     EnterpriseName = enterpriseModel.BusinessName,
                     TypeReport = model.TypeReport,
-                    TypeReportName = model.TypeReportName,
-                    //TypeReport = (EnumTypeBusiness)enterpriseModel.TypeBusiness,
-                    //TypeReportName = AppProcessor.Messagor.GetMessage(
-                    //    EnumHelper.GetDescription((EnumTypeBusiness)enterpriseModel.TypeBusiness)),
+                    TypeReportName = string.IsNullOrWhiteSpace(model.TypeReportName) || model.TypeReportName.StartsWith("TypeBusiness_") ? GetTypeBusinessDisplayName(model.TypeReport) : model.TypeReportName,
+                    ListTypeBusiness = GetListTypeBusinessItems(),
                     IsEdit = true,
                     EnableSignDigitalDoc =
                         (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
                 };
-                return PartialView("_Add", reportModel);
+                return PartialView("_Edit", reportModel);
             }
 
             #endregion
@@ -1498,6 +1639,22 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
             var dataReport = ReadFormData(Request.Form);
+
+            if (string.Equals(Request.Form["BusinessProductReport"], "true", StringComparison.OrdinalIgnoreCase))
+            {
+                string revenueError;
+                if (!ValidateRevenueConstraint(dataReport, out revenueError))
+                {
+                    logActions.AppendLine(" - Lỗi: " + revenueError);
+                    AppProcessor.Logger.Message(logActions.ToString());
+                    return Json(new
+                    {
+                        status = false,
+                        errorCode = 1,
+                        message = CreateMessage(revenueError, EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                    });
+                }
+            }
 
             #region Create Report And File Path
 
@@ -1614,6 +1771,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 System.IO.File.WriteAllBytes(fileSignedFullPath, dataImportViaTemplates);
             }
 
+            if (string.IsNullOrWhiteSpace(model.TypeReportName) || model.TypeReportName.StartsWith("TypeBusiness_"))
+            {
+                model.TypeReportName = GetTypeBusinessDisplayName(model.TypeReport);
+            }
+
             var enterpriseId = _importCache.Import(new ReportDataImportModel
             {
                 EnterpriseId = model.EnterpriseId,
@@ -1670,65 +1832,130 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         [AjaxOnly]
         [HttpGet]
-        [ActionType(Type = EnumActionType.View)]
-        public ActionResult LoadViewTypeReport(int? enterpriseId)
+        [AllowAnyPermission]
+        public ActionResult LoadViewTypeReport(int? enterpriseId, DateTime? onMonth = null, string forMonth = null, int? typeReport = null)
         {
+            if (typeReport.HasValue && typeReport.Value == (int)EnumTypeBusiness.Trading)
+            {
+                return PartialView("_NoTemplateReport");
+            }
+
+            if (!typeReport.HasValue && enterpriseId.HasValue && enterpriseId.Value > 0)
+            {
+                var ent = _enterpriseCache.GetById(enterpriseId.Value);
+                if (ent != null && !string.IsNullOrEmpty(ent.TypeBusiness))
+                {
+                    int biz;
+                    if (int.TryParse(ent.TypeBusiness.Split(',')[0], out biz) && biz == (int)EnumTypeBusiness.Trading)
+                    {
+                        return PartialView("_NoTemplateReport");
+                    }
+                }
+            }
+
             var products = new List<ReportDataImportModel>();
             var mainProducts = new List<ReportDataImportModel>();
+            var exportProducts = new List<ReportDataImportModel>();
+            var importProducts = new List<ReportDataImportModel>();
             var exportProductOptions = new List<ReportDataImportModel>();
             var importProductOptions = new List<ReportDataImportModel>();
-            if (!enterpriseId.HasValue)
+            if (!enterpriseId.HasValue || enterpriseId.Value <= 0)
             {
                 return PartialView("_BusinessProductReport", products);
             }
 
-            var enterprises = _enterpriseCache.GetViaUser(User.UserName) ?? new List<CateEnterpriseModel>();
-            if (enterprises.All(x => x.EnterpriseId != enterpriseId.Value))
+            var targetDate = onMonth;
+            if (!targetDate.HasValue && !string.IsNullOrWhiteSpace(forMonth))
             {
-                return PartialView("_BusinessProductReport", products);
+                DateTime dt;
+                if (DateTime.TryParseExact(forMonth.Trim(), new[] { "MM/yyyy", "M/yyyy", "yyyy-MM-dd", "yyyy/MM", "dd/MM/yyyy" },
+                    System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt))
+                {
+                    targetDate = dt;
+                }
+                else if (DateTime.TryParse(forMonth.Trim(), out dt))
+                {
+                    targetDate = dt;
+                }
+            }
+            var currentForMonth = targetDate ?? DateTime.Now;
+
+            try
+            {
+                mainProducts = (_businessProductCache.GetViaEnterprise(enterpriseId.Value) ?? new List<CateBusinessProductModel>())
+                    .Select(product => new ReportDataImportModel
+                    {
+                        Targets = product.ProductName,
+                        Unit = product.Unit,
+                        Code = !string.IsNullOrWhiteSpace(product.ProductCode)
+                            ? product.ProductCode.Trim()
+                            : string.Format("02{0:D4}", product.ProductId)
+                    }).ToList();
+            }
+            catch (Exception exMain)
+            {
+                AppProcessor.Logger.Message("GetViaEnterprise error: " + exMain.Message);
             }
 
-            mainProducts = _businessProductCache.GetViaEnterprise(enterpriseId.Value)
-                .Select(product => new ReportDataImportModel
-                {
-                    Targets = product.ProductName,
-                    Unit = product.Unit,
-                    Code = !string.IsNullOrWhiteSpace(product.ProductCode)
-                        ? product.ProductCode.Trim()
-                        : string.Format("02{0:D4}", product.ProductId)
-                }).ToList();
+            try
+            {
+                exportProducts = (_businessProductCache.GetByPrefix(enterpriseId.Value, "XK") ?? new List<CateBusinessProductModel>())
+                    .Select(product => new ReportDataImportModel
+                    {
+                        Targets = product.ProductName,
+                        Unit = product.Unit,
+                        Code = product.ProductCode
+                    }).ToList();
+            }
+            catch (Exception exXk)
+            {
+                AppProcessor.Logger.Message("GetByPrefix XK error: " + exXk.Message);
+            }
 
-            var exportProducts = _businessProductCache.GetByPrefix(enterpriseId.Value, "XK")
-                .Select(product => new ReportDataImportModel
-                {
-                    Targets = product.ProductName,
-                    Unit = product.Unit,
-                    Code = product.ProductCode
-                }).ToList();
+            try
+            {
+                importProducts = (_businessProductCache.GetByPrefix(enterpriseId.Value, "NK") ?? new List<CateBusinessProductModel>())
+                    .Select(product => new ReportDataImportModel
+                    {
+                        Targets = product.ProductName,
+                        Unit = product.Unit,
+                        Code = product.ProductCode
+                    }).ToList();
+            }
+            catch (Exception exNk)
+            {
+                AppProcessor.Logger.Message("GetByPrefix NK error: " + exNk.Message);
+            }
 
-            var importProducts = _businessProductCache.GetByPrefix(enterpriseId.Value, "NK")
-                .Select(product => new ReportDataImportModel
-                {
-                    Targets = product.ProductName,
-                    Unit = product.Unit,
-                    Code = product.ProductCode
-                }).ToList();
+            try
+            {
+                exportProductOptions = (_businessProductCache.GetUnconfiguredByPrefix(enterpriseId.Value, "XK") ?? new List<CateBusinessProductModel>())
+                    .Select(product => new ReportDataImportModel
+                    {
+                        Targets = product.ProductName,
+                        Unit = product.Unit,
+                        Code = product.ProductCode
+                    }).ToList();
+            }
+            catch (Exception exOptXk)
+            {
+                AppProcessor.Logger.Message("GetUnconfiguredByPrefix XK error: " + exOptXk.Message);
+            }
 
-            exportProductOptions = _businessProductCache.GetUnconfiguredByPrefix(enterpriseId.Value, "XK")
-                .Select(product => new ReportDataImportModel
-                {
-                    Targets = product.ProductName,
-                    Unit = product.Unit,
-                    Code = product.ProductCode
-                }).ToList();
-
-            importProductOptions = _businessProductCache.GetUnconfiguredByPrefix(enterpriseId.Value, "NK")
-                .Select(product => new ReportDataImportModel
-                {
-                    Targets = product.ProductName,
-                    Unit = product.Unit,
-                    Code = product.ProductCode
-                }).ToList();
+            try
+            {
+                importProductOptions = (_businessProductCache.GetUnconfiguredByPrefix(enterpriseId.Value, "NK") ?? new List<CateBusinessProductModel>())
+                    .Select(product => new ReportDataImportModel
+                    {
+                        Targets = product.ProductName,
+                        Unit = product.Unit,
+                        Code = product.ProductCode
+                    }).ToList();
+            }
+            catch (Exception exOptNk)
+            {
+                AppProcessor.Logger.Message("GetUnconfiguredByPrefix NK error: " + exOptNk.Message);
+            }
 
             // Khung chỉ tiêu theo mẫu báo cáo doanh nghiệp hằng tháng.
             products.Add(CreateBusinessProductLine("Tổng doanh thu", "Tỷ đồng", "01"));
@@ -1745,9 +1972,67 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             products.Add(CreateBusinessProductLine("Kim ngạch nhập khẩu", "1.000 USD", "07"));
             products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng nhập khẩu chủ yếu"));
             products.AddRange(importProducts);
+            ApplyBusinessProductHierarchy(products);
+
+            // Tự động nạp kế hoạch năm nếu đã từng nhập trong năm báo cáo hiện tại
+            try
+            {
+                var reportYear = currentForMonth.Year;
+                var allEnterpriseReports = _importCache.GetViaEnterpriseOnMonth(enterpriseId.Value, null);
+                if (allEnterpriseReports != null && allEnterpriseReports.Any())
+                {
+                    var yearlyPlans = allEnterpriseReports
+                        .Where(r => r.ForMonth.HasValue && r.ForMonth.Value.Year == reportYear && r.AccumulatedBeginingOfYear.HasValue && r.AccumulatedBeginingOfYear.Value > 0)
+                        .ToList();
+
+                    if (yearlyPlans.Any())
+                    {
+                        var plansByCode = yearlyPlans
+                            .Where(r => !string.IsNullOrWhiteSpace(r.Code))
+                            .GroupBy(r => r.Code.Trim(), StringComparer.OrdinalIgnoreCase)
+                            .ToDictionary(g => g.Key, g => g.OrderByDescending(r => r.ForMonth ?? DateTime.MinValue).First().AccumulatedBeginingOfYear, StringComparer.OrdinalIgnoreCase);
+
+                        var plansByTarget = yearlyPlans
+                            .Where(r => !string.IsNullOrWhiteSpace(r.Targets))
+                            .GroupBy(r => r.Targets.Trim(), StringComparer.OrdinalIgnoreCase)
+                            .ToDictionary(g => g.Key, g => g.OrderByDescending(r => r.ForMonth ?? DateTime.MinValue).First().AccumulatedBeginingOfYear, StringComparer.OrdinalIgnoreCase);
+
+                        foreach (var p in products)
+                        {
+                            // Kim ngạch xuất khẩu (06) và nhập khẩu (07) không nạp trực tiếp, chỉ tính từ các mặt hàng bên trong
+                            if (p.Code == "06" || p.Code == "07" || p.Targets == "Kim ngạch xuất khẩu" || p.Targets == "Kim ngạch nhập khẩu")
+                            {
+                                continue;
+                            }
+
+                            if (!p.AccumulatedBeginingOfYear.HasValue || p.AccumulatedBeginingOfYear.Value <= 0)
+                            {
+                                double? planVal;
+                                if (!string.IsNullOrWhiteSpace(p.Code) && plansByCode.TryGetValue(p.Code.Trim(), out planVal))
+                                {
+                                    p.AccumulatedBeginingOfYear = planVal;
+                                }
+                                else if (!string.IsNullOrWhiteSpace(p.Targets) && plansByTarget.TryGetValue(p.Targets.Trim(), out planVal))
+                                {
+                                    p.AccumulatedBeginingOfYear = planVal;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exPlan)
+            {
+                AppProcessor.Logger.Message("YearlyPlan loading error: " + exPlan.Message);
+            }
+
+            // Kim ngạch xuất khẩu và nhập khẩu chỉ tính từ tổng các mặt hàng bên trong
+            RecalculateTradeSummaryInModel(products);
+
             ViewBag.ExportBusinessProductOptions = exportProductOptions;
             ViewBag.ImportBusinessProductOptions = importProductOptions;
             ViewBag.BusinessProductEnterpriseId = enterpriseId.Value;
+            ViewBag.ForMonth = currentForMonth;
 
             return PartialView("_BusinessProductReport", products);
         }
@@ -1762,12 +2047,85 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             return new ReportDataImportModel { Targets = targets, Unit = unit, Code = code };
         }
 
+        private static void ApplyBusinessProductHierarchy(List<ReportDataImportModel> products)
+        {
+            var storageIndex = 0;
+            var section = string.Empty;
+            var mainProductNumber = 0;
+            var exportProductNumber = 0;
+            var importProductNumber = 0;
+
+            foreach (var product in products)
+            {
+                product.Index = null;
+                product.Level = null;
+
+                switch (product.Targets)
+                {
+                    case "Tổng doanh thu":
+                        product.Level = "1";
+                        break;
+                    case "Trong đó doanh thu công nghiệp":
+                        product.Level = "1.1";
+                        break;
+                    case "Sản phẩm công nghiệp chủ yếu":
+                        section = "MainProduct";
+                        product.Level = "2";
+                        continue;
+                    case "Lao động - Thu nhập":
+                        section = "Labor";
+                        product.Level = "3";
+                        continue;
+                    case "Tổng số lao động":
+                        product.Level = "3.1";
+                        break;
+                    case "Thu nhập bình quân/người/tháng":
+                        product.Level = "3.2";
+                        break;
+                    case "Nộp ngân sách":
+                        section = string.Empty;
+                        product.Level = "4";
+                        break;
+                    case "Kim ngạch xuất khẩu":
+                        section = "Export";
+                        product.Level = "5";
+                        break;
+                    case "Nhóm/mặt hàng xuất khẩu chủ yếu":
+                        section = "Export";
+                        continue;
+                    case "Kim ngạch nhập khẩu":
+                        section = "Import";
+                        product.Level = "6";
+                        break;
+                    case "Nhóm/mặt hàng nhập khẩu chủ yếu":
+                        section = "Import";
+                        continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(product.Code))
+                    continue;
+
+                if (section == "MainProduct" && string.IsNullOrWhiteSpace(product.Level))
+                    product.Level = "2." + (++mainProductNumber);
+                else if (section == "Export" && product.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase))
+                    product.Level = "5." + (++exportProductNumber);
+                else if (section == "Import" && product.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase))
+                    product.Level = "6." + (++importProductNumber);
+
+                product.Index = storageIndex++;
+            }
+        }
+
         private static List<ReportDataImportModel> MergeBusinessProductData(
             List<ReportDataImportModel> catalog, List<ReportDataImportModel> savedData)
         {
             savedData = savedData ?? new List<ReportDataImportModel>();
             foreach (var item in catalog.Where(x => !string.IsNullOrWhiteSpace(x.Code)))
             {
+                // Kim ngạch XK và NK không nạp trực tiếp, chỉ tính từ tổng các mặt hàng bên trong
+                if (item.Code == "06" || item.Code == "07" || item.Targets == "Kim ngạch xuất khẩu" || item.Targets == "Kim ngạch nhập khẩu")
+                    continue;
+
                 // Mã sản phẩm có thể trùng giữa ba nhóm danh mục, nên ưu tiên tên và đơn vị.
                 var saved = savedData.FirstOrDefault(x =>
                                 string.Equals(x.Targets, item.Targets, StringComparison.OrdinalIgnoreCase) &&
@@ -1781,14 +2139,38 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
                 item.PerformPreviousPeriod = saved.PerformPreviousPeriod;
                 item.PerformInPeriod = saved.PerformInPeriod;
-                item.AccumulatedBeginingOfYear = saved.AccumulatedBeginingOfYear;
+                item.AccumulatedBeginingOfYear = saved.AccumulatedBeginingOfYear ?? item.AccumulatedBeginingOfYear;
                 item.ComparedSamePeriodLastYear = saved.ComparedSamePeriodLastYear;
             }
 
             InsertTradeIndicators(catalog, savedData, "Nhóm/mặt hàng xuất khẩu chủ yếu", "XK");
             InsertTradeIndicators(catalog, savedData, "Nhóm/mặt hàng nhập khẩu chủ yếu", "NK");
+            ApplyBusinessProductHierarchy(catalog);
+            RecalculateTradeSummaryInModel(catalog);
 
             return catalog;
+        }
+
+        private static void RecalculateTradeSummaryInModel(List<ReportDataImportModel> products)
+        {
+            if (products == null) return;
+            var exportSummary = products.FirstOrDefault(p => string.Equals(p.Code, "06", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Targets, "Kim ngạch xuất khẩu", StringComparison.OrdinalIgnoreCase));
+            if (exportSummary != null)
+            {
+                var xkItems = products.Where(p => !string.IsNullOrWhiteSpace(p.Code) && p.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase)).ToList();
+                exportSummary.AccumulatedBeginingOfYear = xkItems.Any() ? xkItems.Sum(x => x.AccumulatedBeginingOfYear ?? 0) : (double?)0;
+                exportSummary.PerformPreviousPeriod = xkItems.Any() ? xkItems.Sum(x => x.PerformPreviousPeriod ?? 0) : (double?)0;
+                exportSummary.PerformInPeriod = xkItems.Any() ? xkItems.Sum(x => x.PerformInPeriod ?? 0) : (double?)0;
+            }
+
+            var importSummary = products.FirstOrDefault(p => string.Equals(p.Code, "07", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Targets, "Kim ngạch nhập khẩu", StringComparison.OrdinalIgnoreCase));
+            if (importSummary != null)
+            {
+                var nkItems = products.Where(p => !string.IsNullOrWhiteSpace(p.Code) && p.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase)).ToList();
+                importSummary.AccumulatedBeginingOfYear = nkItems.Any() ? nkItems.Sum(x => x.AccumulatedBeginingOfYear ?? 0) : (double?)0;
+                importSummary.PerformPreviousPeriod = nkItems.Any() ? nkItems.Sum(x => x.PerformPreviousPeriod ?? 0) : (double?)0;
+                importSummary.PerformInPeriod = nkItems.Any() ? nkItems.Sum(x => x.PerformInPeriod ?? 0) : (double?)0;
+            }
         }
 
         private static void InsertTradeIndicators(List<ReportDataImportModel> catalog,
@@ -1975,6 +2357,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             dartaFormReport.Columns.Add("Targets");
             dartaFormReport.Columns.Add("Unit");
             dartaFormReport.Columns.Add("Code");
+            dartaFormReport.Columns.Add("Index", typeof(int));
+            dartaFormReport.Columns.Add("Level");
             dartaFormReport.Columns.Add("PerformPreviousPeriod", typeof(double));
             dartaFormReport.Columns.Add("PerformInPeriod", typeof(double));
             dartaFormReport.Columns.Add("AccumulatedBeginingOfYear", typeof(double));
@@ -1985,6 +2369,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             var numKeys = formData.AllKeys.Count(k => k.Contains("Target_"));
             var isBusinessProductReport = string.Equals(formData["BusinessProductReport"], "true",
                 StringComparison.OrdinalIgnoreCase);
+            var dataIndex = 0;
             for (var idx = 1; idx <= numKeys; idx++)
             {
                 var code = formData[$"Code_{idx}"];
@@ -1994,21 +2379,159 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     formData[$"Target_{idx}"],
                     formData[$"Unit_{idx}"],
                     code,
-                    string.IsNullOrEmpty(formData[$"PerformPreviousPeriod_{idx}"])
-                        ? (double?)null
-                        : double.Parse(formData[$"PerformPreviousPeriod_{idx}"]),
-                    string.IsNullOrEmpty(formData[$"PerformInPeriod_{idx}"])
-                        ? (double?)null
-                        : double.Parse(formData[$"PerformInPeriod_{idx}"]),
-                    string.IsNullOrEmpty(formData[$"AccumulatedBeginingOfYear_{idx}"])
-                        ? (double?)null
-                        : double.Parse(formData[$"AccumulatedBeginingOfYear_{idx}"]),
-                    string.IsNullOrEmpty(formData[$"CompareSamePeriodLastYear_{idx}"])
-                        ? (double?)null
-                        : double.Parse(formData[$"CompareSamePeriodLastYear_{idx}"]));
+                    dataIndex++,
+                    formData[$"Level_{idx}"],
+                    ParseFormattedNumber(formData[$"PerformPreviousPeriod_{idx}"]),
+                    ParseFormattedNumber(formData[$"PerformInPeriod_{idx}"]),
+                    ParseFormattedNumber(formData[$"AccumulatedBeginingOfYear_{idx}"]),
+                    ParseFormattedNumber(formData[$"CompareSamePeriodLastYear_{idx}"]));
+            }
+
+            // Dòng mặt hàng được thêm động có thể nằm giữa bảng nhưng có tên field ở cuối form.
+            // Sắp lại Index theo Level để thứ tự lưu luôn khớp với số thứ tự hiển thị (1, 1.1, 2.1...).
+            if (isBusinessProductReport)
+            {
+                RecalculateTradeSummaryInDataTable(dartaFormReport);
+
+                var orderedRows = dartaFormReport.AsEnumerable()
+                    .OrderBy(row => GetBusinessProductSortKey(Convert.ToString(row["Level"])))
+                    .ToList();
+                for (var rowIndex = 0; rowIndex < orderedRows.Count; rowIndex++)
+                    orderedRows[rowIndex]["Index"] = rowIndex;
             }
 
             return dartaFormReport;
+        }
+
+        private static double? ParseFormattedNumber(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return null;
+            raw = raw.Trim();
+            if (raw.Contains(",") && raw.Contains("."))
+            {
+                raw = raw.Replace(".", "").Replace(",", ".");
+            }
+            else if (raw.Contains(","))
+            {
+                raw = raw.Replace(",", ".");
+            }
+            else if (raw.Contains("."))
+            {
+                var dotCount = raw.Count(c => c == '.');
+                if (dotCount > 1)
+                {
+                    raw = raw.Replace(".", "");
+                }
+                else
+                {
+                    var parts = raw.Split('.');
+                    if (parts.Length > 1 && parts[1].Length == 3)
+                    {
+                        raw = raw.Replace(".", "");
+                    }
+                }
+            }
+
+            double result;
+            if (double.TryParse(raw, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result))
+            {
+                return result;
+            }
+            return null;
+        }
+
+        private static string GetBusinessProductSortKey(string level)
+        {
+            if (string.IsNullOrWhiteSpace(level)) return "99999";
+            return string.Join(".", level.Split('.')
+                .Select(part =>
+                {
+                    int number;
+                    return int.TryParse(part, out number) ? number.ToString("D5") : "99999";
+                }));
+        }
+
+        private static void RecalculateTradeSummaryInDataTable(DataTable table)
+        {
+            if (table == null) return;
+            var rows = table.AsEnumerable().ToList();
+            var exportRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "06", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Kim ngạch xuất khẩu", StringComparison.OrdinalIgnoreCase));
+            if (exportRow != null)
+            {
+                var xkRows = rows.Where(r => (Convert.ToString(r["Code"]) ?? "").StartsWith("XK", StringComparison.OrdinalIgnoreCase)).ToList();
+                exportRow["AccumulatedBeginingOfYear"] = xkRows.Any() ? xkRows.Sum(r => r["AccumulatedBeginingOfYear"] != DBNull.Value ? Convert.ToDouble(r["AccumulatedBeginingOfYear"]) : 0.0) : 0.0;
+                exportRow["PerformPreviousPeriod"] = xkRows.Any() ? xkRows.Sum(r => r["PerformPreviousPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformPreviousPeriod"]) : 0.0) : 0.0;
+                exportRow["PerformInPeriod"] = xkRows.Any() ? xkRows.Sum(r => r["PerformInPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformInPeriod"]) : 0.0) : 0.0;
+            }
+
+            var importRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "07", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Kim ngạch nhập khẩu", StringComparison.OrdinalIgnoreCase));
+            if (importRow != null)
+            {
+                var nkRows = rows.Where(r => (Convert.ToString(r["Code"]) ?? "").StartsWith("NK", StringComparison.OrdinalIgnoreCase)).ToList();
+                importRow["AccumulatedBeginingOfYear"] = nkRows.Any() ? nkRows.Sum(r => r["AccumulatedBeginingOfYear"] != DBNull.Value ? Convert.ToDouble(r["AccumulatedBeginingOfYear"]) : 0.0) : 0.0;
+                importRow["PerformPreviousPeriod"] = nkRows.Any() ? nkRows.Sum(r => r["PerformPreviousPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformPreviousPeriod"]) : 0.0) : 0.0;
+                importRow["PerformInPeriod"] = nkRows.Any() ? nkRows.Sum(r => r["PerformInPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformInPeriod"]) : 0.0) : 0.0;
+            }
+        }
+
+        private static string GetTypeBusinessDisplayName(EnumTypeBusiness type)
+        {
+            string msgKey = EnumHelper.GetDescription(type);
+            string msg = AppProcessor.Messagor.GetMessage(msgKey);
+            if (string.IsNullOrWhiteSpace(msg) || msg == msgKey)
+            {
+                switch (type)
+                {
+                    case EnumTypeBusiness.Manufacturing:
+                        return "Doanh nghiệp sản xuất, kinh doanh";
+                    case EnumTypeBusiness.Trading:
+                        return "Doanh nghiệp thương mại, dịch vụ";
+                    default:
+                        return msgKey;
+                }
+            }
+            return msg;
+        }
+
+        private static List<ListItem> GetListTypeBusinessItems()
+        {
+            return Enum.GetValues(typeof(EnumTypeBusiness))
+                .Cast<EnumTypeBusiness>()
+                .Select(x => new ListItem(GetTypeBusinessDisplayName(x), ((int)x).ToString()))
+                .ToList();
+        }
+
+        private static bool ValidateRevenueConstraint(DataTable table, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            if (table == null) return true;
+
+            var rows = table.AsEnumerable().ToList();
+            var totalRevRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "01", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Tổng doanh thu", StringComparison.OrdinalIgnoreCase));
+            var industryRevRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "0101", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Trong đó doanh thu công nghiệp", StringComparison.OrdinalIgnoreCase));
+
+            if (totalRevRow == null || industryRevRow == null) return true;
+
+            var fields = new[]
+            {
+                new { Col = "AccumulatedBeginingOfYear", Label = "Kế hoạch năm" },
+                new { Col = "PerformPreviousPeriod", Label = "Thực hiện tháng trước" },
+                new { Col = "PerformInPeriod", Label = "Ước thực hiện tháng báo cáo" }
+            };
+
+            foreach (var f in fields)
+            {
+                double totalVal = totalRevRow[f.Col] != DBNull.Value ? Convert.ToDouble(totalRevRow[f.Col]) : 0.0;
+                double indVal = industryRevRow[f.Col] != DBNull.Value ? Convert.ToDouble(industryRevRow[f.Col]) : 0.0;
+
+                if (indVal > totalVal)
+                {
+                    errorMessage = string.Format("Doanh thu công nghiệp ({0:N2}) không được lớn hơn Tổng doanh thu ({1:N2}) ở cột {2}.", indVal, totalVal, f.Label);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private byte[] CreateReport(DataTable data, string reportFilename, string urlPathReport, out string mimeType,
