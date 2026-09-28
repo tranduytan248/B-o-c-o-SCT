@@ -24,8 +24,12 @@
         <input type="hidden" name="BusinessProductReport" value="true" />
         <style>
             #DataReport tr.business-summary td { font-weight: 700; }
+            #DataReport .report-invalid { border-color: #dd4b39 !important; }
             .btn-remove-trade { cursor: pointer; margin-left: 8px; font-size: 14px; }
             .btn-remove-trade:hover { color: #a94442 !important; }
+            .trade-header-content { display: flex; align-items: center; gap: 8px; }
+            .btn-add-trade-catalog { width: 22px; height: 22px; padding: 0; margin: 0; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 2px; background: #f7f7f7; color: #333; cursor: pointer; }
+            .btn-add-trade-catalog:hover { background: #e6e6e6; }
         </style>
         <div id="TradeProductTemplates" style="display: none;">
             <select id="ExportProductTemplate" class="none-select2">
@@ -81,6 +85,9 @@
                                             || product.Targets == "Kim ngạch nhập khẩu";
                             var isTradeHeader = product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu"
                                                 || product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu";
+                            var tradeHeaderPrefix = product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu" ? "XK"
+                                : product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu" ? "NK"
+                                : string.Empty;
 
                             string rowDataSummary = "";
                             string rowDataGroup = "";
@@ -119,7 +126,15 @@
                                 {
                                     <td class="text-center">@product.Level</td>
                                     <td colspan="5" style="text-align: left !important;">
-                                        <strong>@Html.Hidden("Target_" + index, product.Targets)@Html.Hidden("Unit_" + index, product.Unit)@Html.Hidden("Code_" + index, product.Code)@Html.Hidden("Index_" + index, product.Index)@Html.Hidden("Level_" + index, product.Level)@product.Targets</strong>
+                                        <div class="trade-header-content">
+                                            <strong>@Html.Hidden("Target_" + index, product.Targets)@Html.Hidden("Unit_" + index, product.Unit)@Html.Hidden("Code_" + index, product.Code)@Html.Hidden("Index_" + index, product.Index)@Html.Hidden("Level_" + index, product.Level)@product.Targets</strong>
+                                            @if (!string.IsNullOrEmpty(tradeHeaderPrefix))
+                                            {
+                                                <button type="button" class="AddTradeCatalogProduct btn-add-trade-catalog" data-prefix="@tradeHeaderPrefix" title="Tạo mặt hàng mới">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            }
+                                        </div>
                                     </td>
                                 }
                                 else
@@ -260,14 +275,11 @@
                 if (indVal > totalVal) {
                     var msg = "Doanh thu công nghiệp (" + formatVNNumber(indVal) + ") không được lớn hơn Tổng doanh thu (" + formatVNNumber(totalVal) + ") ở cột " + f.label + ".";
                     TooltipErrInput($indInput, msg);
-                    if (showAlert) {
-                        alert(msg);
-                        $indInput.focus();
-                    }
+                    $indInput.addClass("report-invalid").focus();
                     isValid = false;
-                    break;
                 } else {
                     ClearTooltipErrInput($indInput);
+                    $indInput.removeClass("report-invalid");
                 }
             }
         }
@@ -510,7 +522,7 @@
             return $("<input />", { id: name, name: name, type: "text", "class": css, placeholder: "0", autocomplete: "off", inputmode: "decimal" });
         };
         var row = $("<tr class='business-product-custom' data-group='" + prefix + "'></tr>");
-        var sectionLevel = prefix === "XK" ? "5" : "6";
+        var sectionLevel = prefix === "XK" ? "6" : "7";
         var childNumber = $("#DataReport input[name^='Level_']").map(function () {
             var level = $(this).val() || "";
             return level.indexOf(sectionLevel + ".") === 0 ? parseInt(level.split(".")[1], 10) || 0 : 0;
@@ -592,6 +604,56 @@
     }
 
     $(".AddTradeProduct").off("click").on("click", function () { AddTradeProduct(this, $(this).data("prefix")); });
+
+    $(document).off("click.addTradeCatalogProduct", ".AddTradeCatalogProduct").on("click.addTradeCatalogProduct", ".AddTradeCatalogProduct", function () {
+        var prefix = $(this).data("prefix");
+        $.get("/Report/Import/AddTradeCatalogProduct", { prefix: prefix })
+            .done(function (html) {
+                $("#TradeCatalogProductModal").remove();
+                $("body").append(html);
+                var $modal = $("#TradeCatalogProductModal");
+                $modal.on("hidden.bs.modal", function () { $(this).remove(); });
+                $modal.modal("show");
+            })
+            .fail(function () { alert("Không thể mở biểu mẫu thêm mặt hàng."); });
+    });
+
+    $(document).off("submit.addTradeCatalogProduct", "#AddTradeCatalogProductForm").on("submit.addTradeCatalogProduct", "#AddTradeCatalogProductForm", function (event) {
+        event.preventDefault();
+        var $form = $(this);
+        var prefix = $form.find("[name='prefix']").val();
+        var $submit = $form.find("button[type='submit']").prop("disabled", true);
+        $.ajax({
+            url: "/Report/Import/AddTradeCatalogProduct",
+            type: "POST",
+            data: $form.serialize()
+        }).done(function (response) {
+            if (!response || !response.status) {
+                alert(response && response.message ? response.message : "Không thể thêm mặt hàng.");
+                return;
+            }
+
+            var product = response.product;
+            var templateId = prefix === "XK" ? "#ExportProductTemplate" : "#ImportProductTemplate";
+            $(templateId).append($("<option></option>")
+                .val(product.code)
+                .attr("data-name", product.name)
+                .attr("data-unit", product.unit || "")
+                .text(product.name + " (" + product.code + ")"));
+
+            var $addButton = $(".trade-add-row[data-prefix='" + prefix + "'] .AddTradeProduct").last();
+            if ($addButton.length) {
+                AddTradeProduct($addButton[0], prefix);
+                var $newRow = $addButton.closest("tr").prev("tr.business-product-custom");
+                $newRow.find("select.TradeProductSelect").val(product.code).trigger("change");
+            }
+            $("#TradeCatalogProductModal").modal("hide");
+        }).fail(function () {
+            alert("Không thể thêm mặt hàng. Vui lòng thử lại.");
+        }).always(function () {
+            $submit.prop("disabled", false);
+        });
+    });
 
     recalculateTradeSummary("XK");
     recalculateTradeSummary("NK");

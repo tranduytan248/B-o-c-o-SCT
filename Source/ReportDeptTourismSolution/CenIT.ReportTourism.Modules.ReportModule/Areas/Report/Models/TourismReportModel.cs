@@ -28,6 +28,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
 
         public List<ListItem> ListEnterprises { get; set; }
 
+        public List<ListItem> ListTypeBusiness { get; set; }
+
         public DataTable DataImports { get; set; }
         public List<ReportDataImportModel> ListDataImports { get; set; }
 

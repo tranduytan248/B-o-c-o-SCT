@@ -98,7 +98,7 @@
 
             @if (Model.TypeReport == EnumTypeBusiness.Trading)
             {
-                @Html.Partial("_NoTemplateReport")
+                @Html.Partial("_TradingReport", Model.ListDataImports)
             }
             else if (ViewBag.IsBusinessProductReport == true)
             {

@@ -225,6 +225,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             int total;
             var data = _importCache.Get(User.UserName, searchModel.EnterpriseIds, searchModel.FromMonth,
                 searchModel.ToMonth, searchModel.TypeBusinessIds, out total, dataSearch);
+            if (data != null)
+            {
+                foreach (var report in data)
+                    report.CanDelete = report.CanDelete && !IsReportLocked(report.ForMonth);
+            }
             var result = Json(
                 new { draw = Convert.ToInt32(draw), recordsTotal = total, recordsFiltered = total, data },
                 JsonRequestBehavior.AllowGet);
@@ -416,6 +421,16 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             StringBuilder logActions = new StringBuilder();
             logActions.AppendLine("=========================================");
+            if (IsReportLocked(model.ForMonth))
+            {
+                return Json(new
+                {
+                    status = false,
+                    errorCode = 1,
+                    message = CreateMessage(GetReportLockedMessage(model.ForMonth), EnumProcessType.NonFormat,
+                        EnumMsgIcon.Error)
+                });
+            }
             logActions.AppendLine(
                 $" - Loại ký số báo cáo: {model.TypeSignature} : {(model.TypeSignature == 0 ? "Tải file đã ký sẵn" : (model.TypeSignature == 1 ? "Ký số trực tiếp bằng Smart CA" : "Ký số Token CA"))}");
 
@@ -1142,6 +1157,15 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [ActionType(Type = EnumActionType.Delete)]
         public ActionResult Delete(int? enterpriseId, DateTime? onMonth)
         {
+            if (IsReportLocked(onMonth))
+                return Json(new
+                {
+                    status = false,
+                    errorCode = 1,
+                    message = CreateMessage(GetReportLockedMessage(onMonth), EnumProcessType.NonFormat,
+                        EnumMsgIcon.Error)
+                });
+
             var enterpriseModel = _enterpriseCache.GetById(enterpriseId);
             if (enterpriseModel == null)
                 return Json(new
@@ -1169,6 +1193,15 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [ActionType(Type = EnumActionType.Delete)]
         public ActionResult Delete(ReportDataImportModel model)
         {
+            if (IsReportLocked(model.ForMonth))
+                return Json(new
+                {
+                    status = false,
+                    errorCode = 1,
+                    message = CreateMessage(GetReportLockedMessage(model.ForMonth), EnumProcessType.NonFormat,
+                        EnumMsgIcon.Error)
+                });
+
             if (!ModelState.IsValidField("Reason") ||
                 !ModelState.IsValidField("EnterpriseId"))
                 return PartialView("_DeleteView", model);
@@ -1258,6 +1291,17 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             StringBuilder logActions = new StringBuilder();
             logActions.AppendLine("=========================================");
 
+            if (IsReportLocked(model.ForMonth))
+            {
+                return Json(new
+                {
+                    status = false,
+                    errorCode = 1,
+                    message = CreateMessage(GetReportLockedMessage(model.ForMonth), EnumProcessType.NonFormat,
+                        EnumMsgIcon.Error)
+                });
+            }
+
             if (!ModelState.IsValid)
             {
                 var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
@@ -1316,6 +1360,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                         message = CreateMessage(revenueError, EnumProcessType.NonFormat, EnumMsgIcon.Error)
                     });
                 }
+            }
+
+            if (string.Equals(Request.Form["TradingReport"], "true", StringComparison.OrdinalIgnoreCase))
+            {
+                string retailError;
+                if (!ValidateTradingRetailConstraint(dataReport, out retailError))
+                    return Json(new { status = false, errorCode = 1, message = CreateMessage(retailError, EnumProcessType.NonFormat, EnumMsgIcon.Error) });
             }
 
             #region Create File Report And Path
@@ -1494,6 +1545,15 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [ActionType(Type = EnumActionType.Edit)]
         public ActionResult Edit(int? enterpriseId, DateTime? onMonth)
         {
+            if (IsReportLocked(onMonth))
+                return Json(new
+                {
+                    status = false,
+                    errorCode = 1,
+                    message = CreateMessage(GetReportLockedMessage(onMonth), EnumProcessType.NonFormat,
+                        EnumMsgIcon.Error)
+                });
+
             var enterpriseModel = _enterpriseCache.GetById(enterpriseId);
             if (enterpriseModel == null)
                 return Json(new
@@ -1516,24 +1576,34 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                         EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 });
 
-            // Báo cáo chỉ tiêu công nghiệp không lưu các dòng tiêu đề nhóm. Khi sửa,
-            // dựng lại toàn bộ khung từ danh mục rồi gắn số liệu đã lưu theo chỉ tiêu.
-            // Không dùng TypeBusiness để nhận diện vì doanh nghiệp có thể có TypeBusiness = 1.
-            var catalogResult = LoadViewTypeReport(enterpriseId, onMonth) as PartialViewResult;
-            var catalog = catalogResult?.Model as List<ReportDataImportModel>;
-            if (catalog != null && catalog.Any())
+            var isTradingReport = dataImports.Any(x => x.TypeReport == (int)EnumTypeBusiness.Trading);
+            if (isTradingReport)
             {
-                dataImports = MergeBusinessProductData(catalog, dataImports);
-                ViewBag.IsBusinessProductReport = true;
+                var tradingResult = LoadTradingReport(enterpriseId, onMonth, null, dataImports);
+                dataImports = tradingResult.Model as List<ReportDataImportModel> ?? dataImports;
+                ViewBag.IsTradingReport = true;
+                ViewBag.TradingProductOptions = tradingResult.ViewData["TradingProductOptions"];
+                ViewBag.ForMonth = tradingResult.ViewData["ForMonth"] ?? (onMonth ?? DateTime.Now);
             }
-            if (catalogResult != null)
+            else
             {
-                ViewBag.ExportBusinessProductOptions = catalogResult.ViewData["ExportBusinessProductOptions"];
-                ViewBag.ImportBusinessProductOptions = catalogResult.ViewData["ImportBusinessProductOptions"];
-                ViewBag.BusinessProductEnterpriseId = catalogResult.ViewData["BusinessProductEnterpriseId"];
-                ViewBag.ForMonth = catalogResult.ViewData["ForMonth"] ?? (onMonth ?? DateTime.Now);
+                // Báo cáo chỉ tiêu công nghiệp không lưu các dòng tiêu đề nhóm. Khi sửa,
+                // dựng lại toàn bộ khung từ danh mục rồi gắn số liệu đã lưu theo chỉ tiêu.
+                var catalogResult = LoadViewTypeReport(enterpriseId, onMonth) as PartialViewResult;
+                var catalog = catalogResult?.Model as List<ReportDataImportModel>;
+                if (catalog != null && catalog.Any())
+                {
+                    dataImports = MergeBusinessProductData(catalog, dataImports);
+                    ViewBag.IsBusinessProductReport = true;
+                }
+                if (catalogResult != null)
+                {
+                    ViewBag.ExportBusinessProductOptions = catalogResult.ViewData["ExportBusinessProductOptions"];
+                    ViewBag.ImportBusinessProductOptions = catalogResult.ViewData["ImportBusinessProductOptions"];
+                    ViewBag.BusinessProductEnterpriseId = catalogResult.ViewData["BusinessProductEnterpriseId"];
+                    ViewBag.ForMonth = catalogResult.ViewData["ForMonth"] ?? (onMonth ?? DateTime.Now);
+                }
             }
-
             EnumTypeBusiness selectedType = EnumTypeBusiness.Manufacturing;
             var savedTypeVal = dataImports?.FirstOrDefault(d => d.TypeReport > 0)?.TypeReport;
             if (savedTypeVal.HasValue && Enum.IsDefined(typeof(EnumTypeBusiness), savedTypeVal.Value))
@@ -1580,6 +1650,17 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             StringBuilder logActions = new StringBuilder();
             logActions.AppendLine("=========================================");
+
+            if (IsReportLocked(model.ForMonth))
+            {
+                return Json(new
+                {
+                    status = false,
+                    errorCode = 1,
+                    message = CreateMessage(GetReportLockedMessage(model.ForMonth), EnumProcessType.NonFormat,
+                        EnumMsgIcon.Error)
+                });
+            }
 
             #region Check Valid Form
 
@@ -1654,6 +1735,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                         message = CreateMessage(revenueError, EnumProcessType.NonFormat, EnumMsgIcon.Error)
                     });
                 }
+            }
+
+            if (string.Equals(Request.Form["TradingReport"], "true", StringComparison.OrdinalIgnoreCase))
+            {
+                string retailError;
+                if (!ValidateTradingRetailConstraint(dataReport, out retailError))
+                    return Json(new { status = false, errorCode = 1, message = CreateMessage(retailError, EnumProcessType.NonFormat, EnumMsgIcon.Error) });
             }
 
             #region Create Report And File Path
@@ -1832,12 +1920,80 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         [AjaxOnly]
         [HttpGet]
+        [ActionType(Type = EnumActionType.Add)]
+        public ActionResult AddTradeCatalogProduct(string prefix)
+        {
+            var codePrefix = GetTradeCatalogCodePrefix(prefix);
+            if (codePrefix == null)
+                return Json(new { status = false, message = "Nhóm mặt hàng không hợp lệ." },
+                    JsonRequestBehavior.AllowGet);
+
+            ViewBag.TradePrefix = prefix.ToUpperInvariant();
+            return PartialView("_AddTradeCatalogProduct");
+        }
+
+        [AjaxOnly]
+        [HttpPost]
+        [ActionType(Type = EnumActionType.Add)]
+        [ValidateInput(false)]
+        public ActionResult AddTradeCatalogProduct(string prefix, string productName, string unit)
+        {
+            var codePrefix = GetTradeCatalogCodePrefix(prefix);
+            productName = (productName ?? string.Empty).Trim();
+            unit = (unit ?? string.Empty).Trim();
+            if (codePrefix == null || string.IsNullOrWhiteSpace(productName))
+                return Json(new { status = false, message = "Vui lòng nhập tên mặt hàng." });
+
+            var products = _businessProductCache.GetAll() ?? new List<CateBusinessProductModel>();
+            var nextNumber = products.Where(product => !string.IsNullOrWhiteSpace(product.ProductCode) &&
+                                                       product.ProductCode.StartsWith(codePrefix,
+                                                           StringComparison.OrdinalIgnoreCase))
+                .Select(product => product.ProductCode.Substring(codePrefix.Length))
+                .Select(suffix =>
+                {
+                    int number;
+                    return int.TryParse(suffix, out number) ? number : 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+
+            int? productId = null;
+            string productCode = null;
+            // Retry to handle a concurrent insertion which happens to use the same next code.
+            for (var attempt = 0; attempt < 10; attempt++)
+            {
+                productCode = codePrefix + (nextNumber + attempt).ToString("D3");
+                productId = _businessProductCache.Save(new CateBusinessProductModel
+                {
+                    ProductCode = productCode,
+                    ProductName = productName,
+                    IndustryId = null,
+                    Unit = unit,
+                    DisplayOrder = 0,
+                    IsActive = true,
+                    UpdatedBy = User.UserName
+                });
+                if (productId != -2) break;
+            }
+
+            if (!productId.HasValue || productId.Value <= 0)
+                return Json(new { status = false, message = "Không thể thêm mặt hàng. Vui lòng thử lại." });
+
+            return Json(new
+            {
+                status = true,
+                product = new { code = productCode, name = productName, unit }
+            });
+        }
+
+        [AjaxOnly]
+        [HttpGet]
         [AllowAnyPermission]
         public ActionResult LoadViewTypeReport(int? enterpriseId, DateTime? onMonth = null, string forMonth = null, int? typeReport = null)
         {
             if (typeReport.HasValue && typeReport.Value == (int)EnumTypeBusiness.Trading)
             {
-                return PartialView("_NoTemplateReport");
+                return LoadTradingReport(enterpriseId, onMonth, forMonth);
             }
 
             if (!typeReport.HasValue && enterpriseId.HasValue && enterpriseId.Value > 0)
@@ -1848,7 +2004,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     int biz;
                     if (int.TryParse(ent.TypeBusiness.Split(',')[0], out biz) && biz == (int)EnumTypeBusiness.Trading)
                     {
-                        return PartialView("_NoTemplateReport");
+                        return LoadTradingReport(enterpriseId, onMonth, forMonth);
                     }
                 }
             }
@@ -2037,6 +2193,154 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             return PartialView("_BusinessProductReport", products);
         }
 
+        private PartialViewResult LoadTradingReport(int? enterpriseId, DateTime? onMonth, string forMonth,
+            List<ReportDataImportModel> savedData = null)
+        {
+            DateTime reportMonth;
+            if (!onMonth.HasValue && !string.IsNullOrWhiteSpace(forMonth) &&
+                DateTime.TryParse(forMonth, out reportMonth))
+                onMonth = reportMonth;
+            reportMonth = onMonth ?? DateTime.Now;
+
+            var rows = CreateTradingReportLines();
+            var options = (_businessProductCache.GetAll() ?? new List<CateBusinessProductModel>())
+                .Where(x => x.IsActive && !string.IsNullOrWhiteSpace(x.ProductCode))
+                .OrderBy(x => x.ProductName)
+                .Select(x => new ReportDataImportModel { Targets = x.ProductName, Unit = x.Unit, Code = x.ProductCode })
+                .ToList();
+
+            if (enterpriseId.HasValue && enterpriseId.Value > 0)
+            {
+                var previous = (_importCache.GetViaEnterpriseOnMonth(enterpriseId.Value, null) ?? new List<ReportDataImportModel>())
+                    .Where(x => x.ForMonth.HasValue && x.ForMonth.Value.Year == reportMonth.Year &&
+                                x.ForMonth.Value.Month < reportMonth.Month && x.TypeReport == (int)EnumTypeBusiness.Trading)
+                    .GroupBy(x => x.Code ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(x => x.Key, x => x.Sum(y => y.PerformInPeriod ?? 0), StringComparer.OrdinalIgnoreCase);
+                foreach (var row in rows)
+                {
+                    double value;
+                    row.ComparedSamePeriodLastYear = previous.TryGetValue(row.Code ?? string.Empty, out value) ? value : 0;
+                }
+            }
+            if (savedData != null)
+            {
+                foreach (var row in rows)
+                {
+                    var saved = savedData.FirstOrDefault(x => string.Equals(x.Code, row.Code, StringComparison.OrdinalIgnoreCase));
+                    if (saved == null) continue;
+                    row.PerformInPeriod = saved.PerformInPeriod;
+                    row.PerformPreviousPeriod = saved.PerformPreviousPeriod;
+                    row.AccumulatedBeginingOfYear = saved.AccumulatedBeginingOfYear;
+                }
+
+                var dynamicRows = savedData.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
+                                                       x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
+                    .Select(x => new ReportDataImportModel
+                    {
+                        Targets = x.Targets,
+                        Unit = x.Unit,
+                        Code = x.Code,
+                        PerformInPeriod = x.PerformInPeriod,
+                        PerformPreviousPeriod = x.PerformPreviousPeriod,
+                        AccumulatedBeginingOfYear = x.AccumulatedBeginingOfYear,
+                        ComparedSamePeriodLastYear = (_importCache.GetViaEnterpriseOnMonth(enterpriseId, null) ?? new List<ReportDataImportModel>())
+                            .Where(p => p.ForMonth.HasValue && p.ForMonth.Value.Year == reportMonth.Year && p.ForMonth.Value.Month < reportMonth.Month &&
+                                        string.Equals(p.Code, x.Code, StringComparison.OrdinalIgnoreCase))
+                            .Sum(p => p.PerformInPeriod ?? 0)
+                    }).ToList();
+                rows.AddRange(dynamicRows);
+            }
+
+            ApplyTradingHierarchy(rows);
+            RecalculateTradingSummary(rows);
+            ViewBag.TradingProductOptions = options;
+            ViewBag.ForMonth = reportMonth;
+            return PartialView("_TradingReport", rows);
+        }
+
+        private static List<ReportDataImportModel> CreateTradingReportLines()
+        {
+            return new List<ReportDataImportModel>
+            {
+                CreateBusinessProductLine("I. Doanh thu thuần hoạt động bán buôn, bán lẻ", "Triệu đồng", "01"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "02"),
+                CreateBusinessProductLine("1. Lương thực, thực phẩm", "Triệu đồng", "03"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "04"),
+                CreateBusinessProductLine("2. Hàng may mặc", "Triệu đồng", "05"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "06"),
+                CreateBusinessProductLine("3. Đồ dùng, dụng cụ, trang thiết bị gia đình", "Triệu đồng", "07"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "08"),
+                CreateBusinessProductLine("4. Văn phòng phẩm, văn hóa, giáo dục", "Triệu đồng", "09"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "10"),
+                CreateBusinessProductLine("5. Gỗ và vật liệu xây dựng", "Triệu đồng", "11"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "12"),
+                CreateBusinessProductLine("6. Phân bón, thuốc trừ sâu", "Triệu đồng", "13"),
+                CreateBusinessProductLine("7. Ô tô các loại", "Triệu đồng", "14"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "15"),
+                CreateBusinessProductLine("8. Phương tiện đi lại (trừ ô tô)", "Triệu đồng", "16"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "17"),
+                CreateBusinessProductLine("9. Xăng, dầu các loại", "Triệu đồng", "18"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "19"),
+                CreateBusinessProductLine("10. Nhiên liệu khác (trừ xăng dầu)", "Triệu đồng", "20"),
+                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "21"),
+                CreateBusinessProductLine("11. Hàng hóa khác", "Triệu đồng", "22")
+            };
+        }
+
+        private static void ApplyTradingHierarchy(List<ReportDataImportModel> rows)
+        {
+            var index = 0;
+            var otherNumber = 0;
+            foreach (var row in rows)
+            {
+                if (row.Code == "01") row.Level = "1";
+                else if (row.Code == "02") row.Level = "1.1";
+                else if (row.Code == "03") row.Level = "1.2";
+                else if (row.Code == "04") row.Level = "1.2.1";
+                else if (row.Code == "05") row.Level = "1.3";
+                else if (row.Code == "06") row.Level = "1.3.1";
+                else if (row.Code == "07") row.Level = "1.4";
+                else if (row.Code == "08") row.Level = "1.4.1";
+                else if (row.Code == "09") row.Level = "1.5";
+                else if (row.Code == "10") row.Level = "1.5.1";
+                else if (row.Code == "11") row.Level = "1.6";
+                else if (row.Code == "12") row.Level = "1.6.1";
+                else if (row.Code == "13") row.Level = "1.7";
+                else if (row.Code == "14") row.Level = "1.8";
+                else if (row.Code == "15") row.Level = "1.8.1";
+                else if (row.Code == "16") row.Level = "1.9";
+                else if (row.Code == "17") row.Level = "1.9.1";
+                else if (row.Code == "18") row.Level = "1.10";
+                else if (row.Code == "19") row.Level = "1.10.1";
+                else if (row.Code == "20") row.Level = "1.11";
+                else if (row.Code == "21") row.Level = "1.11.1";
+                else if (row.Code == "22") row.Level = "1.12";
+                else if (!string.IsNullOrWhiteSpace(row.Code) && row.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase)) row.Level = "1.12." + (++otherNumber);
+                row.Index = index++;
+            }
+        }
+
+        private static void RecalculateTradingSummary(List<ReportDataImportModel> rows)
+        {
+            var other = rows.FirstOrDefault(x => x.Code == "22");
+            var dynamicRows = rows.Where(x => !string.IsNullOrWhiteSpace(x.Code) && x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (other != null)
+            {
+                other.PerformInPeriod = dynamicRows.Sum(x => x.PerformInPeriod ?? 0);
+                other.PerformPreviousPeriod = dynamicRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                other.AccumulatedBeginingOfYear = dynamicRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
+            }
+            var total = rows.FirstOrDefault(x => x.Code == "01");
+            if (total != null)
+            {
+                var mainCodes = new[] { "03", "05", "07", "09", "11", "13", "14", "16", "18", "20", "22" };
+                var mainRows = rows.Where(x => mainCodes.Contains(x.Code)).ToList();
+                total.PerformInPeriod = mainRows.Sum(x => x.PerformInPeriod ?? 0);
+                total.PerformPreviousPeriod = mainRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                total.AccumulatedBeginingOfYear = mainRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
+            }
+        }
+
         private static ReportDataImportModel CreateBusinessProductHeader(string targets)
         {
             return new ReportDataImportModel { Targets = targets };
@@ -2084,18 +2388,18 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                         break;
                     case "Nộp ngân sách":
                         section = string.Empty;
-                        product.Level = "4";
+                        product.Level = "5";
                         break;
                     case "Kim ngạch xuất khẩu":
                         section = "Export";
-                        product.Level = "5";
+                        product.Level = "6";
                         break;
                     case "Nhóm/mặt hàng xuất khẩu chủ yếu":
                         section = "Export";
                         continue;
                     case "Kim ngạch nhập khẩu":
                         section = "Import";
-                        product.Level = "6";
+                        product.Level = "7";
                         break;
                     case "Nhóm/mặt hàng nhập khẩu chủ yếu":
                         section = "Import";
@@ -2108,9 +2412,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 if (section == "MainProduct" && string.IsNullOrWhiteSpace(product.Level))
                     product.Level = "2." + (++mainProductNumber);
                 else if (section == "Export" && product.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase))
-                    product.Level = "5." + (++exportProductNumber);
+                    product.Level = "6." + (++exportProductNumber);
                 else if (section == "Import" && product.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase))
-                    product.Level = "6." + (++importProductNumber);
+                    product.Level = "7." + (++importProductNumber);
 
                 product.Index = storageIndex++;
             }
@@ -2369,11 +2673,12 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             var numKeys = formData.AllKeys.Count(k => k.Contains("Target_"));
             var isBusinessProductReport = string.Equals(formData["BusinessProductReport"], "true",
                 StringComparison.OrdinalIgnoreCase);
+            var isTradingReport = string.Equals(formData["TradingReport"], "true", StringComparison.OrdinalIgnoreCase);
             var dataIndex = 0;
             for (var idx = 1; idx <= numKeys; idx++)
             {
                 var code = formData[$"Code_{idx}"];
-                if (isBusinessProductReport && string.IsNullOrWhiteSpace(code)) continue;
+                if ((isBusinessProductReport || isTradingReport) && string.IsNullOrWhiteSpace(code)) continue;
 
                 dartaFormReport.Rows.Add(
                     formData[$"Target_{idx}"],
@@ -2398,6 +2703,22 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     .ToList();
                 for (var rowIndex = 0; rowIndex < orderedRows.Count; rowIndex++)
                     orderedRows[rowIndex]["Index"] = rowIndex;
+            }
+            else if (isTradingReport)
+            {
+                RecalculateTradingSummaryInDataTable(dartaFormReport);
+                var rows = dartaFormReport.AsEnumerable().ToList();
+                var index = 0;
+                var child = 0;
+                foreach (var row in rows)
+                {
+                    var code = Convert.ToString(row["Code"]);
+                    if (code == "01") row["Level"] = "1";
+                    else if (code == "02") row["Level"] = "1.1";
+                    else if (code == "22") row["Level"] = "1.12";
+                    else if ((code ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase)) row["Level"] = "1.12." + (++child);
+                    row["Index"] = index++;
+                }
             }
 
             return dartaFormReport;
@@ -2451,6 +2772,33 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 }));
         }
 
+        private static string GetTradeCatalogCodePrefix(string prefix)
+        {
+            if (string.Equals(prefix, "XK", StringComparison.OrdinalIgnoreCase)) return "XKB";
+            if (string.Equals(prefix, "NK", StringComparison.OrdinalIgnoreCase)) return "NKB";
+            return null;
+        }
+
+        private bool IsReportLocked(DateTime? forMonth)
+        {
+            if (!forMonth.HasValue) return false;
+
+            int lockDay;
+            if (!int.TryParse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue,
+                    out lockDay) || lockDay <= 0)
+                return false;
+
+            var lastDayOfMonth = DateTime.DaysInMonth(forMonth.Value.Year, forMonth.Value.Month);
+            var lockDate = new DateTime(forMonth.Value.Year, forMonth.Value.Month,
+                Math.Min(lockDay, lastDayOfMonth));
+            return DateTime.Today > lockDate;
+        }
+
+        private static string GetReportLockedMessage(DateTime? forMonth)
+        {
+            return $"Báo cáo tháng {forMonth?.ToString("MM/yyyy")} đã bị khóa, không thể sửa hoặc xóa thông tin.";
+        }
+
         private static void RecalculateTradeSummaryInDataTable(DataTable table)
         {
             if (table == null) return;
@@ -2471,6 +2819,30 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 importRow["AccumulatedBeginingOfYear"] = nkRows.Any() ? nkRows.Sum(r => r["AccumulatedBeginingOfYear"] != DBNull.Value ? Convert.ToDouble(r["AccumulatedBeginingOfYear"]) : 0.0) : 0.0;
                 importRow["PerformPreviousPeriod"] = nkRows.Any() ? nkRows.Sum(r => r["PerformPreviousPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformPreviousPeriod"]) : 0.0) : 0.0;
                 importRow["PerformInPeriod"] = nkRows.Any() ? nkRows.Sum(r => r["PerformInPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformInPeriod"]) : 0.0) : 0.0;
+            }
+        }
+
+        private static void RecalculateTradingSummaryInDataTable(DataTable table)
+        {
+            if (table == null) return;
+            var rows = table.AsEnumerable().ToList();
+            Func<DataRow, string, double> value = (row, field) => row[field] == DBNull.Value ? 0 : Convert.ToDouble(row[field]);
+            var dynamicRows = rows.Where(x => (Convert.ToString(x["Code"]) ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase)).ToList();
+            var other = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "22");
+            if (other != null)
+            {
+                other["PerformInPeriod"] = dynamicRows.Sum(x => value(x, "PerformInPeriod"));
+                other["PerformPreviousPeriod"] = dynamicRows.Sum(x => value(x, "PerformPreviousPeriod"));
+                other["AccumulatedBeginingOfYear"] = dynamicRows.Sum(x => value(x, "AccumulatedBeginingOfYear"));
+            }
+            var total = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "01");
+            if (total != null)
+            {
+                var codes = new[] { "03", "05", "07", "09", "11", "13", "14", "16", "18", "20", "22" };
+                var main = rows.Where(x => codes.Contains(Convert.ToString(x["Code"]))).ToList();
+                total["PerformInPeriod"] = main.Sum(x => value(x, "PerformInPeriod"));
+                total["PerformPreviousPeriod"] = main.Sum(x => value(x, "PerformPreviousPeriod"));
+                total["AccumulatedBeginingOfYear"] = main.Sum(x => value(x, "AccumulatedBeginingOfYear"));
             }
         }
 
@@ -2531,6 +2903,38 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 }
             }
 
+            return true;
+        }
+
+        private static bool ValidateTradingRetailConstraint(DataTable table, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            if (table == null) return true;
+            var pairs = new[]
+            {
+                new { Total = "01", Retail = "02" }, new { Total = "03", Retail = "04" },
+                new { Total = "05", Retail = "06" }, new { Total = "07", Retail = "08" },
+                new { Total = "09", Retail = "10" }, new { Total = "11", Retail = "12" },
+                new { Total = "14", Retail = "15" }, new { Total = "16", Retail = "17" },
+                new { Total = "18", Retail = "19" }, new { Total = "20", Retail = "21" }
+            };
+            var fields = new[] { "PerformInPeriod", "PerformPreviousPeriod", "AccumulatedBeginingOfYear" };
+            foreach (var pair in pairs)
+            {
+                var total = table.AsEnumerable().FirstOrDefault(x => Convert.ToString(x["Code"]) == pair.Total);
+                var retail = table.AsEnumerable().FirstOrDefault(x => Convert.ToString(x["Code"]) == pair.Retail);
+                if (total == null || retail == null) continue;
+                foreach (var field in fields)
+                {
+                    var totalValue = total[field] == DBNull.Value ? 0 : Convert.ToDouble(total[field]);
+                    var retailValue = retail[field] == DBNull.Value ? 0 : Convert.ToDouble(retail[field]);
+                    if (retailValue > totalValue)
+                    {
+                        errorMessage = $"Chỉ tiêu '{Convert.ToString(retail["Targets"])}' không được lớn hơn '{Convert.ToString(total["Targets"])}'.";
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 

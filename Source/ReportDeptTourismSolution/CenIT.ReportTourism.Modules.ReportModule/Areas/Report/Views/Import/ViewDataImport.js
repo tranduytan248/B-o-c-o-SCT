@@ -100,7 +100,7 @@ function initTableViewDataImport() {
                         //} else {
                         //    html = data.toLocaleString("he-IL");
                         //}
-                        html = data.toLocaleString("he-IL");
+                        html = Number(data).toLocaleString("vi-VN");
                         return html;
                     } else if (type === "sort") {
                         return data;
@@ -120,7 +120,7 @@ function initTableViewDataImport() {
                         //} else {
                         //    html = data.toLocaleString("he-IL");
                         //}
-                        html = data.toLocaleString("he-IL");
+                        html = Number(data).toLocaleString("vi-VN");
                         return html;
                     } else if (type === "sort") {
                         return data;
@@ -160,7 +160,7 @@ function initTableViewDataImport() {
                         //} else {
                         //    html = data.toLocaleString("he-IL");
                         //}
-                        html = data.toLocaleString("he-IL");
+                        html = Number(data).toLocaleString("vi-VN");
                         return html;
                     } else if (type === "sort") {
                         return data;

@@ -1,0 +1,128 @@
+﻿@model List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
+@{
+    var options = ViewBag.TradingProductOptions as List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
+                  ?? new List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>();
+    var rowNumber = 1;
+}
+@functions {
+    public static string FormatNumber(double? value)
+    {
+        return value.HasValue ? value.Value.ToString("#,##0.##", new System.Globalization.CultureInfo("vi-VN")) : "";
+    }
+}
+<div class="row">
+    <div class="col-md-12 table-responsive">
+        <input type="hidden" name="TradingReport" value="true" />
+        <style>
+            #TradingDataReport .trading-summary td { font-weight: 700; }
+            #TradingDataReport .trading-retail td:first-child { font-style: italic; padding-left: 30px; }
+            #TradingDataReport .report-invalid { border-color: #dd4b39 !important; }
+            .trading-product-picker { display: flex; align-items: center; gap: 8px; }
+            .trading-product-picker .select2-container { flex: 1 1 auto; min-width: 0; }
+            .trading-remove { flex: 0 0 auto; color: #d9534f; cursor: pointer; }
+        </style>
+        <div style="display: none !important;">
+            <select id="TradingProductTemplate" class="none-select2" disabled="disabled">
+                <option value=""></option>
+                @foreach (var item in options)
+                {
+                    <option value="@item.Code" data-name="@item.Targets">@item.Targets (@item.Code)</option>
+                }
+            </select>
+        </div>
+        <table id="TradingDataReport" class="table table-bordered table-striped" width="100%">
+            <thead>
+                <tr>
+                    <th width="43%">Tên chỉ tiêu</th><th width="10%">Mã số</th>
+                    <th width="16%">Thực hiện tháng báo cáo</th>
+                    <th width="16%">Cộng dồn từ đầu năm đến cuối tháng báo cáo</th>
+                    <th width="15%">Dự tính tháng tiếp theo</th>
+                </tr>
+                <tr><th>A</th><th>B</th><th>1</th><th>2</th><th>3</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                var currentIndex = rowNumber++;
+                var isTotal = item.Code == "01" || item.Code == "22";
+                var isRetail = item.Code == "02" || item.Code == "04" || item.Code == "06" || item.Code == "08" || item.Code == "10" || item.Code == "12" || item.Code == "15" || item.Code == "17" || item.Code == "19" || item.Code == "21";
+                var isDynamic = (item.Code ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase);
+                <tr class="trading-row @(isTotal ? "trading-summary" : "") @(isRetail ? "trading-retail" : "") @(isDynamic ? "trading-dynamic" : "")" data-code="@item.Code" data-base="@(item.ComparedSamePeriodLastYear ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                    <td class="text-left">
+                        @Html.Hidden("Target_" + currentIndex, item.Targets)
+                        @Html.Hidden("Unit_" + currentIndex, "Triệu đồng")
+                        @Html.Hidden("Index_" + currentIndex, item.Index)
+                        @Html.Hidden("Level_" + currentIndex, item.Level)
+                        @Html.Hidden("Code_" + currentIndex, item.Code)
+                        @if (isDynamic)
+                        {
+                            <div class="trading-product-picker"><select class="form-control TradingProductSelect"></select><a class="trading-remove" title="Xóa mặt hàng"><i class="fa fa-trash"></i></a></div>
+                        }
+                        else { @item.Targets }
+                    </td>
+                    <td class="text-center">@item.Code</td>
+                    <td><input type="text" name="PerformInPeriod_@currentIndex" value="@FormatNumber(item.PerformInPeriod)" class="form-control text-right number-separator trading-current" @(isTotal ? "readonly=readonly" : "") /></td>
+                    <td><input type="text" name="PerformPreviousPeriod_@currentIndex" value="@FormatNumber(item.PerformPreviousPeriod)" class="form-control text-right number-separator trading-cumulative" readonly="readonly" /></td>
+                    <td><input type="text" name="AccumulatedBeginingOfYear_@currentIndex" value="@FormatNumber(item.AccumulatedBeginingOfYear)" class="form-control text-right number-separator trading-forecast" @(isTotal ? "readonly=readonly" : "") /></td>
+                </tr>
+            }
+            <tr id="TradingAddRow"><td colspan="5" class="text-left"><button type="button" class="btn btn-sm btn-primary" id="AddTradingProduct"><i class="fa fa-plus"></i> Thêm mặt hàng khác</button></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    // Add.cshtml gọi hàm này trước khi submit qua ajaxForm.
+    function ValidForm() {
+        var pairs = [["01", "02"], ["03", "04"], ["05", "06"], ["07", "08"], ["09", "10"], ["11", "12"], ["14", "15"], ["16", "17"], ["18", "19"], ["20", "21"]];
+        var fields = [{ selector: ".trading-current", label: "Thực hiện tháng báo cáo" }, { selector: ".trading-cumulative", label: "Cộng dồn" }, { selector: ".trading-forecast", label: "Dự tính tháng tiếp theo" }];
+        var parse = function (value) { return parseFloat((value || "").toString().replace(/\./g, "").replace(",", ".")) || 0; };
+        $("#TradingDataReport .trading-retail input").each(function () { ClearTooltipErrInput($(this)); $(this).removeClass("report-invalid"); });
+        var isValid = true;
+        for (var i = 0; i < pairs.length; i++) {
+            var $total = $("#TradingDataReport tr[data-code='" + pairs[i][0] + "']");
+            var $retail = $("#TradingDataReport tr[data-code='" + pairs[i][1] + "']");
+            for (var j = 0; j < fields.length; j++) {
+                var $retailInput = $retail.find(fields[j].selector), $totalInput = $total.find(fields[j].selector);
+                if (parse($retailInput.val()) > parse($totalInput.val())) {
+                    TooltipErrInput($retailInput, "Số liệu 'Trong đó: Bán lẻ' không được lớn hơn dòng tổng ở cột " + fields[j].label + ".");
+                    $retailInput.addClass("report-invalid");
+                    if (isValid) $retailInput.focus();
+                    isValid = false;
+                }
+            }
+        }
+        return isValid;
+    }
+
+    (function () {
+        function parseNumber(value) { value = (value || "").toString().replace(/\./g, "").replace(",", "."); return parseFloat(value) || 0; }
+        function formatNumber(value) { return Number(value || 0).toLocaleString("vi-VN", { maximumFractionDigits: 2 }); }
+        function recalculateTrading() {
+            $("#TradingDataReport .trading-row").not(".trading-summary").each(function () {
+                var $row = $(this), base = parseFloat($row.attr("data-base")) || 0;
+                $row.find(".trading-cumulative").val(formatNumber(base + parseNumber($row.find(".trading-current").val())));
+            });
+            var sumOther = { current: 0, cumulative: 0, forecast: 0 };
+            $("#TradingDataReport .trading-dynamic").each(function () { var $r = $(this); sumOther.current += parseNumber($r.find(".trading-current").val()); sumOther.cumulative += parseNumber($r.find(".trading-cumulative").val()); sumOther.forecast += parseNumber($r.find(".trading-forecast").val()); });
+            var $other = $("#TradingDataReport tr[data-code='22']");
+            $other.find(".trading-current").val(formatNumber(sumOther.current)); $other.find(".trading-cumulative").val(formatNumber(sumOther.cumulative)); $other.find(".trading-forecast").val(formatNumber(sumOther.forecast));
+            var total = { current: 0, cumulative: 0, forecast: 0 }, codes = ["03", "05", "07", "09", "11", "13", "14", "16", "18", "20", "22"];
+            $("#TradingDataReport .trading-row").each(function () { var $r = $(this); if ($.inArray($r.attr("data-code"), codes) < 0) return; total.current += parseNumber($r.find(".trading-current").val()); total.cumulative += parseNumber($r.find(".trading-cumulative").val()); total.forecast += parseNumber($r.find(".trading-forecast").val()); });
+            var $total = $("#TradingDataReport tr[data-code='01']");
+            $total.find(".trading-current").val(formatNumber(total.current)); $total.find(".trading-cumulative").val(formatNumber(total.cumulative)); $total.find(".trading-forecast").val(formatNumber(total.forecast));
+        }
+        function initDynamicRow($row, selectedCode) {
+            var $select = $row.find(".TradingProductSelect");
+            $("#TradingProductTemplate option").each(function () { $select.append($(this).clone()); });
+            $select.val(selectedCode || "");
+            if ($.fn.select2) $select.select2({ placeholder: "Chọn mặt hàng", allowClear: true, width: "100%", dropdownParent: $row.closest(".modal-content") });
+            $select.on("change", function () { var $option = $(this).find("option:selected"), value = $option.val(), rowIndex = $row.find("input[name^='Code_']").attr("name").replace("Code_", ""); $row.attr("data-code", value ? "TM_" + value : ""); $row.find("input[name='Code_" + rowIndex + "']").val(value ? "TM_" + value : ""); $row.find("input[name='Target_" + rowIndex + "']").val($option.data("name") || ""); });
+        }
+        $("#TradingDataReport .trading-dynamic").each(function () { var $r = $(this), code = ($r.attr("data-code") || "").replace(/^TM_/i, ""); initDynamicRow($r, code); });
+        $(document).off("input.trading", ".trading-current, .trading-forecast").on("input.trading", ".trading-current, .trading-forecast", recalculateTrading);
+        $(document).off("click.trading", "#AddTradingProduct").on("click.trading", "#AddTradingProduct", function () { var index = $("#TradingDataReport input[name^='Target_']").length + 1, $row = $("<tr class='trading-row trading-dynamic' data-code='' data-base='0'><td class='text-left'><input type='hidden' name='Target_" + index + "'><input type='hidden' name='Unit_" + index + "' value='Triệu đồng'><input type='hidden' name='Index_" + index + "'><input type='hidden' name='Level_" + index + "'><input type='hidden' name='Code_" + index + "'><div class='trading-product-picker'><select class='form-control TradingProductSelect'></select><a class='trading-remove' title='Xóa mặt hàng'><i class='fa fa-trash'></i></a></div></td><td></td><td><input type='text' name='PerformInPeriod_" + index + "' class='form-control text-right number-separator trading-current'></td><td><input type='text' name='PerformPreviousPeriod_" + index + "' class='form-control text-right number-separator trading-cumulative' readonly></td><td><input type='text' name='AccumulatedBeginingOfYear_" + index + "' class='form-control text-right number-separator trading-forecast'></td></tr>"); $("#TradingAddRow").before($row); initDynamicRow($row); });
+        $(document).off("click.tradingRemove", ".trading-remove").on("click.tradingRemove", ".trading-remove", function () { $(this).closest("tr").remove(); recalculateTrading(); });
+        recalculateTrading();
+    })();
+</script>
