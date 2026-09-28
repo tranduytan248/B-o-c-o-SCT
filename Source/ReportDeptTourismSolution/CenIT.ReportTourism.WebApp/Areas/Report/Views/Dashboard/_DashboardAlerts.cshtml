@@ -1,26 +1,37 @@
-﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
+@model CenIT.ReportTourism.Models.Report.DashboardModel
 
 @using System.Linq
+@{
+    var maxVal = Math.Max(1, Math.Max(Model.Alerts.DeclineOver10, Math.Max(Model.Alerts.DeclineOver20, Model.Alerts.DeclineOver30)));
+}
+
 <section class="dashboard-panel alert-panel">
     <header class="panel-heading">
-        <div><h2>Cảnh báo biến động</h2><p>Doanh thu công nghiệp so với tháng trước</p></div>
+        <div>
+            <h2>Cảnh báo biến động</h2>
+            <p>Doanh thu công nghiệp so với tháng trước</p>
+        </div>
         <a class="panel-link" href="@Url.Action("Warnings", "Dashboard", Model.Filters)">Bảng cảnh báo <i class="fa fa-angle-right" aria-hidden="true"></i></a>
     </header>
-    @if (!Model.HasComparisonData) { <p class="dashboard-empty">Chưa có dữ liệu tháng trước với giá trị gốc dương để đánh giá cảnh báo.</p> }
-    @if (Model.HasComparisonData) {
-    <div class="alert-summary">
-        <div class="alert-level level-10">
-            <div class="alert-level-label"><span>Giảm trên 10%</span><strong>@Model.Alerts.DeclineOver10</strong></div>
-            <div class="alert-track"><span style="width:@Math.Min(100, Model.Alerts.DeclineOver10 * 4)%"></span></div>
+    @if (!Model.HasComparisonData)
+    {
+        <p class="dashboard-empty">Chưa có dữ liệu tháng trước với giá trị gốc dương để đánh giá cảnh báo.</p>
+    }
+    else
+    {
+        <div class="alert-summary">
+            <div class="alert-level level-10">
+                <div class="alert-level-label"><span>Giảm trên 10%</span><strong>@Model.Alerts.DeclineOver10</strong></div>
+                <div class="alert-track"><span style="width:@((Model.Alerts.DeclineOver10 * 100 / maxVal))%"></span></div>
+            </div>
+            <div class="alert-level level-20">
+                <div class="alert-level-label"><span>Giảm trên 20%</span><strong>@Model.Alerts.DeclineOver20</strong></div>
+                <div class="alert-track"><span style="width:@((Model.Alerts.DeclineOver20 * 100 / maxVal))%"></span></div>
+            </div>
+            <div class="alert-level level-30">
+                <div class="alert-level-label"><span>Giảm trên 30%</span><strong>@Model.Alerts.DeclineOver30</strong></div>
+                <div class="alert-track"><span style="width:@((Model.Alerts.DeclineOver30 * 100 / maxVal))%"></span></div>
+            </div>
         </div>
-        <div class="alert-level level-20">
-            <div class="alert-level-label"><span>Giảm trên 20%</span><strong>@Model.Alerts.DeclineOver20</strong></div>
-            <div class="alert-track"><span style="width:@Math.Min(100, Model.Alerts.DeclineOver20 * 9)%"></span></div>
-        </div>
-        <div class="alert-level level-30">
-            <div class="alert-level-label"><span>Giảm trên 30%</span><strong>@Model.Alerts.DeclineOver30</strong></div>
-            <div class="alert-track"><span style="width:@Math.Min(100, Model.Alerts.DeclineOver30 * 22)%"></span></div>
-        </div>
-    </div>
     }
 </section>

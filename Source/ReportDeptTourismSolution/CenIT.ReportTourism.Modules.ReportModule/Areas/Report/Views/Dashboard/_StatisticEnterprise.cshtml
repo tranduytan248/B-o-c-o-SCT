@@ -1,24 +1,30 @@
-﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
+@model CenIT.ReportTourism.Models.Report.DashboardModel
 
 <div class="row dashboard-kpis">
     @foreach (var kpi in Model.Kpis)
     {
         <div class="col-xs-6 col-md-3">
-        <article class="dashboard-kpi kpi-@kpi.Tone">
-            <div class="kpi-label">@kpi.Label</div>
-            <div class="kpi-value">@kpi.Value @if (kpi.Value != "—") { <small>@kpi.Unit</small> }</div>
-            @if (kpi.Label == "Tỷ lệ báo cáo")
-            {
-                <div class="kpi-note"><i class="fa fa-check-circle" aria-hidden="true"></i> @kpi.Note</div>
-            }
-            else
-            {
-                <div class="kpi-changes">
-                    <span class="@(kpi.Mom.HasValue ? (kpi.Mom.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">Tháng @(kpi.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}", kpi.Mom.Value) + "%" : "chưa đủ lịch sử")</span>
-                    <span class="@(kpi.Yoy.HasValue ? (kpi.Yoy.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">Cùng kỳ @(kpi.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}", kpi.Yoy.Value) + "%" : "chưa đủ lịch sử")</span>
+            <article class="dashboard-kpi kpi-@kpi.Tone">
+                <div class="kpi-label">@kpi.Label</div>
+                <div class="kpi-value" @(kpi.Value == "—" ? "title=\"Chưa có số liệu phát sinh trong kỳ báo cáo này\"" : "")>
+                    @kpi.Value @if (kpi.Value != "—") { <small>@kpi.Unit</small> }
                 </div>
-            }
-        </article>
+                @if (kpi.Label == "Tỷ lệ báo cáo")
+                {
+                    <div class="kpi-note"><i class="fa fa-check-circle" aria-hidden="true"></i> @kpi.Note</div>
+                }
+                else
+                {
+                    <div class="kpi-changes">
+                        <span class="@(kpi.Mom.HasValue ? (kpi.Mom.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">
+                            T.trước: @(kpi.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", kpi.Mom.Value) : "chưa đủ lịch sử")
+                        </span>
+                        <span class="@(kpi.Yoy.HasValue ? (kpi.Yoy.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">
+                            Cùng kỳ: @(kpi.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", kpi.Yoy.Value) : "chưa đủ lịch sử")
+                        </span>
+                    </div>
+                }
+            </article>
         </div>
     }
 </div>

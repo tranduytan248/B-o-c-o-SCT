@@ -1,4 +1,4 @@
-﻿@model CenIT.ReportTourism.Models.Report.DashboardProgressModel
+@model CenIT.ReportTourism.Models.Report.DashboardProgressModel
 
 @{
     ViewBag.Title = "Tiến độ nộp báo cáo";
@@ -8,24 +8,89 @@
 
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
-    <link rel="stylesheet" href="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css") + "?v=20260928-compact")" />
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
 
 <div class="management-dashboard">
     @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Progress", Filters = Model.Filters })
-    <div class="dashboard-heading"><div><h1 id="dashboard-content" tabindex="-1">Tiến độ nộp báo cáo</h1><p>Nhóm doanh nghiệp đang theo dõi và đã phân loại công nghiệp <span class="scope-badge">Không phải toàn bộ doanh nghiệp Khánh Hòa</span></p></div></div>
-    @Html.Partial("_DashboardFilters", Model.FilterOptions)
-
-    <div class="row progress-kpis progress-kpis-six">
-        <div class="col-xs-6 col-md-4"><article class="dashboard-kpi kpi-blue"><div class="kpi-label">Dự kiến phải báo cáo</div><div class="kpi-value">@Model.Submission.TotalEnterprises</div><div class="kpi-note">Nhóm theo dõi đã phân loại</div></article></div>
-        <div class="col-xs-6 col-md-4"><article class="dashboard-kpi kpi-green"><div class="kpi-label">Đã nộp tệp báo cáo</div><div class="kpi-value">@Model.Submission.Submitted</div><div class="kpi-note">Có hồ sơ trong kỳ</div></article></div>
-        <div class="col-xs-6 col-md-4"><article class="dashboard-kpi kpi-green"><div class="kpi-label">Đủ chỉ tiêu dashboard</div><div class="kpi-value">@Model.Submission.CompleteIndicators</div><div class="kpi-note">Có 0101, 06 và 07</div></article></div>
-        <div class="col-xs-6 col-md-4"><article class="dashboard-kpi kpi-amber"><div class="kpi-label">Nộp nhưng thiếu chỉ tiêu</div><div class="kpi-value">@Model.Submission.MissingIndicators</div><div class="kpi-note">Thiếu ít nhất một trong ba mã</div></article></div>
-        <div class="col-xs-6 col-md-4"><article class="dashboard-kpi kpi-amber"><div class="kpi-label">Chưa nộp tệp</div><div class="kpi-value">@Model.Submission.NotSubmitted</div><div class="kpi-note">Trong nhóm dự kiến báo cáo</div></article></div>
-        <div class="col-xs-6 col-md-4"><article class="dashboard-kpi kpi-slate"><div class="kpi-label">Nộp muộn</div><div class="kpi-value">@Model.Submission.Late</div><div class="kpi-note">Nằm trong số đã nộp</div></article></div>
+    
+    <div class="dashboard-heading">
+        <div>
+            <h1 id="dashboard-content" tabindex="-1">Tiến độ nộp báo cáo thống kê</h1>
+            <p>Nhóm doanh nghiệp công nghiệp đang theo dõi và đã phân loại <span class="scope-badge">Không phải toàn bộ doanh nghiệp Khánh Hòa</span></p>
+        </div>
+        <span class="dashboard-updated"><i class="fa fa-clock-o" aria-hidden="true"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
     </div>
 
-    <p class="dashboard-context-link">Cần kiểm tra chỉ tiêu còn thiếu hoặc lịch sử đối chiếu? <a href="@Url.Action("Quality", "Dashboard", Model.Filters)">Xem độ bao phủ dữ liệu <i class="fa fa-angle-right" aria-hidden="true"></i></a></p>
+    @Html.Partial("_DashboardFilters", Model.FilterOptions)
+
+    <!-- Top Headline Progress Overview -->
+    <div class="progress-headline">
+        <div class="progress-headline-header">
+            <span class="progress-headline-title"><i class="fa fa-tasks" aria-hidden="true"></i> Tiến độ hoàn thành báo cáo kỳ @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
+            <span class="progress-headline-metric">
+                <strong>@Model.Submission.Submitted</strong> / @Model.Submission.TotalEnterprises doanh nghiệp
+                <span class="badge-tone tone-blue" style="margin-left: 6px; font-size: 13px;">@Model.Submission.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+            </span>
+        </div>
+        <div class="progress-headline-track">
+            <div class="progress-headline-fill" style="width: @Model.Submission.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%;"></div>
+        </div>
+        <div class="progress-headline-footer">
+            <span>Đã hoàn thành: @Model.Submission.Submitted đơn vị</span>
+            <span>Còn thiếu: @Model.Submission.NotSubmitted đơn vị (@((100m - Model.Submission.CompletionPercent).ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN")))%)</span>
+        </div>
+    </div>
+
+    <div class="row progress-kpis progress-kpis-six">
+        <div class="col-xs-6 col-md-4">
+            <article class="dashboard-kpi kpi-blue">
+                <div class="kpi-label">Dự kiến phải báo cáo</div>
+                <div class="kpi-value">@Model.Submission.TotalEnterprises</div>
+                <div class="kpi-note">Nhóm theo dõi đã phân loại</div>
+            </article>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <article class="dashboard-kpi kpi-green">
+                <div class="kpi-label">Đã nộp tệp báo cáo</div>
+                <div class="kpi-value">@Model.Submission.Submitted</div>
+                <div class="kpi-note">Có hồ sơ gửi trong kỳ</div>
+            </article>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <article class="dashboard-kpi kpi-green">
+                <div class="kpi-label">Đủ 3 chỉ tiêu dashboard</div>
+                <div class="kpi-value">@Model.Submission.CompleteIndicators</div>
+                <div class="kpi-note">Có đủ mã 0101, 06 và 07</div>
+            </article>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <article class="dashboard-kpi kpi-amber">
+                <div class="kpi-label">Nộp nhưng thiếu chỉ tiêu</div>
+                <div class="kpi-value">@Model.Submission.MissingIndicators</div>
+                <div class="kpi-note">Thiếu ít nhất một trong 3 mã</div>
+            </article>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <article class="dashboard-kpi kpi-amber">
+                <div class="kpi-label">Chưa nộp tệp báo cáo</div>
+                <div class="kpi-value">@Model.Submission.NotSubmitted</div>
+                <div class="kpi-note">Chưa gửi hồ sơ trong kỳ</div>
+            </article>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <article class="dashboard-kpi kpi-slate">
+                <div class="kpi-label">Nộp muộn hạn định</div>
+                <div class="kpi-value">@Model.Submission.Late</div>
+                <div class="kpi-note">Nằm trong số đã nộp tệp</div>
+            </article>
+        </div>
+    </div>
+
+    <p class="dashboard-context-link">
+        <i class="fa fa-info-circle" aria-hidden="true"></i> Cần kiểm tra mã chỉ tiêu còn thiếu hoặc lịch sử đối chiếu? 
+        <a href="@Url.Action("Quality", "Dashboard", Model.Filters)">Xem báo cáo độ bao phủ dữ liệu <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+    </p>
 
     <div class="row dashboard-row">
         <div class="col-md-4">
@@ -33,9 +98,20 @@
         </div>
         <div class="col-md-8">
             <section class="dashboard-panel">
-                <header class="panel-heading"><div><h2>Tiến độ theo tháng</h2><p>Tỷ lệ có tệp báo cáo trong nhóm theo dõi</p></div></header>
-                @if (Model.Trend.Count < 2) { <p class="dashboard-empty">Chưa đủ tháng nộp báo cáo để thể hiện xu hướng.</p> }
-                else { <div id="completion-trend-chart" class="morris-chart warning-trend-chart" role="img" aria-label="Tỷ lệ hoàn thành báo cáo theo tháng"></div> }
+                <header class="panel-heading">
+                    <div>
+                        <h2>Tỷ lệ hoàn thành theo tháng</h2>
+                        <p>Tỷ lệ doanh nghiệp nộp tệp báo cáo trong năm @Model.Filters.Year</p>
+                    </div>
+                </header>
+                @if (Model.Trend.Count < 2)
+                {
+                    <p class="dashboard-empty">Chưa đủ tháng nộp báo cáo để thể hiện xu hướng.</p>
+                }
+                else
+                {
+                    <div id="completion-trend-chart" class="morris-chart warning-trend-chart" role="img" aria-label="Tỷ lệ hoàn thành báo cáo theo tháng"></div>
+                }
                 <script type="application/json" class="md-chart-data" data-chart="completion-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
             </section>
         </div>
@@ -44,21 +120,55 @@
     <div class="row dashboard-row">
         <div class="col-md-6">
             <section class="dashboard-panel">
-                <header class="panel-heading"><div><h2>Nộp tệp theo phường / xã</h2><p>Tỷ lệ trong nhóm theo dõi của từng địa bàn</p></div></header>
-                @if (Model.Areas.Count == 0) { <p class="dashboard-empty">Không có địa bàn trong phạm vi lọc.</p> }
+                <header class="panel-heading">
+                    <div>
+                        <h2>Nộp tệp theo phường / xã</h2>
+                        <p>Tỷ lệ trong nhóm theo dõi của từng địa bàn</p>
+                    </div>
+                </header>
+                @if (Model.Areas.Count == 0)
+                {
+                    <p class="dashboard-empty">Không có địa bàn trong phạm vi lọc.</p>
+                }
                 @foreach (var area in Model.Areas)
                 {
-                    <div class="progress-breakdown-row"><div class="horizontal-share-heading"><strong>@area.Name</strong><span>@area.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span></div><div class="ranked-bar-track"><span class="ranked-bar positive" style="width:@area.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div><small>@area.Submitted đã nộp · @area.NotSubmitted còn thiếu</small></div>
+                    <div class="progress-breakdown-row">
+                        <div class="horizontal-share-heading">
+                            <strong>@area.Name</strong>
+                            <span>@area.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                        </div>
+                        <div class="ranked-bar-track">
+                            <span class="ranked-bar positive" style="width:@area.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span>
+                        </div>
+                        <small>@area.Submitted đã nộp &middot; @area.NotSubmitted chưa nộp</small>
+                    </div>
                 }
             </section>
         </div>
         <div class="col-md-6">
             <section class="dashboard-panel">
-                <header class="panel-heading"><div><h2>Nộp tệp theo ngành chính</h2><p>Tỷ lệ trong nhóm theo dõi của từng ngành</p></div></header>
-                @if (Model.Industries.Count == 0) { <p class="dashboard-empty">Không có ngành trong phạm vi lọc.</p> }
+                <header class="panel-heading">
+                    <div>
+                        <h2>Nộp tệp theo ngành chính</h2>
+                        <p>Tỷ lệ trong nhóm theo dõi của từng ngành</p>
+                    </div>
+                </header>
+                @if (Model.Industries.Count == 0)
+                {
+                    <p class="dashboard-empty">Không có ngành trong phạm vi lọc.</p>
+                }
                 @foreach (var industry in Model.Industries)
                 {
-                    <div class="progress-breakdown-row"><div class="horizontal-share-heading"><strong>@industry.Name</strong><span>@industry.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span></div><div class="ranked-bar-track"><span class="ranked-bar sector-share" style="width:@industry.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div><small>@industry.Submitted đã nộp · @industry.NotSubmitted còn thiếu</small></div>
+                    <div class="progress-breakdown-row">
+                        <div class="horizontal-share-heading">
+                            <strong>@industry.Name</strong>
+                            <span>@industry.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                        </div>
+                        <div class="ranked-bar-track">
+                            <span class="ranked-bar sector-share" style="width:@industry.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span>
+                        </div>
+                        <small>@industry.Submitted đã nộp &middot; @industry.NotSubmitted chưa nộp</small>
+                    </div>
                 }
             </section>
         </div>
@@ -67,12 +177,24 @@
     <div class="row dashboard-row">
         <div class="col-xs-12">
             <section class="dashboard-panel outstanding-panel">
-                <header class="panel-heading"><div><h2>Địa bàn, ngành còn nhiều báo cáo thiếu</h2><p>Ưu tiên theo dõi trong kỳ</p></div></header>
-                @if (Model.OutstandingAreas.Count == 0) { <p class="dashboard-empty">Không có đơn vị cần theo dõi trong phạm vi lọc.</p> }
+                <header class="panel-heading">
+                    <div>
+                        <h2>Đơn vị cần đôn đốc nộp báo cáo</h2>
+                        <p>Các địa bàn và ngành có số lượng báo cáo chưa nộp nhiều nhất trong kỳ</p>
+                    </div>
+                </header>
+                @if (Model.OutstandingAreas.Count == 0)
+                {
+                    <p class="dashboard-empty">Không có đơn vị cần theo dõi trong phạm vi lọc.</p>
+                }
                 <div class="outstanding-grid">
                     @foreach (var item in Model.OutstandingAreas)
                     {
-                        <div class="outstanding-item"><span>@item.Name</span><strong>@item.NotSubmitted</strong><small>chưa nộp</small></div>
+                        <div class="outstanding-item">
+                            <span>@item.Name</span>
+                            <strong>@item.NotSubmitted</strong>
+                            <small>chưa nộp</small>
+                        </div>
                     }
                 </div>
             </section>
@@ -83,5 +205,5 @@
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
     <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
-    <script src="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js") + "?v=20260928-responsive")"></script>
+    <script src="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js")"></script>
 }
