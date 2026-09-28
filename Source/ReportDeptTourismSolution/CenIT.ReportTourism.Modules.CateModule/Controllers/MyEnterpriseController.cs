@@ -121,10 +121,20 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                         EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 });
 
-            RemoveModelState("TaxCode", "BusinessAddress", "StreetName", "ProvinceId", "ProvinceName", "WardId",
-                "WardName", "ListIndustryId", "IndustryIds", "ListTypeBusinessId", "TypeBusiness");
+            RemoveModelState("OwnerEnterpriseName", "BusinessName", "TaxCode", "EconomicSectorId", "EconomicSectorName",
+                "EnterpriseTypeId", "EnterpriseTypeName", "EnterpriseStatusId", "EnterpriseStatusName", "BusinessAddress",
+                "StreetName", "ProvinceId", "ProvinceName", "WardId", "WardName", "ListIndustryId", "IndustryIds",
+                "ListTypeBusinessId", "TypeBusiness");
             var currentProvince = _provinceCache.GetViaWard(current.WardId);
+            model.OwnerEnterpriseName = current.OwnerEnterpriseName;
+            model.BusinessName = current.BusinessName;
             model.TaxCode = current.TaxCode;
+            model.EconomicSectorId = current.EconomicSectorId;
+            model.EconomicSectorName = current.EconomicSectorName;
+            model.EnterpriseTypeId = current.EnterpriseTypeId;
+            model.EnterpriseTypeName = current.EnterpriseTypeName;
+            model.EnterpriseStatusId = current.EnterpriseStatusId;
+            model.EnterpriseStatusName = current.EnterpriseStatusName;
             model.BusinessAddress = current.BusinessAddress;
             model.StreetName = current.StreetName;
             model.WardId = current.WardId;

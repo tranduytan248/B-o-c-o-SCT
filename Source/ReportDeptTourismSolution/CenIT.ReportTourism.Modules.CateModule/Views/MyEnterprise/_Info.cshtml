@@ -24,12 +24,12 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             @Html.TitleFor(model => model.OwnerEnterpriseName, new { @class = "control-label" })
-                            @Html.TextBoxFor(model => model.OwnerEnterpriseName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Owner") })
+                            @Html.TextBoxFor(model => model.OwnerEnterpriseName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_Owner"), disabled = "disabled" })
                             @Html.ValidationMessageFor(model => model.OwnerEnterpriseName, "", new { @class = "text-danger" })
                         </div>
                         <div class="col-md-6">
                             @Html.TitleFor(model => model.BusinessName, new { @class = "control-label" })
-                            @Html.TextBoxFor(model => model.BusinessName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_BusinessName") })
+                            @Html.TextBoxFor(model => model.BusinessName, new { @class = "col-md-12 form-control", placeholder = AppProcessor.Messagor.GetMessage("Enterprise_Label_BusinessName"), disabled = "disabled" })
                             @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -42,13 +42,13 @@
                         </div>
                         <div class="col-md-4">
                             @Html.TitleFor(model => model.EconomicSectorId, new { @class = "control-label" })
-                            @Html.DropDownListFor(model => model.EconomicSectorId, new SelectList(Model.ListEconomicSector, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EconomicSectorName');" })
+                            @Html.DropDownListFor(model => model.EconomicSectorId, new SelectList(Model.ListEconomicSector, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EconomicSectorName');", disabled = "disabled" })
                             <br /> @Html.ValidationMessageFor(model => model.EconomicSectorId, "", new { @class = "text-danger" })
                             @Html.HiddenFor(model => model.EconomicSectorName)
                         </div>
                         <div class="col-md-5">
                             @Html.TitleFor(model => model.EnterpriseTypeId, new { @class = "control-label" })
-                            @Html.DropDownListFor(model => model.EnterpriseTypeId, new SelectList(Model.ListEnterpriseType, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EnterpriseTypeName');" })
+                            @Html.DropDownListFor(model => model.EnterpriseTypeId, new SelectList(Model.ListEnterpriseType, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EnterpriseTypeName');", disabled = "disabled" })
                             @Html.ValidationMessageFor(model => model.EnterpriseTypeId, "", new { @class = "text-danger" })
                             @Html.HiddenFor(model => model.EnterpriseTypeName)
                         </div>
@@ -68,7 +68,7 @@
                         </div>
                         <div class="col-md-3">
                             @Html.TitleFor(model => model.EnterpriseStatusId, new { @class = "control-label" })
-                            @Html.DropDownListFor(model => model.EnterpriseStatusId, new SelectList(Model.ListEnterpriseStatus, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EnterpriseStatusName');" })
+                            @Html.DropDownListFor(model => model.EnterpriseStatusId, new SelectList(Model.ListEnterpriseStatus, "Value", "Text"), "", new { @class = "col-md-12 form-control", onchange = "OnChangeCombo(this, '#EnterpriseStatusName');", disabled = "disabled" })
                             <br /> @Html.ValidationMessageFor(model => model.EnterpriseStatusId, "", new { @class = "text-danger" })
                             @Html.HiddenFor(model => model.EnterpriseStatusName)
                         </div>
