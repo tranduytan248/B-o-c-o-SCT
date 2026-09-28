@@ -1,0 +1,31 @@
+﻿@using TSFramework.App.Processors
+@{
+    Layout = "";
+    var isDepartmentUser = (ViewBag.IsDepartmentUser as bool?) == true;
+}
+<div class="modal-header bg-primary">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title"><i class="fa fa-question-circle"></i>&nbsp;Hướng dẫn sử dụng</h4>
+</div>
+<div class="modal-body">
+    <div class="list-group" style="margin-bottom: 0;">
+        <a class="list-group-item" data-modal="true" data-modal-id="UserGuideView" data-modal-id-parent="UserGuide" data-width="full"
+           href="@Url.Action("UserGuideView", "Home", new { area = "", type = "DN" })">
+            <i class="fa fa-file-pdf-o text-red"></i>&nbsp;Hướng dẫn sử dụng cho doanh nghiệp
+            <i class="fa fa-chevron-right pull-right text-muted"></i>
+        </a>
+        @if (isDepartmentUser)
+        {
+            <a class="list-group-item" data-modal="true" data-modal-id="UserGuideView" data-modal-id-parent="UserGuide" data-width="full"
+               href="@Url.Action("UserGuideView", "Home", new { area = "", type = "SCT" })">
+                <i class="fa fa-file-pdf-o text-red"></i>&nbsp;Hướng dẫn sử dụng cho Sở Công Thương
+                <i class="fa fa-chevron-right pull-right text-muted"></i>
+            </a>
+        }
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;@AppProcessor.Messagor.GetMessage("Button_Close")</button>
+</div>
