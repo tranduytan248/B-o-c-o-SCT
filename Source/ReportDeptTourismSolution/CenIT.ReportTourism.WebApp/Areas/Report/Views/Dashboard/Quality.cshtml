@@ -14,7 +14,7 @@
 
 @section Title { @ViewBag.Title }
 @section HeadCss {
-    <link rel="stylesheet" href="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css") + "?v=20260928-compact")" />
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
 
 <div class="management-dashboard">
@@ -87,5 +87,5 @@
 </div>
 
 @section CustomJS {
-    <script src="@(Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js") + "?v=20260928-responsive")"></script>
+    <script src="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js")"></script>
 }

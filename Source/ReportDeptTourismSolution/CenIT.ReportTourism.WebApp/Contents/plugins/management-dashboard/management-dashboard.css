@@ -1,13 +1,14 @@
 .management-dashboard {
-    --md-blue: #3c8dbc;
-    --md-blue-dark: #2875a4;
-    --md-green: #368b6b;
-    --md-amber: #c58b36;
-    --md-red: #bd5b5b;
-    --md-ink: #263747;
-    --md-muted: #738292;
-    --md-border: #e2e8ed;
-    --md-surface: #fff;
+    --md-blue: #1686c9;
+    --md-blue-dark: #0e6ba8;
+    --md-green: #059669;
+    --md-amber: #d97706;
+    --md-red: #dc2626;
+    --md-ink: #1d2b34;
+    --md-muted: #64748b;
+    --md-border: #dde3e8;
+    --md-surface: #ffffff;
+    --md-bg: #f4f6f8;
     color: var(--md-ink);
     font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
     padding-top: 0;
@@ -817,3 +818,136 @@ body:has(.management-dashboard) .content { padding-top: 10px; }
     .management-dashboard .filter-actions { flex-wrap: wrap; }
     .management-dashboard .filter-actions .btn { flex-basis: 100%; }
 }
+
+/* ==========================================================================
+   Enterprise BI Enhancements: Tables, Headline Progress, and Status Badges
+   ========================================================================== */
+.management-dashboard .progress-headline {
+    background: #ffffff;
+    border: 1px solid var(--md-border);
+    border-top: 3px solid var(--md-blue);
+    border-radius: 3px;
+    padding: 14px 18px 16px;
+    margin-bottom: 14px;
+}
+.management-dashboard .progress-headline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.management-dashboard .progress-headline-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--md-ink);
+}
+.management-dashboard .progress-headline-metric {
+    font-size: 14px;
+    color: var(--md-muted);
+}
+.management-dashboard .progress-headline-metric strong {
+    font-size: 20px;
+    color: var(--md-blue-dark);
+    font-variant-numeric: tabular-nums;
+}
+.management-dashboard .progress-headline-track {
+    background: #eef2f5;
+    border-radius: 2px;
+    height: 10px;
+    overflow: hidden;
+    position: relative;
+}
+.management-dashboard .progress-headline-fill {
+    background: linear-gradient(90deg, var(--md-blue), #2bb1ff);
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+.management-dashboard .progress-headline-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--md-muted);
+}
+
+/* Enterprise Data Tables */
+.management-dashboard .table-enterprise {
+    margin-bottom: 0;
+    font-size: 12px;
+    width: 100%;
+}
+.management-dashboard .table-enterprise th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid var(--md-border);
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+.management-dashboard .table-enterprise td {
+    padding: 9px 10px;
+    vertical-align: middle;
+    border-top: 1px solid #f1f5f9;
+    color: var(--md-ink);
+}
+.management-dashboard .table-enterprise tbody tr:hover {
+    background: #f8fbfe;
+}
+.management-dashboard .table-enterprise .num-col {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.management-dashboard .table-enterprise strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+.management-dashboard .table-enterprise small {
+    display: block;
+    color: var(--md-muted);
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+/* Badges */
+.management-dashboard .badge-tone {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 2px;
+    white-space: nowrap;
+}
+.management-dashboard .badge-tone.tone-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.management-dashboard .badge-tone.tone-amber { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.management-dashboard .badge-tone.tone-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.management-dashboard .badge-tone.tone-blue { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+.management-dashboard .badge-tone.tone-slate { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+
+/* Refined Alert Summary in Overview */
+.management-dashboard .alert-summary-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+}
+.management-dashboard .alert-summary-item {
+    display: grid;
+    grid-template-columns: minmax(80px, 1.2fr) minmax(40px, 1fr) 32px;
+    gap: 8px;
+    align-items: center;
+    font-size: 11px;
+}
+.management-dashboard .alert-summary-item span { color: #475569; }
+.management-dashboard .alert-summary-item strong {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--md-ink);
+}
+
