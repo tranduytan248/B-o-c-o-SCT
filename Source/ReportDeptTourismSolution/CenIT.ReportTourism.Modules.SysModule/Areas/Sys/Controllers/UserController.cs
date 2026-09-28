@@ -608,8 +608,7 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                 return Json(new
                 {
                     status = true,
-                    message = CreateMessage("Tài khoản",
-                        EnumProcessType.DataNotExist, EnumMsgIcon.Error)
+                    message = CreateMessage("Tài khoản", EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 }, JsonRequestBehavior.AllowGet);
             var enterprises = _cateEnterpriseCache.GetAll()
                 .Select(u => new ListItem(u.BusinessName, u.EnterpriseId.ToString())).ToList();
@@ -620,6 +619,7 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                 FullName = currentUser.FullName,
                 UserName = currentUser.UserName,
                 Email = currentUser.Email,
+                //Enterprises = new List<ListItem>(),
                 Enterprises = enterprises,
                 StrEnterprisesSelected = string.Join(",", enterprisesSelected)
             });

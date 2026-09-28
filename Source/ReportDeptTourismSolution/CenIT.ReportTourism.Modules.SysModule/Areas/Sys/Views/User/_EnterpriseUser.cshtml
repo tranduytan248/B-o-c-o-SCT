@@ -1,26 +1,32 @@
 ﻿@using TSFramework.App.Processors
 @model CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models.EnterpriseUserModel
 
-
 @Html.HiddenFor(model => model.UserName)
 @Html.HiddenFor(model => model.FullName)
 @Html.HiddenFor(model => model.Email)
 
-<link rel="stylesheet" href="~/Contents/Modules/Sys/plugins/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css"/>
+<link rel="stylesheet" href="~/Contents/Modules/Sys/plugins/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" />
 
-<div id="PermissionModule">
+<div id="PermissionEnterprise">
     <div class="form-group">
-        @Html.TitleFor(model => model.UserName, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.TextBoxFor(model => model.UserName, new { @class = "col-md-7", disabled = true, placeholder = AppProcessor.Messagor.GetMessage("AppModule_Label_ModuleName") })
+        <div class="col-md-4">
+            @Html.TitleFor(model => model.UserName, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.UserName, new { @class = "col-md-12 form-control", disabled = true, placeholder = AppProcessor.Messagor.GetMessage("User_Label_UserName") })
+            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-8">
+            @Html.TitleFor(model => model.FullName, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.FullName, new { @class = "col-md-12 form-control", disabled = true, placeholder = AppProcessor.Messagor.GetMessage("User_Label_FullName") })
             @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
         </div>
     </div>
     <div class="form-group">
-        @Html.TitleFor(model => model.StrEnterprisesSelected, new { @class = "control-label col-md-3" })
-        <div class="col-md-9">
-            @Html.DropDownList("SelectedEnterprises", new SelectList(Model.Enterprises, "Value", "Text"),
-                new { @class = "form-control col-md-10 none-select2", multiple = "multiple", placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select_Enterprises") })
+        <div class="col-md-12">
+            @Html.TitleFor(model => model.StrEnterprisesSelected, new { @class = "control-label" })
+            <div class="col-md-12 row">
+                @Html.DropDownList("SelectedEnterprises", new SelectList(Model.Enterprises, "Value", "Text"),
+                    new { @class = "col-md-12 form-control none-select2", multiple = "multiple", placeholder = AppProcessor.Messagor.GetMessage("Combobox_Select_Enterprises") })
+            </div>
         </div>
         @Html.HiddenFor(model => model.StrEnterprisesSelected)
     </div>
@@ -28,7 +34,7 @@
     <script type="text/javascript" src="~/Contents/Modules/Sys/plugins/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('select#SelectedEnterprises').multiselect({
                 maxHeight: 400,
                 numberDisplayed: 1,
@@ -46,7 +52,7 @@
                 nSelectedText: 'doanh nghiệp đã được chọn',
                 enableClickableOptGroups: true,
                 enableCollapsibleOptGroups: true,
-                onChange: function(option, checked, select) {
+                onChange: function (option, checked, select) {
                     var selectedValues = $('input[type="hidden"][id$="StrEnterprisesSelected"]').val();
                     var arrSelectedValues = selectedValues != undefined && selectedValues.length > 0
                         ? selectedValues.split(',')
@@ -65,18 +71,18 @@
                         }
                     }
                 },
-                onSelectAll: function() {
+                onSelectAll: function () {
                     var arrSelectedValues = $('select#SelectedEnterprises option:selected')
-                        .map(function(a, item) { return item.value; });
+                        .map(function (a, item) { return item.value; });
                     $('input[type="hidden"][id$="StrEnterprisesSelected"]').val(arrSelectedValues.toArray());
                 },
-                onDeselectAll: function(options) {
+                onDeselectAll: function (options) {
                     $('input[type="hidden"][id$="StrEnterprisesSelected"]').val('');
                 }
             });
         });
 
-        $(function() {
+        $(function () {
             var selectedValues = $('input[type="hidden"][id$="StrEnterprisesSelected"]').val();
             $('select#SelectedEnterprises').multiselect('select', selectedValues.split(","));
         });
