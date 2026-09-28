@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using CenIT.ReportTourism.Caches.Sys;
@@ -6,6 +9,7 @@ using CenIT.ReportTourism.Core.Apps;
 using CenIT.ReportTourism.WebApp.Models;
 using TSFramework.App.Attributes;
 using TSFramework.App.BaseApps;
+using TSFramework.App.Processors;
 using TSFramework.Core.Enums;
 
 namespace CenIT.ReportTourism.WebApp.Controllers
@@ -13,6 +17,12 @@ namespace CenIT.ReportTourism.WebApp.Controllers
     public class HomeController : AppController
     {
         private readonly SysModuleCache _sysModuleCache = new SysModuleCache();
+        private readonly SysUserCache _sysUserCache = new SysUserCache();
+
+        private const string EnterpriseGuideType = "DN";
+        private const string DepartmentGuideType = "SCT";
+        private const string EnterpriseGuideFile = "~/Contents/DOANHNGHIEP_HUONGDAN.pdf";
+        private const string DepartmentGuideFile = "~/Contents/SOCONGTHUONG_HUONGDAN.pdf";
 
         [ActionType(Type = EnumActionType.View)]
         public ActionResult Index()
@@ -87,6 +97,76 @@ namespace CenIT.ReportTourism.WebApp.Controllers
             }
 
             return Json(listModulesHtml, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        ///     Modal "Hướng dẫn sử dụng": mọi tài khoản đã đăng nhập đều xem được,
+        ///     mục hướng dẫn cho Sở Công Thương chỉ hiển thị với tài khoản thuộc Sở
+        /// </summary>
+        [HttpGet]
+        [AjaxOnly]
+        [AllowAnyPermission]
+        public ActionResult UserGuide()
+        {
+            ViewBag.IsDepartmentUser = IsDepartmentUser();
+            return PartialView("_UserGuide");
+        }
+
+        /// <summary>
+        ///     Xem file PDF hướng dẫn sử dụng (type: DN - doanh nghiệp, SCT - Sở Công Thương)
+        /// </summary>
+        [HttpGet]
+        [AjaxOnly]
+        [AllowAnyPermission]
+        public ActionResult UserGuideView(string type = EnterpriseGuideType)
+        {
+            string filePath;
+            if (string.Equals(type, DepartmentGuideType, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!IsDepartmentUser())
+                    return Json(new
+                    {
+                        status = false,
+                        message = CreateMessage(AppProcessor.Messagor.GetMessage("Common_AccessDenied_Message"),
+                            EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                    }, JsonRequestBehavior.AllowGet);
+
+                ViewBag.Title = "Hướng dẫn sử dụng cho Sở Công Thương";
+                filePath = DepartmentGuideFile;
+            }
+            else
+            {
+                ViewBag.Title = "Hướng dẫn sử dụng cho doanh nghiệp";
+                filePath = EnterpriseGuideFile;
+            }
+
+            var physicalPath = Server.MapPath(filePath);
+            ViewBag.FileUrl = System.IO.File.Exists(physicalPath)
+                ? $"{Url.Content(filePath)}?v={System.IO.File.GetLastWriteTimeUtc(physicalPath).Ticks}"
+                : null;
+            return PartialView("_UserGuideView");
+        }
+
+        /// <summary>
+        ///     Tài khoản thuộc Sở: có vai trò khác vai trò Doanh nghiệp (AppSettings: Enterprise_Role_Default)
+        /// </summary>
+        private bool IsDepartmentUser()
+        {
+            try
+            {
+                var enterpriseRoleIds = (ConfigurationManager.AppSettings["Enterprise_Role_Default"] ?? "5")
+                    .Split(',').Select(r => r.Trim()).ToList();
+                var sysUser = _sysUserCache.GetByUserName(User?.UserName);
+                if (sysUser?.UserId == null) return false;
+
+                var roles = _sysUserCache.GetRoles(sysUser.UserId);
+                return roles != null && roles.Any(r => !enterpriseRoleIds.Contains(r.RoleId.ToString()));
+            }
+            catch (Exception ex)
+            {
+                AppProcessor.Logger.Error(ex);
+                return false;
+            }
         }
 
         //[ActionType(Type = EnumActionType.Edit)]
