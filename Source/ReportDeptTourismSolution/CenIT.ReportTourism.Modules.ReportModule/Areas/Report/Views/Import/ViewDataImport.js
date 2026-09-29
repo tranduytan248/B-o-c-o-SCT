@@ -86,6 +86,7 @@ function initTableViewDataImport() {
                 "defaultContent": "",
                 "render": function(data, type, row, meta) {
                     if (data == null || data.length === 0) return "";
+                    if (data.indexOf("TM_") === 0) return "";
                     return data.padStart(2, "0");
                 }
             },

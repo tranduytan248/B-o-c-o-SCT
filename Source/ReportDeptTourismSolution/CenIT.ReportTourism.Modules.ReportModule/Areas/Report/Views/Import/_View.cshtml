@@ -68,13 +68,19 @@
                 <tbody>
                 @if (Model.ListDataImports != null && Model.ListDataImports.Any())
                 {
+                    var hasDynamic = Model.ListDataImports.Any(x => (x.Code ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase));
                     foreach (var item in Model.ListDataImports)
                     {
                         var code = item.Code ?? "";
+                        if (hasDynamic && (code == "38" || code == "39"))
+                        {
+                            continue;
+                        }
                         var isDynamic = code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase);
+                        var isDynamicSub = isDynamic && (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) || code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase));
                         var isCalculated = new[] { "01", "02", "03", "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code);
                         var isSummary = isCalculated || code == "40";
-                        var isDetail = new[] { "02", "03", "05", "06", "08", "09", "11", "12", "14", "15", "17", "18", "20", "21", "23", "24", "26", "27", "29", "30", "32", "33", "38", "39" }.Contains(code);
+                        var isDetail = isDynamicSub || new[] { "02", "03", "05", "06", "08", "09", "11", "12", "14", "15", "17", "18", "20", "21", "23", "24", "26", "27", "29", "30", "32", "33", "38", "39" }.Contains(code);
                         <tr class="@(isSummary ? "view-summary" : "") @(isDetail ? "view-detail" : "")">
                             <td class="text-left" style="@(isDetail ? "padding-left: 28px; font-style: italic;" : "")">
                                 @if (isSummary)

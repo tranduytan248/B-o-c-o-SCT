@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -106,6 +106,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                 .Where(e => lstReportsViaUsers == null || !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
 
+            var isEnterpriseUser = lstEnterpisePermits != null && lstEnterpisePermits.Count > 0;
             var searchModel = new ReportDataImportSearchModel
             {
                 ListEnterprises = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
@@ -115,6 +116,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 DayDeadlineSendReportLate =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
                 ExistEnterpriseSubmitReportYet = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0 ? lstEnterpriseOther.Count > 0 : true),
+                IsEnterpriseUser = isEnterpriseUser,
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -374,6 +376,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                 .Where(e => lstReportsViaUsers == null || !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
 
+            var isEnterpriseUser = lstEnterpisePermits != null && lstEnterpisePermits.Count > 0;
             var searchModel = new ReportDataImportSearchModel
             {
                 ListEnterprises = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
@@ -383,6 +386,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 DayDeadlineSendReportLate =
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
                 ExistEnterpriseSubmitReportYet = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0 ? lstEnterpriseOther.Count > 0 : true),
+                IsEnterpriseUser = isEnterpriseUser,
                 EnableSignDigitalDoc =
                     (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
             };
@@ -1107,23 +1111,23 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var enterpriseModel = _enterpriseCache.GetById(enterpriseId);
             if (enterpriseModel == null)
-                return Json(new
-                {
-                    status = true,
-                    message = CreateMessage($"{_enterpriseTitle}",
-                        EnumProcessType.DataNotExist, EnumMsgIcon.Error)
-                });
+                return Content("<div class='alert alert-danger'>Không tìm thấy doanh nghiệp.</div>");
 
-            var dataImports = _importCache.GetViaEnterpriseOnMonth(enterpriseId, onMonth);
+            // Always retain the original result.  Older reports were stored before
+            // TypeReport was introduced, therefore filtering strictly by the type
+            // from the listing used to return an empty result and prevented the
+            // framework from opening the view modal.
+            var allDataImports = _importCache.GetViaEnterpriseOnMonth(enterpriseId, onMonth) ??
+                                 new List<ReportDataImportModel>();
+            var dataImports = allDataImports;
             if (typeReport.HasValue)
-                dataImports = (dataImports ?? new List<ReportDataImportModel>()).Where(x => x.TypeReport == typeReport.Value).ToList();
+            {
+                dataImports = allDataImports.Where(x => x.TypeReport == typeReport.Value).ToList();
+                if (!dataImports.Any() && allDataImports.Any(x => x.TypeReport <= 0))
+                    dataImports = allDataImports.Where(x => x.TypeReport <= 0).ToList();
+            }
             if (dataImports == null || dataImports.Count <= 0)
-                return Json(new
-                {
-                    status = true,
-                    message = CreateMessage($"{_importTile}",
-                        EnumProcessType.DataNotExist, EnumMsgIcon.Error)
-                });
+                return Content("<div class='alert alert-info'>Chưa có dữ liệu báo cáo cho kỳ đã chọn.</div>");
 
             EnumTypeBusiness selectedType = EnumTypeBusiness.Manufacturing;
             if (typeReport.HasValue && Enum.IsDefined(typeof(EnumTypeBusiness), typeReport.Value))
@@ -1191,12 +1195,21 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var draw = Request.Form.GetValues("draw")?[0];
             var data = _importCache.GetViaEnterpriseOnMonth(searchModel.EnterpriseId, searchModel.ForMonth);
+            if (!searchModel.TypeReport.HasValue && data != null && data.Any())
+            {
+                var detected = data.FirstOrDefault(d => d.TypeReport > 0)?.TypeReport;
+                if (detected.HasValue) searchModel.TypeReport = detected.Value;
+            }
             if (searchModel.TypeReport.HasValue)
                 data = (data ?? new List<ReportDataImportModel>()).Where(x => x.TypeReport == searchModel.TypeReport.Value).ToList();
             if (searchModel.TypeReport.HasValue && searchModel.TypeReport.Value == (int)EnumTypeBusiness.Trading)
             {
                 var tradingResult = LoadTradingReport(searchModel.EnterpriseId, searchModel.ForMonth, null, data);
                 data = tradingResult.Model as List<ReportDataImportModel> ?? data;
+                if (data.Any(x => (x.Code ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase)))
+                {
+                    data = data.Where(x => x.Code != "38" && x.Code != "39").ToList();
+                }
             }
             else if (searchModel.TypeReport.HasValue && searchModel.TypeReport.Value == (int)EnumTypeBusiness.ImportExport)
             {
@@ -1352,7 +1365,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ForMonth = DateTime.Now,
                 TypeReport = defaultType,
                 TypeReportName = GetTypeBusinessDisplayName(defaultType),
-                ListTypeBusiness = GetListTypeBusinessItems()
+                ListTypeBusiness = GetListTypeBusinessItems(),
+                IsEnterpriseUser = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0)
             };
             return PartialView("_Add", reportModel);
         }
@@ -1395,7 +1409,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     ForMonth = model.ForMonth,
                     TypeReport = model.TypeReport,
                     TypeReportName = string.IsNullOrWhiteSpace(model.TypeReportName) || model.TypeReportName.StartsWith("TypeBusiness_") ? GetTypeBusinessDisplayName(model.TypeReport) : model.TypeReportName,
-                    ListTypeBusiness = GetListTypeBusinessItems()
+                    ListTypeBusiness = GetListTypeBusinessItems(),
+                    IsEnterpriseUser = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0)
                 };
                 return PartialView("_Add", reportModel);
             }
@@ -1740,7 +1755,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 IsEdit = true,
                 AccessToken = (string)Session[$"VNPT-SmartCA-{User?.UserName}-AccessToken"],
                 EnableSignDigitalDoc =
-                    (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
+                    (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0",
+                IsEnterpriseUser = (_enterpriseCache.GetViaUser(User.UserName)?.Count > 0)
             };
 
             return PartialView("_Edit", reportModel);
@@ -1838,7 +1854,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     ListTypeBusiness = GetListTypeBusinessItems(),
                     IsEdit = true,
                     EnableSignDigitalDoc =
-                        (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
+                        (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0",
+                    IsEnterpriseUser = (_enterpriseCache.GetViaUser(User.UserName)?.Count > 0)
                 };
                 return PartialView("_Edit", reportModel);
             }
@@ -2419,23 +2436,51 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     row.AccumulatedBeginingOfYear = saved.AccumulatedBeginingOfYear;
                 }
 
-                var dynamicRows = savedData.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
-                                                       x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
-                    .Select(x => new ReportDataImportModel
+                var dynamicParents = savedData.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
+                                                       x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) &&
+                                                       !x.Code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) &&
+                                                       !x.Code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase)).ToList();
+
+                var dynamicRows = new List<ReportDataImportModel>();
+                foreach (var p in dynamicParents)
+                {
+                    dynamicRows.Add(new ReportDataImportModel
                     {
-                        Targets = x.Targets,
-                        Unit = x.Unit,
-                        Code = x.Code,
-                        PerformInPeriod = x.PerformInPeriod,
-                        PerformPreviousPeriod = x.PerformPreviousPeriod,
-                        AccumulatedBeginingOfYear = x.AccumulatedBeginingOfYear,
+                        Targets = p.Targets,
+                        Unit = p.Unit ?? "Triệu đồng",
+                        Code = p.Code,
+                        PerformInPeriod = p.PerformInPeriod,
+                        PerformPreviousPeriod = p.PerformPreviousPeriod,
+                        AccumulatedBeginingOfYear = p.AccumulatedBeginingOfYear,
                         ComparedSamePeriodLastYear = (_importCache.GetViaEnterpriseOnMonth(enterpriseId, null) ?? new List<ReportDataImportModel>())
-                            .Where(p => p.ForMonth.HasValue && p.ForMonth.Value.Year == reportMonth.Year && p.ForMonth.Value.Month < reportMonth.Month &&
-                                        string.Equals(p.Code, x.Code, StringComparison.OrdinalIgnoreCase))
-                            .Sum(p => p.PerformInPeriod ?? 0)
-                    }).ToList();
-                // Mặt hàng tự nhập thuộc nhóm 11, hiển thị ngay dưới "Hàng hóa khác"
-                // và trước hai dòng Bán lẻ/Nền tảng trực tuyến của nhóm này.
+                            .Where(prev => prev.ForMonth.HasValue && prev.ForMonth.Value.Year == reportMonth.Year && prev.ForMonth.Value.Month < reportMonth.Month &&
+                                        string.Equals(prev.Code, p.Code, StringComparison.OrdinalIgnoreCase))
+                            .Sum(prev => prev.PerformInPeriod ?? 0)
+                    });
+
+                    var bl = savedData.FirstOrDefault(x => string.Equals(x.Code, p.Code + "_BL", StringComparison.OrdinalIgnoreCase));
+                    dynamicRows.Add(new ReportDataImportModel
+                    {
+                        Targets = "Trong đó: Bán lẻ",
+                        Unit = "Triệu đồng",
+                        Code = p.Code + "_BL",
+                        PerformInPeriod = bl != null ? bl.PerformInPeriod : p.PerformInPeriod,
+                        PerformPreviousPeriod = bl != null ? bl.PerformPreviousPeriod : p.PerformPreviousPeriod,
+                        AccumulatedBeginingOfYear = bl != null ? bl.AccumulatedBeginingOfYear : p.AccumulatedBeginingOfYear
+                    });
+
+                    var tt = savedData.FirstOrDefault(x => string.Equals(x.Code, p.Code + "_TT", StringComparison.OrdinalIgnoreCase));
+                    dynamicRows.Add(new ReportDataImportModel
+                    {
+                        Targets = "Trong đó: Nền tảng trực tuyến",
+                        Unit = "Triệu đồng",
+                        Code = p.Code + "_TT",
+                        PerformInPeriod = tt != null ? tt.PerformInPeriod : 0,
+                        PerformPreviousPeriod = tt != null ? tt.PerformPreviousPeriod : 0,
+                        AccumulatedBeginingOfYear = tt != null ? tt.AccumulatedBeginingOfYear : 0
+                    });
+                }
+
                 var otherRetailIndex = rows.FindIndex(x => x.Code == "38");
                 if (otherRetailIndex < 0) rows.AddRange(dynamicRows);
                 else rows.InsertRange(otherRetailIndex, dynamicRows);
@@ -2493,25 +2538,86 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
         private static void ApplyTradingHierarchy(List<ReportDataImportModel> rows)
         {
-            var index = 0;
             var otherNumber = 0;
             foreach (var row in rows)
             {
-                if (row.Code == "01") row.Level = "1";
-                else if (row.Code == "02") row.Level = "1.1";
-                else if (row.Code == "03") row.Level = "1.2";
-                else if (new[] { "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(row.Code)) row.Level = "1." + ((Convert.ToInt32(row.Code) - 1) / 3 + 2);
-                else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(row.Code)) row.Level = row.Code == "38" ? "1.13.1" : "1." + ((Convert.ToInt32(row.Code) - 2) / 3 + 2) + ".1";
-                else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" }.Contains(row.Code)) row.Level = row.Code == "39" ? "1.13.2" : "1." + ((Convert.ToInt32(row.Code) - 3) / 3 + 2) + ".2";
-                else if (row.Code == "40") row.Level = "2";
-                else if (!string.IsNullOrWhiteSpace(row.Code) && row.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase)) row.Level = "1.13." + (++otherNumber + 2);
-                row.Index = index++;
+                var code = row.Code ?? "";
+                if (code == "01") row.Level = "1";
+                else if (code == "02") row.Level = "1.1";
+                else if (code == "03") row.Level = "1.2";
+                else if (new[] { "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code)) row.Level = "1." + ((Convert.ToInt32(code) - 1) / 3 + 2);
+                else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(code)) row.Level = code == "38" ? "1.13.1" : "1." + ((Convert.ToInt32(code) - 2) / 3 + 2) + ".1";
+                else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" }.Contains(code)) row.Level = code == "39" ? "1.13.2" : "1." + ((Convert.ToInt32(code) - 3) / 3 + 2) + ".2";
+                else if (code == "40") row.Level = "2";
+                else if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase))
+                        row.Level = "1.13." + (otherNumber + 2) + ".1";
+                    else if (code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
+                        row.Level = "1.13." + (otherNumber + 2) + ".2";
+                    else
+                    {
+                        otherNumber++;
+                        row.Level = "1.13." + (otherNumber + 2);
+                    }
+                }
             }
+            var index = 0;
+            foreach (var row in rows) row.Index = index++;
         }
 
         private static void RecalculateTradingSummary(List<ReportDataImportModel> rows)
         {
-            var sums = new[] { new[] { "04", "05", "06" }, new[] { "07", "08", "09" }, new[] { "10", "11", "12" }, new[] { "13", "14", "15" }, new[] { "16", "17", "18" }, new[] { "19", "20", "21" }, new[] { "22", "23", "24" }, new[] { "25", "26", "27" }, new[] { "28", "29", "30" }, new[] { "31", "32", "33" }, new[] { "34", "38", "39" } };
+            // Dynamic parents = BL + TT
+            var dynamicParents = rows.Where(r => {
+                var c = r.Code ?? "";
+                return c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
+            }).ToList();
+
+            foreach (var parent in dynamicParents)
+            {
+                var bl = rows.FirstOrDefault(r => string.Equals(r.Code, parent.Code + "_BL", StringComparison.OrdinalIgnoreCase));
+                var tt = rows.FirstOrDefault(r => string.Equals(r.Code, parent.Code + "_TT", StringComparison.OrdinalIgnoreCase));
+                parent.PerformInPeriod = (bl?.PerformInPeriod ?? 0) + (tt?.PerformInPeriod ?? 0);
+                parent.PerformPreviousPeriod = (bl?.PerformPreviousPeriod ?? 0) + (tt?.PerformPreviousPeriod ?? 0);
+                parent.AccumulatedBeginingOfYear = (bl?.AccumulatedBeginingOfYear ?? 0) + (tt?.AccumulatedBeginingOfYear ?? 0);
+            }
+
+            // Row 38 = sum of dynamic BL
+            var row38 = rows.FirstOrDefault(x => x.Code == "38");
+            var blRows = rows.Where(x => (x.Code ?? "").EndsWith("_BL", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (row38 != null)
+            {
+                row38.PerformInPeriod = blRows.Sum(x => x.PerformInPeriod ?? 0);
+                row38.PerformPreviousPeriod = blRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                row38.AccumulatedBeginingOfYear = blRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
+            }
+
+            // Row 39 = sum of dynamic TT
+            var row39 = rows.FirstOrDefault(x => x.Code == "39");
+            var ttRows = rows.Where(x => (x.Code ?? "").EndsWith("_TT", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (row39 != null)
+            {
+                row39.PerformInPeriod = ttRows.Sum(x => x.PerformInPeriod ?? 0);
+                row39.PerformPreviousPeriod = ttRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                row39.AccumulatedBeginingOfYear = ttRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
+            }
+
+            // Row 34 = 38 + 39
+            var row34 = rows.FirstOrDefault(x => x.Code == "34");
+            if (row34 != null)
+            {
+                row34.PerformInPeriod = (row38?.PerformInPeriod ?? 0) + (row39?.PerformInPeriod ?? 0);
+                row34.PerformPreviousPeriod = (row38?.PerformPreviousPeriod ?? 0) + (row39?.PerformPreviousPeriod ?? 0);
+                row34.AccumulatedBeginingOfYear = (row38?.AccumulatedBeginingOfYear ?? 0) + (row39?.AccumulatedBeginingOfYear ?? 0);
+            }
+
+            var sums = new[] {
+                new[] { "04", "05", "06" }, new[] { "07", "08", "09" }, new[] { "10", "11", "12" },
+                new[] { "13", "14", "15" }, new[] { "16", "17", "18" }, new[] { "19", "20", "21" },
+                new[] { "22", "23", "24" }, new[] { "25", "26", "27" }, new[] { "28", "29", "30" },
+                new[] { "31", "32", "33" }
+            };
             foreach (var sum in sums)
             {
                 var parent = rows.FirstOrDefault(x => x.Code == sum[0]);
@@ -2522,6 +2628,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 parent.PerformPreviousPeriod = (retail.PerformPreviousPeriod ?? 0) + (online.PerformPreviousPeriod ?? 0);
                 parent.AccumulatedBeginingOfYear = (retail.AccumulatedBeginingOfYear ?? 0) + (online.AccumulatedBeginingOfYear ?? 0);
             }
+
             var totalRetail = rows.FirstOrDefault(x => x.Code == "02");
             var totalOnline = rows.FirstOrDefault(x => x.Code == "03");
             var retailRows = rows.Where(x => new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(x.Code)).ToList();
@@ -3133,11 +3240,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 RecalculateTradingSummaryInDataTable(dartaFormReport);
                 var rows = dartaFormReport.AsEnumerable().ToList();
-                var index = 0;
                 var child = 0;
                 foreach (var row in rows)
                 {
-                    var code = Convert.ToString(row["Code"]);
+                    var code = Convert.ToString(row["Code"]) ?? "";
                     if (code == "01") row["Level"] = "1";
                     else if (code == "02") row["Level"] = "1.1";
                     else if (code == "03") row["Level"] = "1.2";
@@ -3145,9 +3251,25 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(code)) row["Level"] = code == "38" ? "1.13.1" : "1." + ((Convert.ToInt32(code) - 2) / 3 + 2) + ".1";
                     else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" }.Contains(code)) row["Level"] = code == "39" ? "1.13.2" : "1." + ((Convert.ToInt32(code) - 3) / 3 + 2) + ".2";
                     else if (code == "40") row["Level"] = "2";
-                    else if ((code ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase)) row["Level"] = "1.13." + (++child + 2);
-                    row["Index"] = index++;
+                    else if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase))
+                            row["Level"] = "1.13." + (child + 2) + ".1";
+                        else if (code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
+                            row["Level"] = "1.13." + (child + 2) + ".2";
+                        else
+                        {
+                            child++;
+                            row["Level"] = "1.13." + (child + 2);
+                        }
+                    }
                 }
+
+                var orderedRows = dartaFormReport.AsEnumerable()
+                    .OrderBy(row => GetBusinessProductSortKey(Convert.ToString(row["Level"])))
+                    .ToList();
+                for (var rowIndex = 0; rowIndex < orderedRows.Count; rowIndex++)
+                    orderedRows[rowIndex]["Index"] = rowIndex;
             }
             else if (isImportExportReport)
             {
@@ -3319,22 +3441,84 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             if (table == null) return;
             var rows = table.AsEnumerable().ToList();
-            Func<DataRow, string, double> value = (row, field) => row[field] == DBNull.Value ? 0 : Convert.ToDouble(row[field]);
-            Action<DataRow, DataRow, DataRow> setSum = (parent, retail, online) => { if (parent == null || retail == null || online == null) return; foreach (var field in new[] { "PerformInPeriod", "PerformPreviousPeriod", "AccumulatedBeginingOfYear" }) parent[field] = value(retail, field) + value(online, field); };
-            foreach (var codes in new[] { new[] { "04", "05", "06" }, new[] { "07", "08", "09" }, new[] { "10", "11", "12" }, new[] { "13", "14", "15" }, new[] { "16", "17", "18" }, new[] { "19", "20", "21" }, new[] { "22", "23", "24" }, new[] { "25", "26", "27" }, new[] { "28", "29", "30" }, new[] { "31", "32", "33" }, new[] { "34", "38", "39" } }) setSum(rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[0]), rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[1]), rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[2]));
+            Func<DataRow, string, double> value = (row, field) => (row == null || row[field] == DBNull.Value) ? 0 : Convert.ToDouble(row[field]);
+            var fields = new[] { "PerformInPeriod", "PerformPreviousPeriod", "AccumulatedBeginingOfYear" };
+
+            // Dynamic products: parent = BL + TT
+            var dynamicParents = rows.Where(r => {
+                var c = Convert.ToString(r["Code"]) ?? "";
+                return c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
+            }).ToList();
+
+            foreach (var parent in dynamicParents)
+            {
+                var c = Convert.ToString(parent["Code"]);
+                var bl = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), c + "_BL", StringComparison.OrdinalIgnoreCase));
+                var tt = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), c + "_TT", StringComparison.OrdinalIgnoreCase));
+                foreach (var f in fields)
+                {
+                    parent[f] = value(bl, f) + value(tt, f);
+                }
+            }
+
+            // Row 38 = sum of dynamic BL sub-rows
+            var row38 = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "38");
+            var blRows = rows.Where(x => (Convert.ToString(x["Code"]) ?? "").EndsWith("_BL", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (row38 != null)
+            {
+                foreach (var f in fields) row38[f] = blRows.Sum(x => value(x, f));
+            }
+
+            // Row 39 = sum of dynamic TT sub-rows
+            var row39 = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "39");
+            var ttRows = rows.Where(x => (Convert.ToString(x["Code"]) ?? "").EndsWith("_TT", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (row39 != null)
+            {
+                foreach (var f in fields) row39[f] = ttRows.Sum(x => value(x, f));
+            }
+
+            // Row 34 = 38 + 39
+            var row34 = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "34");
+            if (row34 != null)
+            {
+                foreach (var f in fields) row34[f] = value(row38, f) + value(row39, f);
+            }
+
+            // Groups 1 to 10
+            Action<DataRow, DataRow, DataRow> setSum = (parent, retail, online) => {
+                if (parent == null || retail == null || online == null) return;
+                foreach (var f in fields) parent[f] = value(retail, f) + value(online, f);
+            };
+            foreach (var codes in new[] {
+                new[] { "04", "05", "06" }, new[] { "07", "08", "09" }, new[] { "10", "11", "12" },
+                new[] { "13", "14", "15" }, new[] { "16", "17", "18" }, new[] { "19", "20", "21" },
+                new[] { "22", "23", "24" }, new[] { "25", "26", "27" }, new[] { "28", "29", "30" },
+                new[] { "31", "32", "33" }
+            })
+            {
+                setSum(rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[0]),
+                       rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[1]),
+                       rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[2]));
+            }
+
             var retailCodes = new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" };
             var onlineCodes = new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" };
             var retailTotal = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "02");
             var onlineTotal = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "03");
-            foreach (var field in new[] { "PerformInPeriod", "PerformPreviousPeriod", "AccumulatedBeginingOfYear" }) { if (retailTotal != null) retailTotal[field] = rows.Where(x => retailCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, field)); if (onlineTotal != null) onlineTotal[field] = rows.Where(x => onlineCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, field)); }
+            foreach (var f in fields)
+            {
+                if (retailTotal != null) retailTotal[f] = rows.Where(x => retailCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, f));
+                if (onlineTotal != null) onlineTotal[f] = rows.Where(x => onlineCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, f));
+            }
+
             var total = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "01");
             var mainGroupCodes = new[] { "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" };
             var mainGroupRows = rows.Where(x => mainGroupCodes.Contains(Convert.ToString(x["Code"]))).ToList();
             if (total != null)
             {
-                foreach (var field in new[] { "PerformInPeriod", "PerformPreviousPeriod", "AccumulatedBeginingOfYear" })
+                foreach (var f in fields)
                 {
-                    total[field] = mainGroupRows.Sum(x => value(x, field));
+                    total[f] = mainGroupRows.Sum(x => value(x, f));
                 }
             }
         }
@@ -3454,23 +3638,26 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             if (table == null) return true;
 
             var rows = table.AsEnumerable().ToList();
-            var dynamicRows = rows.Where(x => (Convert.ToString(x["Code"]) ?? string.Empty).StartsWith("TM_", StringComparison.OrdinalIgnoreCase)).ToList();
-            if (!dynamicRows.Any()) return true;
+            var dynamicParents = rows.Where(x => {
+                var c = Convert.ToString(x["Code"]) ?? string.Empty;
+                return c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
+            }).ToList();
+            if (!dynamicParents.Any()) return true;
 
-            if (dynamicRows.Any(x => string.IsNullOrWhiteSpace(Convert.ToString(x["Targets"]))))
+            if (dynamicParents.Any(x => string.IsNullOrWhiteSpace(Convert.ToString(x["Targets"]))))
             {
                 errorMessage = "Vui lòng nhập tên cho tất cả các mặt hàng đã thêm ở mục '11. Hàng hóa khác'.";
                 return false;
             }
 
-            Func<DataRow, string, double> value = (row, field) => row[field] == DBNull.Value ? 0 : Convert.ToDouble(row[field]);
+            Func<DataRow, string, double> value = (row, field) => (row == null || row[field] == DBNull.Value) ? 0 : Convert.ToDouble(row[field]);
             var otherGoodsRow = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "34");
             if (otherGoodsRow == null) return true;
 
             double total34Prev = value(otherGoodsRow, "PerformPreviousPeriod");
             double total34Curr = value(otherGoodsRow, "PerformInPeriod");
-            double sumDynPrev = dynamicRows.Sum(x => value(x, "PerformPreviousPeriod"));
-            double sumDynCurr = dynamicRows.Sum(x => value(x, "PerformInPeriod"));
+            double sumDynPrev = dynamicParents.Sum(x => value(x, "PerformPreviousPeriod"));
+            double sumDynCurr = dynamicParents.Sum(x => value(x, "PerformInPeriod"));
 
             if (Math.Abs(sumDynPrev - total34Prev) > 0.01)
             {
@@ -3498,20 +3685,39 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             if (!dynamicRows.Any()) return;
 
             var knownCodes = (_importCache.GetViaEnterpriseOnMonth(enterpriseId, null) ?? new List<ReportDataImportModel>())
-                .Where(x => !string.IsNullOrWhiteSpace(x.Targets) && !string.IsNullOrWhiteSpace(x.Code) && x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
+                .Where(x => !string.IsNullOrWhiteSpace(x.Targets) && !string.IsNullOrWhiteSpace(x.Code) && x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !x.Code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !x.Code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
                 .GroupBy(x => x.Targets.Trim(), StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.First().Code, StringComparer.OrdinalIgnoreCase);
-            foreach (var row in dynamicRows)
-            {
-                var target = (Convert.ToString(row["Targets"]) ?? string.Empty).Trim();
-                if (string.IsNullOrWhiteSpace(target)) continue;
-                string code;
-                if (!knownCodes.TryGetValue(target, out code))
+
+            var groups = dynamicRows
+                .Select(r => Convert.ToString(r["Code"]))
+                .Select(c =>
                 {
-                    code = "TM_" + Guid.NewGuid().ToString("N").Substring(0, 12).ToUpperInvariant();
-                    knownCodes[target] = code;
+                    var raw = c.Substring("TM_NEW_".Length);
+                    var idx = raw.IndexOf('_');
+                    return idx > 0 ? raw.Substring(0, idx) : raw;
+                })
+                .Distinct()
+                .ToList();
+
+            foreach (var grp in groups)
+            {
+                var parentRow = dynamicRows.FirstOrDefault(r => Convert.ToString(r["Code"]).Equals("TM_NEW_" + grp, StringComparison.OrdinalIgnoreCase));
+                var target = parentRow != null ? (Convert.ToString(parentRow["Targets"]) ?? string.Empty).Trim() : string.Empty;
+                if (string.IsNullOrWhiteSpace(target)) continue;
+
+                string baseCode;
+                if (!knownCodes.TryGetValue(target, out baseCode))
+                {
+                    baseCode = "TM_" + Guid.NewGuid().ToString("N").Substring(0, 12).ToUpperInvariant();
+                    knownCodes[target] = baseCode;
                 }
-                row["Code"] = code;
+
+                if (parentRow != null) parentRow["Code"] = baseCode;
+                var blRow = dynamicRows.FirstOrDefault(r => Convert.ToString(r["Code"]).Equals("TM_NEW_" + grp + "_BL", StringComparison.OrdinalIgnoreCase));
+                if (blRow != null) blRow["Code"] = baseCode + "_BL";
+                var ttRow = dynamicRows.FirstOrDefault(r => Convert.ToString(r["Code"]).Equals("TM_NEW_" + grp + "_TT", StringComparison.OrdinalIgnoreCase));
+                if (ttRow != null) ttRow["Code"] = baseCode + "_TT";
             }
         }
 
