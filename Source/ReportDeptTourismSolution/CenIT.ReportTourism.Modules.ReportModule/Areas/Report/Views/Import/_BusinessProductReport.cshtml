@@ -588,13 +588,6 @@
                 }, minimumInputLength: 0
             });
         }
-        $.get("/Report/Import/SearchUnconfiguredBusinessProducts", { enterpriseId: enterpriseId, prefix: prefix, page: 1 }, function (data) {
-            if (!data || !data.results || !data.results.length) return;
-            var first = data.results[0];
-            select.append(new Option(first.text, first.id, true, true));
-            applyProduct(first);
-            select.trigger("change");
-        });
         recalculateTradeSummary(prefix);
     }
 
@@ -638,9 +631,38 @@
 
             var $addButton = $(".trade-add-row[data-prefix='" + prefix + "'] .AddTradeProduct").last();
             if ($addButton.length) {
-                AddTradeProduct($addButton[0], prefix);
-                var $newRow = $addButton.closest("tr").prev("tr.business-product-custom");
-                $newRow.find("select.TradeProductSelect").val(product.code).trigger("change");
+                var $targetRow = $addButton.closest("tr").prev("tr.business-product-custom").filter(function () {
+                    return !$(this).find("input[name^='Code_']").val();
+                });
+
+                if (!$targetRow.length) {
+                    AddTradeProduct($addButton[0], prefix);
+                    $targetRow = $addButton.closest("tr").prev("tr.business-product-custom");
+                }
+
+                if ($targetRow.length) {
+                    var $sel = $targetRow.find("select.TradeProductSelect");
+                    var optText = product.name + (product.unit ? " (" + product.unit + ")" : "") + " (" + product.code + ")";
+                    var newOption = new Option(optText, product.code, true, true);
+                    $(newOption).attr("data-name", product.name)
+                                .attr("data-unit", product.unit || "")
+                                .attr("data-code", product.code);
+                    $sel.append(newOption);
+
+                    $sel.trigger({
+                        type: "select2:select",
+                        params: {
+                            data: {
+                                id: product.code,
+                                name: product.name,
+                                unit: product.unit || "",
+                                code: product.code,
+                                text: optText
+                            }
+                        }
+                    });
+                    $sel.trigger("change");
+                }
             }
             $("#TradeCatalogProductModal").modal("hide");
         }).fail(function () {

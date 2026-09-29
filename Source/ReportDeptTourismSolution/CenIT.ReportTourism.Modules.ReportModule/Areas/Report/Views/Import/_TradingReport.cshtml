@@ -46,25 +46,155 @@
     </table>
 </div></div>
 <script type="text/javascript">
-    function ValidForm() { return true; }
+    function parseNumberTrading(v) { return parseFloat((v || "").toString().replace(/\./g, "").replace(",", ".")) || 0; }
+    function formatNumberTrading(v) { return Number(v || 0).toLocaleString("vi-VN", { maximumFractionDigits: 2 }); }
+
+    function ValidForm() {
+        var dynamicRows = $("#TradingDataReport .trading-dynamic");
+        if (dynamicRows.length > 0) {
+            var hasEmptyName = false;
+            dynamicRows.each(function () {
+                var $nameInput = $(this).find(".TradingProductName");
+                if (!$.trim($nameInput.val())) {
+                    hasEmptyName = true;
+                    $nameInput.addClass("report-invalid");
+                } else {
+                    $nameInput.removeClass("report-invalid");
+                }
+            });
+            if (hasEmptyName) {
+                alert("Vui lòng nhập tên cho tất cả các mặt hàng đã thêm ở mục '11. Hàng hóa khác'.");
+                return false;
+            }
+
+            var sumDynPrev = 0, sumDynCurr = 0;
+            dynamicRows.each(function () {
+                sumDynPrev += parseNumberTrading($(this).find(".trading-previous").val());
+                sumDynCurr += parseNumberTrading($(this).find(".trading-current").val());
+            });
+            var total34Prev = parseNumberTrading($("#TradingDataReport tr[data-code='34']").find(".trading-previous").val());
+            var total34Curr = parseNumberTrading($("#TradingDataReport tr[data-code='34']").find(".trading-current").val());
+
+            if (Math.abs(sumDynPrev - total34Prev) > 0.01) {
+                alert("Ràng buộc: Tổng Thực hiện tháng trước của các mặt hàng thêm (" + formatNumberTrading(sumDynPrev) + ") phải bằng tổng Bán lẻ + Nền tảng trực tuyến của Hàng hóa khác (" + formatNumberTrading(total34Prev) + ").");
+                return false;
+            }
+
+            if (Math.abs(sumDynCurr - total34Curr) > 0.01) {
+                alert("Ràng buộc: Tổng Ước thực hiện tháng báo cáo của các mặt hàng thêm (" + formatNumberTrading(sumDynCurr) + ") phải bằng tổng Bán lẻ + Nền tảng trực tuyến của Hàng hóa khác (" + formatNumberTrading(total34Curr) + ").");
+                return false;
+            }
+        }
+        return true;
+    }
+
     (function () {
         var calculated = ["01","02","03","04","07","10","13","16","19","22","25","28","31","34"];
         var retailCodes = ["05","08","11","14","17","20","23","26","29","32","38"], onlineCodes = ["06","09","12","15","18","21","24","27","30","33","39"];
         var groups = [["04","05","06"],["07","08","09"],["10","11","12"],["13","14","15"],["16","17","18"],["19","20","21"],["22","23","24"],["25","26","27"],["28","29","30"],["31","32","33"],["34","38","39"]];
-        function parseNumber(v) { return parseFloat((v || "").toString().replace(/\./g, "").replace(",", ".")) || 0; }
-        function formatNumber(v) { return Number(v || 0).toLocaleString("vi-VN", { maximumFractionDigits: 2 }); }
+        var mainGroupCodes = ["04","07","10","13","16","19","22","25","28","31","34"];
+        function parseNumber(v) { return parseNumberTrading(v); }
+        function formatNumber(v) { return formatNumberTrading(v); }
         function val(code, cls) { return parseNumber($("#TradingDataReport tr[data-code='" + code + "']").find(cls).val()); }
         function set(code, cls, value) { $("#TradingDataReport tr[data-code='" + code + "']").find(cls).val(formatNumber(value)); }
         function sum(codes, cls) { var total = 0; $.each(codes, function (_, code) { total += val(code, cls); }); return total; }
-        function recalculateTrading() {
-            $.each(groups, function (_, g) { $.each([".trading-previous", ".trading-current"], function (_, cls) { set(g[0], cls, val(g[1], cls) + val(g[2], cls)); }); });
+
+        function checkDynamicConstraint() {
             var dynamicRows = $("#TradingDataReport .trading-dynamic");
-            $.each([".trading-previous", ".trading-current"], function (_, cls) { var total = 0; dynamicRows.each(function () { total += parseNumber($(this).find(cls).val()); }); set("34", cls, total); });
-            $.each([".trading-previous", ".trading-current"], function (_, cls) { set("02", cls, sum(retailCodes, cls)); set("03", cls, sum(onlineCodes, cls)); set("01", cls, val("02", cls) + val("03", cls)); });
+            var $msg = $("#TradingDynamicWarning");
+            if (!$msg.length) {
+                $msg = $("<div id='TradingDynamicWarning' class='text-danger' style='margin-top: 6px; font-weight: 600; display: none;'></div>");
+                $("#TradingAddRow td").append($msg);
+            }
+
+            if (dynamicRows.length === 0) {
+                $msg.hide().empty();
+                dynamicRows.find(".trading-previous, .trading-current").removeClass("report-invalid");
+                return true;
+            }
+
+            var sumDynPrev = 0, sumDynCurr = 0;
+            dynamicRows.each(function () {
+                sumDynPrev += parseNumber($(this).find(".trading-previous").val());
+                sumDynCurr += parseNumber($(this).find(".trading-current").val());
+            });
+            var total34Prev = val("34", ".trading-previous");
+            var total34Curr = val("34", ".trading-current");
+
+            var isPrevDiff = Math.abs(sumDynPrev - total34Prev) > 0.01;
+            var isCurrDiff = Math.abs(sumDynCurr - total34Curr) > 0.01;
+
+            if (isPrevDiff || isCurrDiff) {
+                var errors = [];
+                if (isPrevDiff) {
+                    errors.push("Thực hiện tháng trước: tổng mặt hàng thêm (" + formatNumber(sumDynPrev) + ") ≠ Bán lẻ + Trực tuyến (" + formatNumber(total34Prev) + ")");
+                    dynamicRows.find(".trading-previous").addClass("report-invalid");
+                } else {
+                    dynamicRows.find(".trading-previous").removeClass("report-invalid");
+                }
+
+                if (isCurrDiff) {
+                    errors.push("Ước thực hiện tháng báo cáo: tổng mặt hàng thêm (" + formatNumber(sumDynCurr) + ") ≠ Bán lẻ + Trực tuyến (" + formatNumber(total34Curr) + ")");
+                    dynamicRows.find(".trading-current").addClass("report-invalid");
+                } else {
+                    dynamicRows.find(".trading-current").removeClass("report-invalid");
+                }
+
+                $msg.html("<i class='fa fa-exclamation-triangle'></i> Ràng buộc: " + errors.join("<br/>&nbsp;&nbsp;&nbsp;&nbsp;")).show();
+                return false;
+            } else {
+                dynamicRows.find(".trading-previous, .trading-current").removeClass("report-invalid");
+                $msg.hide().empty();
+                return true;
+            }
+        }
+
+        function recalculateTrading() {
+            $.each(groups, function (_, g) {
+                $.each([".trading-previous", ".trading-current"], function (_, cls) {
+                    set(g[0], cls, val(g[1], cls) + val(g[2], cls));
+                });
+            });
+            $.each([".trading-previous", ".trading-current"], function (_, cls) {
+                set("02", cls, sum(retailCodes, cls));
+                set("03", cls, sum(onlineCodes, cls));
+                set("01", cls, sum(mainGroupCodes, cls));
+            });
+            checkDynamicConstraint();
         }
         function syncProductName($row) { var index=$row.find("input[name^='Code_']").attr("name").replace("Code_", ""), name=$.trim($row.find(".TradingProductName").val() || ""); $row.find("input[name='Target_" + index + "']").val(name); }
-        $(document).off("input.trading", ".trading-previous, .trading-current").on("input.trading", ".trading-previous, .trading-current", recalculateTrading);
-        $(document).off("input.tradingName", ".TradingProductName").on("input.tradingName", ".TradingProductName", function () { syncProductName($(this).closest("tr")); });
+        $(document).off("input.trading", "#TradingDataReport .trading-previous, #TradingDataReport .trading-current").on("input.trading", "#TradingDataReport .trading-previous, #TradingDataReport .trading-current", recalculateTrading);
+        $(document).off("input.tradingName", "#TradingDataReport .TradingProductName").on("input.tradingName", "#TradingDataReport .TradingProductName", function () {
+            $(this).removeClass("report-invalid");
+            syncProductName($(this).closest("tr"));
+        });
+        $(document).off("input.tradingNumSep", "#TradingDataReport .number-separator").on("input.tradingNumSep", "#TradingDataReport .number-separator", function () {
+            if ($(this).prop("readonly")) return;
+            var cursor = this.selectionStart;
+            var original = this.value;
+            var numCharsBefore = original.substring(0, cursor).replace(/[^\d,]/g, "").length;
+
+            var raw = original.replace(/[^0-9,]/g, "");
+            var commaParts = raw.split(",");
+            var intPart = commaParts[0] ? commaParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "";
+            var decPart = commaParts.length > 1 ? "," + commaParts.slice(1).join("").substring(0, 2) : "";
+            var formatted = intPart + decPart;
+            this.value = formatted;
+
+            var newPos = 0, counted = 0;
+            while (newPos < formatted.length && counted < numCharsBefore) {
+                if (/[\d,]/.test(formatted[newPos])) counted++;
+                newPos++;
+            }
+            this.setSelectionRange(newPos, newPos);
+
+            recalculateTrading();
+        });
+        $(document).off("blur.tradingNumSep", "#TradingDataReport .number-separator").on("blur.tradingNumSep", "#TradingDataReport .number-separator", function () {
+            if (this.value && this.value.endsWith(",")) {
+                this.value = this.value.slice(0, -1);
+            }
+        });
         $(document).off("click.trading", "#AddTradingProduct").on("click.trading", "#AddTradingProduct", function () {
             var index=$("#TradingDataReport input[name^='Target_']").length + 1, code="TM_NEW_" + index;
             var html="<tr class='trading-row trading-dynamic' data-code='"+code+"' data-base='0'><td class='text-left'><input type='hidden' name='Target_"+index+"'><input type='hidden' name='Unit_"+index+"' value='Triệu đồng'><input type='hidden' name='Index_"+index+"'><input type='hidden' name='Level_"+index+"'><input type='hidden' name='Code_"+index+"' value='"+code+"'><div class='trading-product-picker'><input type='text' class='form-control TradingProductName' placeholder='Nhập tên mặt hàng'><a class='trading-remove' title='Xóa mặt hàng'><i class='fa fa-trash'></i></a></div></td><td class='text-center'></td><td><input type='text' name='PerformPreviousPeriod_"+index+"' class='form-control text-right number-separator trading-previous'></td><td><input type='text' name='PerformInPeriod_"+index+"' class='form-control text-right number-separator trading-current'></td></tr>";

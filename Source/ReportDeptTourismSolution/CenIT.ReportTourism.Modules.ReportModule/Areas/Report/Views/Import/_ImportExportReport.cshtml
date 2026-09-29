@@ -10,6 +10,7 @@
     int prevYear = currentMonth == 1 ? forMonth.Year - 1 : forMonth.Year;
 
     var rowNumber = 1;
+    bool isEdit = ViewBag.IsEdit is bool && (bool)ViewBag.IsEdit;
 }
 
 @functions {
@@ -173,13 +174,23 @@
                             @Html.Hidden("Index_" + rowNumber, cRow.Index.HasValue ? cRow.Index.Value : rowNumber - 1)
                             @Html.Hidden("Level_" + rowNumber, cRow.Level ?? "1.1")
                             @Html.Hidden("Code_" + rowNumber, cRow.Code)
-                            <div class="ie-picker-container">
-                                <span style="font-weight: bold;">-</span>
-                                <div class="ie-select-wrapper">
-                                    <select class="form-control ie-country-select" style="width: 100%;"><option value="@natCode" data-name="@natName" selected="selected">@natName</option></select>
+                            @if (isEdit)
+                            {
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding-left: 10px;">
+                                    <span style="font-weight: 500;">- @natName</span>
+                                    <a href="javascript:void(0)" class="text-danger btn-remove-ie-row" title="Xóa" style="flex-shrink: 0;"><i class="fa fa-trash"></i></a>
                                 </div>
-                                <a href="javascript:void(0)" class="text-danger btn-remove-ie-row" title="Xóa"><i class="fa fa-trash"></i></a>
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="ie-picker-container">
+                                    <span style="font-weight: bold;">-</span>
+                                    <div class="ie-select-wrapper">
+                                        <select class="form-control ie-country-select" style="width: 100%;"><option value="@natCode" data-name="@natName" selected="selected">@natName</option></select>
+                                    </div>
+                                    <a href="javascript:void(0)" class="text-danger btn-remove-ie-row" title="Xóa"><i class="fa fa-trash"></i></a>
+                                </div>
+                            }
                         </td>
                         <td><input type="text" name="PerformPreviousPeriod_@rowNumber" value="@FormatNumber(cRow.PerformPreviousPeriod)" class="form-control text-right number-separator ie-val ie-prev-qty" placeholder="0" autocomplete="off" inputmode="decimal" /></td>
                         <td><input type="text" name="CompareSamePeriodLastYear_@rowNumber" value="@FormatNumber(cRow.ComparedSamePeriodLastYear)" class="form-control text-right number-separator ie-val ie-prev-val" placeholder="0" autocomplete="off" inputmode="decimal" /></td>
@@ -217,22 +228,33 @@
                     var parts = rawTarget.Split(new[] { " / " }, StringSplitOptions.None);
                     var prodName = parts.Length > 0 ? parts[0].Trim() : "";
                     var cntryName = parts.Length > 1 ? parts[1].Trim() : "";
+                    var displayText = string.IsNullOrEmpty(cntryName) ? prodName : (prodName + " / " + cntryName);
                     <tr class="ie-row ie-country-product-row" data-group="XK_MH">
                         <td class="text-left">
-                            @Html.Hidden("Target_" + rowNumber, pcRow.Targets)
+                            @Html.Hidden("Target_" + rowNumber, "- " + displayText)
                             @Html.Hidden("Unit_" + rowNumber, "USD")
                             @Html.Hidden("Index_" + rowNumber, pcRow.Index.HasValue ? pcRow.Index.Value : rowNumber - 1)
                             @Html.Hidden("Level_" + rowNumber, pcRow.Level ?? "1.2")
                             @Html.Hidden("Code_" + rowNumber, pcRow.Code)
-                            <div class="ie-picker-container">
-                                <span style="font-weight: bold;">-</span>
-                                <select class="form-control ie-product-select" style="width:45%;"><option value="@prodName" selected="selected">@prodName</option></select>
-                                <span>/</span>
-                                <div class="ie-select-wrapper">
-                                    <select class="form-control ie-country-select" style="width: 100%;"><option value="" data-name="@cntryName" selected="selected">@cntryName</option></select>
+                            @if (isEdit)
+                            {
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding-left: 10px;">
+                                    <span style="font-weight: 500;">- @displayText</span>
+                                    <a href="javascript:void(0)" class="text-danger btn-remove-ie-row" title="Xóa" style="flex-shrink: 0;"><i class="fa fa-trash"></i></a>
                                 </div>
-                                <a href="javascript:void(0)" class="text-danger btn-remove-ie-row" title="Xóa"><i class="fa fa-trash"></i></a>
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="ie-picker-container">
+                                    <span style="font-weight: bold;">-</span>
+                                    <select class="form-control ie-product-select" style="width:45%;"><option value="@prodName" selected="selected">@prodName</option></select>
+                                    <span>/</span>
+                                    <div class="ie-select-wrapper">
+                                        <select class="form-control ie-country-select" style="width: 100%;"><option value="@cntryName" data-name="@cntryName" selected="selected">@cntryName</option></select>
+                                    </div>
+                                    <a href="javascript:void(0)" class="text-danger btn-remove-ie-row" title="Xóa"><i class="fa fa-trash"></i></a>
+                                </div>
+                            }
                         </td>
                         <td><input type="text" name="PerformPreviousPeriod_@rowNumber" value="@FormatNumber(pcRow.PerformPreviousPeriod)" class="form-control text-right number-separator ie-val" placeholder="0" autocomplete="off" inputmode="decimal" /></td>
                         <td><input type="text" name="CompareSamePeriodLastYear_@rowNumber" value="@FormatNumber(pcRow.ComparedSamePeriodLastYear)" class="form-control text-right number-separator ie-val" placeholder="0" autocomplete="off" inputmode="decimal" /></td>
@@ -333,9 +355,9 @@
     }
 
     function recalculateImportExport() {
-        // 1. Calculate Section I ("I.Tổng trị giá xuất khẩu trực tiếp" = tổng số liệu của các quốc gia)
+        // 1. Calculate Section I ("I.Tổng trị giá xuất khẩu trực tiếp" = tổng Chia theo nước cuối cùng hàng đến + Mặt hàng xuất khẩu trực tiếp chia theo nước cuối cùng hàng đến)
         var sumI_prevQty = 0, sumI_prevVal = 0, sumI_currQty = 0, sumI_currVal = 0;
-        $("#ImportExportDataReport tr[data-group='XK_QG']").each(function () {
+        $("#ImportExportDataReport tr[data-group='XK_QG'], #ImportExportDataReport tr[data-group='XK_MH']").each(function () {
             sumI_prevQty += parseFormattedNumberIE($(this).find("input[name^='PerformPreviousPeriod_']").val());
             sumI_prevVal += parseFormattedNumberIE($(this).find("input[name^='CompareSamePeriodLastYear_']").val());
             sumI_currQty += parseFormattedNumberIE($(this).find("input[name^='PerformInPeriod_']").val());
@@ -417,10 +439,23 @@
     });
 
     // Modal scroll fix for Select2
+    // Modal scroll fix for Select2
     if ($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.prototype.enforceFocus) {
         $.fn.modal.Constructor.prototype.enforceFocus = function () {};
     }
     $(document).off("focusin.bs.modal");
+
+    $(document).off("click.s2forceOpenIE", "#ImportExportDataReport .select2-container").on("click.s2forceOpenIE", "#ImportExportDataReport .select2-container", function (e) {
+        var $sel = $(this).prev("select.ie-country-select, select.ie-product-select");
+        if (!$sel.length) {
+            $sel = $(this).siblings("select.ie-country-select, select.ie-product-select");
+        }
+        if ($sel.length && $sel.data("select2")) {
+            if (!$sel.data("select2").isOpen()) {
+                $sel.select2("open");
+            }
+        }
+    });
 
     $(document).off("select2:open.fixModalScrollIE").on("select2:open.fixModalScrollIE", function (e) {
         var s2 = $(e.target).data("select2");
@@ -430,11 +465,17 @@
             $(".modal").off("scroll.select2." + id).off("scroll.select2");
             $(window).off("scroll.select2." + id).off("scroll.select2");
             $(document).off("focusin.bs.modal");
-        }, 0);
+
+            // Kích hoạt nạp dữ liệu ngay khi mở dropdown nếu chưa có từ khóa
+            var $search = $(".select2-container--open .select2-search__field");
+            if ($search.length && !$search.val()) {
+                $search.trigger("input");
+            }
+        }, 50);
     });
 
     $(document).off("scroll.closeS2IE", ".modal").on("scroll.closeS2IE", ".modal", function () {
-        $("#ImportExportDataReport select.ie-country-select").each(function () {
+        $("#ImportExportDataReport select.ie-country-select, #ImportExportDataReport select.ie-product-select").each(function () {
             var s2 = $(this).data("select2");
             if (s2 && s2.isOpen()) {
                 $(this).select2("close");
@@ -482,7 +523,7 @@
         var numCountryRows = $("#ImportExportDataReport tr[data-group='XK_QG']").length;
         var level = "1.1." + (numCountryRows + 1);
 
-        var $select = $("<select></select>")
+        var $select = $("<select><option value=''></option></select>")
             .attr("id", "CountrySelect_" + index)
             .addClass("form-control ie-country-select");
 
@@ -543,11 +584,11 @@
         var numMhRows = $("#ImportExportDataReport tr[data-group='XK_MH']").length;
         var level = "1.2." + (numMhRows + 1);
 
-        var $select = $("<select></select>")
+        var $select = $("<select><option value=''></option></select>")
             .attr("id", "CountrySelect_" + index)
             .addClass("form-control ie-country-select");
 
-        var $prodInput = $("<select></select>").addClass("form-control ie-product-select").css("width", "45%");
+        var $prodInput = $("<select><option value=''></option></select>").addClass("form-control ie-product-select").css("width", "45%");
 
         var $target = $("<input />", { id: "Target_" + index, name: "Target_" + index, type: "hidden" });
         var $unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden", value: "USD" });
