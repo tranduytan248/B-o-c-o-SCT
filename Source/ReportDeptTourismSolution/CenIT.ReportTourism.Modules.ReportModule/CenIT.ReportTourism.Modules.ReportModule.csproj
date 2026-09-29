@@ -257,7 +257,6 @@
     <Content Include="Areas\Report\Views\Dashboard\Analysis.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\Warnings.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\Progress.cshtml" />
-    <Content Include="Areas\Report\Views\Dashboard\Quality.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardFilters.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardNavigation.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_EnterpriseMovement.cshtml" />

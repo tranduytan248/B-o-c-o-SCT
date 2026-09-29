@@ -3,257 +3,268 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using CenIT.ReportTourism.Biz.Cate;
+using CenIT.ReportTourism.Models.Cate;
 using CenIT.ReportTourism.Models.Report;
 
 namespace CenIT.ReportTourism.Biz.Report
 {
     public class ReportDashboardBiz
     {
-        // One source of truth for industrial-revenue warning thresholds.
-        private const decimal Warning10 = 10m;
-        private const decimal Warning20 = 20m;
-        private const decimal Warning30 = 30m;
         private const string SnapshotProcedure = "Report_Dashboard_IndustrialSnapshot";
+        private const string SummaryProcedure = "Report_Dashboard_OverviewSummary";
         private static readonly CultureInfo Vietnamese = CultureInfo.GetCultureInfo("vi-VN");
         private readonly ReportBiz _reports = new ReportBiz();
+
+        private static readonly Dictionary<int, DashboardMetric[]> MetricSets = new Dictionary<int, DashboardMetric[]>
+        {
+            { 1, new[] {
+                new DashboardMetric { Key = "primary", Code = "0101", Label = "Doanh thu công nghiệp", Unit = "Tỷ đồng" },
+                new DashboardMetric { Key = "secondary", Code = "06", Label = "Kim ngạch xuất khẩu", Unit = "1.000 USD" },
+                new DashboardMetric { Key = "tertiary", Code = "07", Label = "Kim ngạch nhập khẩu", Unit = "1.000 USD" } } },
+            { 2, new[] {
+                new DashboardMetric { Key = "primary", Code = "01", Label = "Doanh thu bán buôn, bán lẻ", Unit = "Triệu đồng" },
+                new DashboardMetric { Key = "secondary", Code = "40", Label = "Doanh thu sửa chữa xe", Unit = "Triệu đồng" },
+                new DashboardMetric { Key = "tertiary", Code = "02", Label = "Trong đó: bán lẻ", Unit = "Triệu đồng" } } },
+            { 3, new[] {
+                new DashboardMetric { Key = "primary", Code = "FOB", Label = "Tổng trị giá xuất khẩu FOB", Unit = "USD" },
+                new DashboardMetric { Key = "secondary", Code = "XK_TT", Label = "Xuất khẩu trực tiếp", Unit = "USD" },
+                new DashboardMetric { Key = "tertiary", Code = "UT_XK", Label = "Xuất khẩu ủy thác", Unit = "USD" } } }
+        };
+
+        public static string TypeName(int type)
+        {
+            return type == 2 ? "Thương mại, dịch vụ" : type == 3 ? "Xuất nhập khẩu" : "Sản xuất, kinh doanh";
+        }
 
         public DashboardModel GetDashboard(DashboardFilters filters)
         {
             filters = Normalize(filters);
-            var rows = GetRows(filters);
-            var current = At(rows, filters.Year, filters.Month).ToList();
-            var submission = Submission(current);
-            var trend = IndicatorTrend(rows, filters);
-            var filterOptions = BuildFilterOptions(rows, filters, "Index", false);
-            var industrial = Kpi(rows, filters, "industrial", "Doanh thu công nghiệp", "Tỷ đồng", "blue");
-            var exports = Kpi(rows, filters, "export", "Xuất khẩu", "1.000 USD", "green");
-            var imports = Kpi(rows, filters, "import", "Nhập khẩu", "1.000 USD", "amber");
-            var impacts = Comparable(rows, filters, "industrial").ToList();
-
+            var byType = Enumerable.Range(1, 3).ToDictionary(type => type, type => GetRows(filters, type));
+            var cards = byType.Select(pair =>
+            {
+                var current = At(pair.Value, filters.Year, filters.Month).ToList();
+                var metric = MetricSets[pair.Key][0];
+                return new DashboardTypeCard
+                {
+                    ReportType = pair.Key, Name = TypeName(pair.Key), MetricLabel = metric.Label,
+                    Unit = metric.Unit, Value = FormatOrDash(SumOrNull(current.Select(r => r.PrimaryValue))),
+                    Assigned = current.Count, Received = current.Count(r => r.DataImported),
+                    Conflicts = current.Count(r => r.MetricConflict)
+                };
+            }).ToList();
+            var end = new DateTime(filters.Year, filters.Month, 1);
+            var today = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            if (end > today) end = today;
+            var trend = Enumerable.Range(0, 12).Select(offset => end.AddMonths(offset - 11)).Select(date =>
+                new DashboardReceiptPoint
+                {
+                    Month = date.ToString("yyyy-MM"),
+                    Type1 = At(byType[1], date.Year, date.Month).Count(r => r.DataImported),
+                    Type2 = At(byType[2], date.Year, date.Month).Count(r => r.DataImported),
+                    Type3 = At(byType[3], date.Year, date.Month).Count(r => r.DataImported)
+                }).ToList();
+            var movements = Comparable(byType[1], filters, "primary")
+                .OrderByDescending(x => Math.Abs(x.Change)).Take(5).ToList();
             return new DashboardModel
             {
-                Filters = filters,
-                FilterOptions = filterOptions,
-                Years = filterOptions.Years, Months = filterOptions.Months,
-                Areas = filterOptions.Areas, EconomicSectors = filterOptions.EconomicSectors,
-                Industries = filterOptions.Industries, Enterprises = filterOptions.Enterprises,
-                Kpis = new List<DashboardKpi>
-                {
-                    industrial, exports, imports,
-                    new DashboardKpi { Label = "DN có giá trị chỉ tiêu", Value = current.Count(HasObservedIndicator).ToString(Vietnamese),
-                        Unit = "/ " + current.Count.ToString(Vietnamese), Tone = "blue",
-                        Note = "Có ít nhất một giá trị 0101, 06 hoặc 07; chưa xác định nghĩa vụ báo cáo" }
-                },
-                MonthlyTrend = trend,
-                SectorContributions = SectorShares(current),
-                IndustryContributions = ImpactsByIndustry(impacts),
-                IncreasingEnterprises = EnterpriseImpacts(impacts.Where(x => x.Change > 0).OrderByDescending(x => x.Change).Take(3), impacts.Sum(x => x.Change)),
-                DecreasingEnterprises = EnterpriseImpacts(impacts.Where(x => x.Change < 0).OrderBy(x => x.Change).Take(3), impacts.Sum(x => x.Change)),
-                Submission = submission,
-                Alerts = Alerts(impacts),
-                HasComparisonData = impacts.Any(x => x.HasRate),
-                ReportedReasons = Reasons(current),
-                FilterSummary = "Tháng " + filters.Month.ToString("00") + "/" + filters.Year + " · " + current.Count + " doanh nghiệp thuộc nhóm theo dõi đã phân loại trong phạm vi lọc"
+                Filters = filters, FilterOptions = BuildOptions(byType.Values.SelectMany(x => x).ToList(), filters, "Index", false),
+                TypeCards = cards, Classification = GetSummary(filters), ReceiptTrend = trend,
+                Movements = movements
             };
         }
 
         public DashboardAnalysisModel GetAnalysis(DashboardFilters filters)
         {
             filters = Normalize(filters);
-            var rows = GetRows(filters);
+            var rows = GetRows(filters, filters.ReportType);
             var current = At(rows, filters.Year, filters.Month).ToList();
-            var metric = filters.Metric;
-            var impacts = Comparable(rows, filters, metric).ToList();
-            var label = metric == "industrial" ? "Doanh thu công nghiệp" : metric == "import" ? "Nhập khẩu" : "Xuất khẩu";
-            var unit = metric == "industrial" ? "Tỷ đồng" : "1.000 USD";
-            var values = current.Select(r => Value(r, metric)).Where(v => v.HasValue).ToList();
-            var ytdMonths = Enumerable.Range(1, filters.Month).Select(month => At(rows, filters.Year, month)
-                .Select(r => Value(r, metric)).Where(v => v.HasValue).ToList()).ToList();
-            var ytd = ytdMonths.All(month => month.Count > 0)
-                ? (decimal?)ytdMonths.Sum(month => month.Sum(v => v.Value)) : null;
-            var filterOptions = BuildFilterOptions(rows, filters, "Analysis", true);
+            var metric = SelectedMetric(filters);
+            var values = current.Select(r => Value(r, metric.Key));
+            var monthly = Enumerable.Range(1, filters.Month).Select(month =>
+                SumOrNull(At(rows, filters.Year, month).Select(r => Value(r, metric.Key)))).ToList();
+            var ytdValues = monthly.Where(v => v.HasValue).ToList();
+            var currentDate = new DateTime(filters.Year, filters.Month, 1);
+            var trend = Enumerable.Range(0, 12).Select(offset => currentDate.AddMonths(offset - 11))
+                .Where(date => date <= DateTime.Today)
+                .Select(date => new DashboardMetricPoint
+                {
+                    Month = date.ToString("yyyy-MM"),
+                    Value = SumOrNull(At(rows, date.Year, date.Month).Select(r => Value(r, metric.Key)))
+                }).ToList();
+            var sectorValues = current.GroupBy(r => String.IsNullOrWhiteSpace(r.EconomicSectorName) ? "Chưa phân khu vực" : r.EconomicSectorName)
+                .Select(g => new DashboardBreakdown { Name = g.Key, Value = SumOrNull(g.Select(r => Value(r, metric.Key))) ?? 0 })
+                .OrderByDescending(g => g.Value).ToList();
+            var sectorTotal = sectorValues.Sum(g => g.Value);
+            foreach (var sector in sectorValues) sector.Share = sectorTotal > 0 ? sector.Value * 100 / sectorTotal : 0;
+            var mom = Comparable(rows, filters, metric.Key).ToList();
+            var yoy = Comparable(rows, filters, metric.Key, -12).ToList();
             return new DashboardAnalysisModel
             {
-                Filters = filters,
-                FilterOptions = filterOptions,
-                Metrics = filterOptions.Metrics,
-                MetricLabel = label,
-                CurrentValue = values.Count == 0 ? "Chưa có dữ liệu" : Format(values.Sum(v => v.Value)) + " " + unit,
-                YtdValue = ytd.HasValue ? Format(ytd.Value) + " " + unit : "Chưa đủ kỳ báo cáo",
-                Mom = Rate(rows, filters, metric, -1),
-                Yoy = Rate(rows, filters, metric, -12),
-                SectorContributions = SectorShares(current).Where(x =>
-                    (metric == "industrial" ? x.GtsXcnShare : metric == "import" ? x.ImportShare : x.ExportShare) > 0).ToList(),
-                IndustryContributions = ImpactsByIndustry(impacts),
-                EnterpriseImpact = EnterpriseImpacts(impacts.OrderByDescending(x => Math.Abs(x.Change)).Take(8), impacts.Sum(x => x.Change)),
-                Reasons = Reasons(current)
+                Filters = filters, FilterOptions = BuildOptions(rows, filters, "Analysis", true),
+                TypeName = TypeName(filters.ReportType), SelectedMetric = metric, Metrics = MetricSets[filters.ReportType],
+                CurrentValue = FormatOrDash(SumOrNull(values)),
+                YtdValue = ytdValues.Count == 0 ? "—" : Format(ytdValues.Sum(v => v.Value)),
+                YtdMonths = ytdValues.Count,
+                Mom = Rate(mom), Yoy = Rate(yoy), MomCompared = mom.Count, YoyCompared = yoy.Count,
+                Assigned = current.Count,
+                Trend = trend, Sectors = sectorValues,
+                Movements = mom.OrderByDescending(x => Math.Abs(x.Change)).Take(8).ToList()
             };
         }
 
         public DashboardWarningsModel GetWarnings(DashboardFilters filters)
         {
             filters = Normalize(filters);
-            var rows = GetRows(filters);
-            var impacts = Comparable(rows, filters, "industrial").ToList();
-            var warnings = impacts.Where(x => x.HasRate && x.Percent < -Warning10).ToList();
-            var trend = new List<DashboardTrendPoint>();
-            foreach (var month in Enumerable.Range(1, filters.Month))
-            {
-                var monthFilter = new DashboardFilters { Year = filters.Year, Month = month };
-                var monthImpacts = Comparable(rows, monthFilter, "industrial").ToList();
-                if (monthImpacts.Count == 0) continue;
-                trend.Add(new DashboardTrendPoint
+            var rows = GetRows(filters, filters.ReportType);
+            var movements = Comparable(rows, filters, "primary").ToList();
+            var current = At(rows, filters.Year, filters.Month).ToList();
+            var end = new DateTime(filters.Year, filters.Month, 1);
+            var trend = Enumerable.Range(0, 12).Select(offset => end.AddMonths(offset - 11))
+                .Where(date => date <= DateTime.Today)
+                .Select(date =>
                 {
-                    Month = filters.Year + "-" + month.ToString("00"),
-                    Over10 = monthImpacts.Count(x => x.HasRate && x.Percent < -Warning10),
-                    Over20 = monthImpacts.Count(x => x.HasRate && x.Percent < -Warning20),
-                    Over30 = monthImpacts.Count(x => x.HasRate && x.Percent < -Warning30)
-                });
-            }
+                    var period = new DashboardFilters { Year = date.Year, Month = date.Month };
+                    var pairs = Comparable(rows, period, "primary").ToList();
+                    return new DashboardMetricPoint
+                    {
+                        Month = date.ToString("yyyy-MM"),
+                        Value = pairs.Count == 0 ? (decimal?)null :
+                            pairs.Count(x => x.Percent.HasValue && x.Percent.Value < (filters.ReportType == 1 ? -10 : 0))
+                    };
+                }).ToList();
             return new DashboardWarningsModel
             {
-                Filters = filters,
-                FilterOptions = BuildFilterOptions(rows, filters, "Warnings", false),
-                Summary = Alerts(impacts),
-                HasComparisonData = impacts.Any(x => x.HasRate),
-                Trend = trend,
-                ByIndustry = warnings.GroupBy(x => x.Current.IndustryName ?? "Chưa phân ngành")
-                    .Select(g => new DashboardIndustryImpact { Name = g.Key, Contribution = g.Count() })
-                    .OrderByDescending(x => x.Contribution).Take(8).ToList(),
-                UrgentEnterprises = EnterpriseImpacts(warnings.OrderBy(x => x.Change).ThenBy(x => x.Percent).Take(8), impacts.Sum(x => x.Change))
+                Filters = filters, FilterOptions = BuildOptions(rows, filters, "Warnings", false),
+                TypeName = TypeName(filters.ReportType), Metric = MetricSets[filters.ReportType][0],
+                IsIndustrial = filters.ReportType == 1, ComparableCount = movements.Count,
+                Assigned = current.Count,
+                DeclineOver10 = movements.Count(x => x.Percent < -10),
+                DeclineOver20 = movements.Count(x => x.Percent < -20),
+                DeclineOver30 = movements.Count(x => x.Percent < -30),
+                ConflictCount = current.Count(r => r.MetricConflict), Trend = trend,
+                Movements = (filters.ReportType == 1
+                    ? movements.Where(x => x.Percent < -10).OrderBy(x => x.Change)
+                    : movements.OrderByDescending(x => Math.Abs(x.Change))).Take(8).ToList()
             };
         }
 
         public DashboardProgressModel GetProgress(DashboardFilters filters)
         {
             filters = Normalize(filters);
-            var rows = GetRows(filters);
+            var rows = GetRows(filters, filters.ReportType);
             var current = At(rows, filters.Year, filters.Month).ToList();
+            var end = new DateTime(filters.Year, filters.Month, 1);
+            var trend = Enumerable.Range(0, 12).Select(offset => end.AddMonths(offset - 11))
+                .Where(date => date <= DateTime.Today)
+                .Select(date => new DashboardMetricPoint
+                {
+                    Month = date.ToString("yyyy-MM"),
+                    Value = At(rows, date.Year, date.Month).Count(r => r.DataImported)
+                }).ToList();
             return new DashboardProgressModel
             {
-                Filters = filters,
-                FilterOptions = BuildFilterOptions(rows, filters, "Progress", false),
-                Submission = Submission(current),
-                ObservedIndicatorEnterprises = current.Count(HasObservedIndicator),
-                ObservationTrend = Enumerable.Range(1, filters.Month).Select(month =>
+                Filters = filters, FilterOptions = BuildOptions(rows, filters, "Progress", false),
+                TypeName = TypeName(filters.ReportType), Assigned = current.Count,
+                Received = current.Count(r => r.DataImported),
+                FileAnyType = current.Count(r => r.FileAnyType),
+                MetricValues = current.Count(r => r.PrimaryValue.HasValue),
+                MetricPresence = MetricSets[filters.ReportType].Select(metric => new DashboardBreakdown
                 {
-                    var monthRows = At(rows, filters.Year, month).ToList();
-                    return new DashboardObservationPoint
-                    {
-                        Month = filters.Year + "-" + month.ToString("00"),
-                        Files = monthRows.Count(r => r.Submitted),
-                        Indicators = monthRows.Count(HasObservedIndicator)
-                    };
+                    Name = metric.Label + " (" + metric.Code + ")",
+                    Assigned = current.Count,
+                    Received = current.Count(r => Value(r, metric.Key).HasValue)
                 }).ToList(),
-                AreaObservations = ObservationBreakdown(current, r => r.WardName, "Chưa có địa bàn"),
-                SectorObservations = ObservationBreakdown(current, r => r.EconomicSectorName, "Chưa phân khu vực"),
-                EnterpriseRows = current.OrderBy(r => r.BusinessName).Select(r => new DashboardProgressEnterprise
-                {
-                    EnterpriseId = r.EnterpriseId,
-                    Name = r.BusinessName,
-                    WardName = r.WardName,
-                    EconomicSectorName = r.EconomicSectorName,
-                    HasFile = r.Submitted,
-                    HasIndustrialRevenue = r.IndustrialRevenue.HasValue,
-                    HasExportValue = r.ExportValue.HasValue,
-                    HasImportValue = r.ImportValue.HasValue
-                }).ToList()
-            };
-        }
-
-        private static bool HasObservedIndicator(SnapshotRow row)
-        {
-            return row.IndustrialRevenue.HasValue || row.ExportValue.HasValue || row.ImportValue.HasValue;
-        }
-
-        private static IList<DashboardObservationBreakdown> ObservationBreakdown(
-            IEnumerable<SnapshotRow> rows, Func<SnapshotRow, string> name, string unknownLabel)
-        {
-            return rows.GroupBy(r => String.IsNullOrWhiteSpace(name(r)) ? unknownLabel : name(r))
-                .Select(g => new DashboardObservationBreakdown
-                {
-                    Name = g.Key,
-                    Enterprises = g.Count(),
-                    Files = g.Count(r => r.Submitted),
-                    Indicators = g.Count(HasObservedIndicator)
-                }).OrderByDescending(g => g.Indicators).ThenBy(g => g.Name).ToList();
-        }
-
-        public DashboardQualityModel GetQuality(DashboardFilters filters)
-        {
-            filters = Normalize(filters);
-            var rows = GetRows(filters);
-            var current = At(rows, filters.Year, filters.Month).ToList();
-            var start = new DateTime(filters.Year, filters.Month, 1).AddMonths(-11);
-            var end = new DateTime(filters.Year, filters.Month, 1);
-            var history = rows.Where(r => r.ForMonth >= start && r.ForMonth <= end).ToList();
-            return new DashboardQualityModel
-            {
-                Filters = filters,
-                FilterOptions = BuildFilterOptions(rows, filters, "Quality", false),
-                Submission = Submission(current),
-                IndustrialRevenueCoverage = current.Count(r => r.Submitted && r.IndustrialRevenue.HasValue),
-                ExportCoverage = current.Count(r => r.Submitted && r.ExportValue.HasValue),
-                ImportCoverage = current.Count(r => r.Submitted && r.ImportValue.HasValue),
-                IndustrialRevenueHistoryMonths = history.Where(r => r.IndustrialRevenue.HasValue).Select(r => r.ForMonth).Distinct().Count(),
-                ExportHistoryMonths = history.Where(r => r.ExportValue.HasValue).Select(r => r.ForMonth).Distinct().Count(),
-                ImportHistoryMonths = history.Where(r => r.ImportValue.HasValue).Select(r => r.ForMonth).Distinct().Count(),
-                MissingIndicatorEnterprises = current.Where(r => r.Submitted && !HasRequiredIndicators(r))
-                    .Select(r => new DashboardQualityEnterprise
+                Conflicts = current.Count(r => r.MetricConflict),
+                CoveragePercent = current.Count == 0 ? 0 : 100m * current.Count(r => r.DataImported) / current.Count,
+                ReceiptTrend = trend,
+                Areas = Breakdown(current, r => r.WardName, "Chưa có địa bàn"),
+                Sectors = Breakdown(current, r => r.EconomicSectorName, "Chưa phân khu vực"),
+                Enterprises = current.OrderByDescending(r => r.MetricConflict).ThenBy(r => r.DataImported)
+                    .ThenBy(r => r.PrimaryValue.HasValue)
+                    .ThenBy(r => r.BusinessName).Select(r => new DashboardEnterpriseRow
                     {
-                        Name = r.BusinessName,
-                        IsLate = r.IsLate,
-                        MissingCodes = String.Join(", ", new[]
-                        {
-                            r.IndustrialRevenue.HasValue ? null : "0101",
-                            r.ExportValue.HasValue ? null : "06",
-                            r.ImportValue.HasValue ? null : "07"
-                        }.Where(code => code != null))
-                    }).OrderBy(r => r.Name).Take(12).ToList()
+                        EnterpriseId = r.EnterpriseId, Name = r.BusinessName, WardName = r.WardName,
+                        DataImported = r.DataImported, FileAnyType = r.FileAnyType,
+                        HasMetricValue = r.PrimaryValue.HasValue, MetricConflict = r.MetricConflict,
+                        MissingMetricCodes = String.Join(", ", MetricSets[filters.ReportType]
+                            .Where(metric => !Value(r, metric.Key).HasValue).Select(metric => metric.Code))
+                    }).ToList()
             };
         }
 
-        private List<SnapshotRow> GetRows(DashboardFilters filters)
+        private DashboardOverviewSummary GetSummary(DashboardFilters filters)
+        {
+            var table = _reports.GetDataReport(SummaryProcedure, new DateTime(filters.Year, filters.Month, 1));
+            if (table.Rows.Count == 0) return new DashboardOverviewSummary();
+            var row = table.Rows[0];
+            return new DashboardOverviewSummary
+            {
+                ActiveEnterprises = Convert.ToInt32(row["ActiveEnterprises"]),
+                ConfiguredEnterprises = Convert.ToInt32(row["ConfiguredEnterprises"]),
+                MissingBusinessRow = Convert.ToInt32(row["MissingBusinessRow"]),
+                MissingIndustry = Convert.ToInt32(row["MissingIndustry"]),
+                MissingReportType = Convert.ToInt32(row["MissingReportType"]),
+                TypeZeroRows = Convert.ToInt32(row["TypeZeroRows"]),
+                FutureDatedRows = Convert.ToInt32(row["FutureDatedRows"])
+            };
+        }
+
+        private List<SnapshotRow> GetRows(DashboardFilters filters, int reportType)
         {
             var table = _reports.GetDataReport(SnapshotProcedure,
-                new DateTime(filters.Year, filters.Month, 1), DbFilter(filters.AreaId),
-                DbFilter(filters.EconomicSectorId), DbFilter(filters.IndustryId), DbFilter(filters.EnterpriseId));
+                new DateTime(filters.Year, filters.Month, 1), reportType, DbFilter(filters.AreaId),
+                DbFilter(filters.EconomicSectorId), DbFilter(filters.IndustryId),
+                DbFilter(filters.EnterpriseId));
             return table.Rows.Cast<DataRow>().Select(row => new SnapshotRow
             {
-                ForMonth = Convert.ToDateTime(row["ForMonth"]),
-                EnterpriseId = Convert.ToInt32(row["EnterpriseId"]),
+                ForMonth = Convert.ToDateTime(row["ForMonth"]), EnterpriseId = Convert.ToInt32(row["EnterpriseId"]),
                 BusinessName = Convert.ToString(row["BusinessName"]),
                 WardId = NullableInt(row["WardId"]), WardName = Convert.ToString(row["WardName"]),
                 EconomicSectorId = NullableInt(row["EconomicSectorId"]),
                 EconomicSectorName = Convert.ToString(row["EconomicSectorName"]),
-                IndustryId = NullableInt(row["IndustryId"]), IndustryName = Convert.ToString(row["IndustryName"]),
-                Submitted = Convert.ToBoolean(row["Submitted"]), IsLate = Convert.ToBoolean(row["IsLate"]),
-                Reason = Convert.ToString(row["Reason"]),
-                IndustrialRevenue = NullableDecimal(row["IndustrialRevenue"]),
-                ExportValue = NullableDecimal(row["ExportValue"]), ImportValue = NullableDecimal(row["ImportValue"])
+                IndustryIds = Convert.ToString(row["IndustryIds"]),
+                DataImported = Convert.ToBoolean(row["DataImported"]),
+                FileAnyType = Convert.ToBoolean(row["FileSubmittedAnyType"]),
+                MetricConflict = Convert.ToBoolean(row["MetricConflict"]),
+                PrimaryValue = NullableDecimal(row["PrimaryValue"]),
+                SecondaryValue = NullableDecimal(row["SecondaryValue"]),
+                TertiaryValue = NullableDecimal(row["TertiaryValue"])
             }).ToList();
         }
 
         private static object DbFilter(string value)
         {
             int parsed;
-            return Int32.TryParse(value, out parsed) && parsed > 0 ? (object)parsed : DBNull.Value;
+            return Int32.TryParse(value, out parsed) && parsed >= 0 ? (object)parsed : DBNull.Value;
         }
 
         private static int? NullableInt(object value) { return value == DBNull.Value ? (int?)null : Convert.ToInt32(value); }
         private static decimal? NullableDecimal(object value) { return value == DBNull.Value ? (decimal?)null : Convert.ToDecimal(value); }
+        private static string Format(decimal value) { return value.ToString(decimal.Truncate(value) == value ? "#,##0" : "#,##0.##", Vietnamese); }
+        private static string FormatOrDash(decimal? value) { return value.HasValue ? Format(value.Value) : "—"; }
 
         private static DashboardFilters Normalize(DashboardFilters filters)
         {
             filters = filters ?? new DashboardFilters();
-            if (filters.Year < 2000 || filters.Year > 2100) filters.Year = DateTime.Today.Year;
-            if (filters.Month < 1 || filters.Month > 12) filters.Month = DateTime.Today.Month;
+            var previous = DateTime.Today.AddMonths(-1);
+            if (filters.Year < 2000 || filters.Year > 2100 || filters.Month < 1 || filters.Month > 12 ||
+                new DateTime(filters.Year, filters.Month, 1) > new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1))
+            {
+                filters.Year = previous.Year; filters.Month = previous.Month;
+            }
+            if (filters.ReportType < 1 || filters.ReportType > 3) filters.ReportType = 1;
             filters.AreaId = filters.AreaId ?? "all";
             filters.EconomicSectorId = filters.EconomicSectorId ?? "all";
             filters.IndustryId = filters.IndustryId ?? "all";
             filters.EnterpriseId = filters.EnterpriseId ?? "all";
-            filters.Metric = filters.Metric == "export" || filters.Metric == "import" ? filters.Metric : "industrial";
+            if (filters.Metric != "secondary" && filters.Metric != "tertiary") filters.Metric = "primary";
             return filters;
+        }
+
+        private static DashboardMetric SelectedMetric(DashboardFilters filters)
+        {
+            return MetricSets[filters.ReportType].First(m => m.Key == filters.Metric);
         }
 
         private static IEnumerable<SnapshotRow> At(IEnumerable<SnapshotRow> rows, int year, int month)
@@ -263,50 +274,7 @@ namespace CenIT.ReportTourism.Biz.Report
 
         private static decimal? Value(SnapshotRow row, string metric)
         {
-            return metric == "industrial" ? row.IndustrialRevenue : metric == "import" ? row.ImportValue : row.ExportValue;
-        }
-
-        private static DashboardKpi Kpi(List<SnapshotRow> rows, DashboardFilters filters, string metric,
-            string label, string unit, string tone)
-        {
-            var values = At(rows, filters.Year, filters.Month).Select(r => Value(r, metric)).Where(v => v.HasValue).ToList();
-            return new DashboardKpi
-            {
-                Label = label, Value = values.Count == 0 ? "—" : Format(values.Sum(v => v.Value)),
-                Unit = unit, Tone = tone, Mom = Rate(rows, filters, metric, -1),
-                Yoy = Rate(rows, filters, metric, -12), Note = "Số liệu doanh nghiệp đã nhập",
-                ShowComparisons = true
-            };
-        }
-
-        private static decimal? Rate(List<SnapshotRow> rows, DashboardFilters filters, string metric, int monthOffset)
-        {
-            var currentDate = new DateTime(filters.Year, filters.Month, 1);
-            var priorDate = currentDate.AddMonths(monthOffset);
-            var current = At(rows, currentDate.Year, currentDate.Month).Where(r => Value(r, metric).HasValue)
-                .ToDictionary(r => r.EnterpriseId, r => Value(r, metric).Value);
-            var prior = At(rows, priorDate.Year, priorDate.Month).Where(r => Value(r, metric).HasValue)
-                .ToDictionary(r => r.EnterpriseId, r => Value(r, metric).Value);
-            if (current.Count == 0 || prior.Count == 0 || !current.Keys.OrderBy(x => x).SequenceEqual(prior.Keys.OrderBy(x => x)))
-                return null;
-            var baseline = prior.Values.Sum();
-            return baseline == 0 ? (decimal?)null : (current.Values.Sum() - baseline) * 100m / baseline;
-        }
-
-        private static List<DashboardTrendPoint> IndicatorTrend(List<SnapshotRow> rows, DashboardFilters filters)
-        {
-            var start = new DateTime(filters.Year, filters.Month, 1).AddMonths(-11);
-            var end = new DateTime(filters.Year, filters.Month, 1);
-            return rows.Where(r => r.ForMonth >= start && r.ForMonth <= end)
-                .GroupBy(r => r.ForMonth).OrderBy(g => g.Key)
-                .Where(g => g.Any(r => r.IndustrialRevenue.HasValue || r.ExportValue.HasValue || r.ImportValue.HasValue))
-                .Select(g => new DashboardTrendPoint
-                {
-                    Month = g.Key.ToString("yyyy-MM"),
-                    GtsXcnIndex = SumOrNull(g.Select(r => r.IndustrialRevenue)),
-                    ExportIndex = SumOrNull(g.Select(r => r.ExportValue)),
-                    ImportIndex = SumOrNull(g.Select(r => r.ImportValue))
-                }).ToList();
+            return metric == "secondary" ? row.SecondaryValue : metric == "tertiary" ? row.TertiaryValue : row.PrimaryValue;
         }
 
         private static decimal? SumOrNull(IEnumerable<decimal?> values)
@@ -315,135 +283,80 @@ namespace CenIT.ReportTourism.Biz.Report
             return known.Count == 0 ? (decimal?)null : known.Sum(v => v.Value);
         }
 
-        private static DashboardSubmissionStatus Submission(List<SnapshotRow> rows)
+        private static List<DashboardMovement> Comparable(List<SnapshotRow> rows, DashboardFilters filters,
+            string metric, int offset = -1)
         {
-            var submitted = rows.Count(r => r.Submitted);
-            var complete = rows.Count(r => r.Submitted && HasRequiredIndicators(r));
-            return new DashboardSubmissionStatus
-            {
-                TotalEnterprises = rows.Count, Submitted = submitted, NotSubmitted = rows.Count - submitted,
-                CompleteIndicators = complete,
-                Late = rows.Count(r => r.Submitted && r.IsLate),
-                MissingIndicators = submitted - complete,
-                CompletionPercent = rows.Count == 0 ? 0 : submitted * 100m / rows.Count
-            };
-        }
-
-        private static bool HasRequiredIndicators(SnapshotRow row)
-        {
-            return row.IndustrialRevenue.HasValue && row.ExportValue.HasValue && row.ImportValue.HasValue;
-        }
-
-        private static List<DashboardSectorContribution> SectorShares(List<SnapshotRow> rows)
-        {
-            var totals = new[] { SumOrNull(rows.Select(r => r.IndustrialRevenue)) ?? 0,
-                SumOrNull(rows.Select(r => r.ExportValue)) ?? 0, SumOrNull(rows.Select(r => r.ImportValue)) ?? 0 };
-            if (totals.All(total => total <= 0)) return new List<DashboardSectorContribution>();
-            return rows.GroupBy(r => r.EconomicSectorName ?? "Chưa phân khu vực")
-                .Select(g => new DashboardSectorContribution
-                {
-                    Name = g.Key,
-                    GtsXcnShare = totals[0] > 0 ? (SumOrNull(g.Select(r => r.IndustrialRevenue)) ?? 0) * 100m / totals[0] : 0,
-                    ExportShare = totals[1] > 0 ? (SumOrNull(g.Select(r => r.ExportValue)) ?? 0) * 100m / totals[1] : 0,
-                    ImportShare = totals[2] > 0 ? (SumOrNull(g.Select(r => r.ImportValue)) ?? 0) * 100m / totals[2] : 0
-                }).Where(x => x.GtsXcnShare > 0 || x.ExportShare > 0 || x.ImportShare > 0)
-                .OrderByDescending(x => x.GtsXcnShare).ToList();
-        }
-
-        private static IEnumerable<Impact> Comparable(List<SnapshotRow> rows, DashboardFilters filters, string metric)
-        {
-            var date = new DateTime(filters.Year, filters.Month, 1);
-            var previous = date.AddMonths(-1);
-            var prior = At(rows, previous.Year, previous.Month).ToDictionary(r => r.EnterpriseId);
-            foreach (var current in At(rows, filters.Year, filters.Month))
+            var currentDate = new DateTime(filters.Year, filters.Month, 1);
+            var previousDate = currentDate.AddMonths(offset);
+            var previous = At(rows, previousDate.Year, previousDate.Month).ToDictionary(r => r.EnterpriseId);
+            var result = new List<DashboardMovement>();
+            foreach (var row in At(rows, filters.Year, filters.Month))
             {
                 SnapshotRow old;
-                if (!prior.TryGetValue(current.EnterpriseId, out old)) continue;
-                var value = Value(current, metric);
+                if (!previous.TryGetValue(row.EnterpriseId, out old)) continue;
+                var value = Value(row, metric);
                 var baseline = Value(old, metric);
                 if (!value.HasValue || !baseline.HasValue) continue;
-                yield return new Impact { Current = current, Change = value.Value - baseline.Value,
+                result.Add(new DashboardMovement
+                {
+                    Name = row.BusinessName, WardName = row.WardName,
                     CurrentValue = value.Value, PreviousValue = baseline.Value,
-                    HasRate = baseline.Value > 0,
-                    Percent = baseline.Value > 0 ? (value.Value - baseline.Value) * 100m / baseline.Value : 0 };
+                    Change = value.Value - baseline.Value,
+                    Percent = baseline.Value > 0 ? (value.Value - baseline.Value) * 100m / baseline.Value : (decimal?)null
+                });
             }
+            return result;
         }
 
-        private static DashboardAlertSummary Alerts(List<Impact> impacts)
+        private static decimal? Rate(IList<DashboardMovement> movements)
         {
-            return new DashboardAlertSummary
-            {
-                DeclineOver10 = impacts.Count(x => x.HasRate && x.Percent < -Warning10),
-                DeclineOver20 = impacts.Count(x => x.HasRate && x.Percent < -Warning20),
-                DeclineOver30 = impacts.Count(x => x.HasRate && x.Percent < -Warning30),
-                UrgentEnterprises = impacts.Count(x => x.HasRate && x.Percent < -Warning30)
-            };
+            if (movements.Count == 0) return null;
+            var baseline = movements.Sum(m => m.PreviousValue);
+            return baseline == 0 ? (decimal?)null : movements.Sum(m => m.Change) * 100m / baseline;
         }
 
-        private static List<DashboardIndustryImpact> ImpactsByIndustry(IEnumerable<Impact> impacts)
+        private static IList<DashboardBreakdown> Breakdown(List<SnapshotRow> rows,
+            Func<SnapshotRow, string> label, string unknown)
         {
-            var all = impacts.ToList();
-            var totalChange = all.Sum(x => x.Change);
-            return all.GroupBy(x => x.Current.IndustryName ?? "Chưa phân ngành")
-                .Select(g => new DashboardIndustryImpact { Name = g.Key, Contribution = g.Sum(x => x.Change),
-                    CurrentValue = g.Sum(x => x.CurrentValue), PreviousValue = g.Sum(x => x.PreviousValue),
-                    HasGrowthRate = g.Sum(x => x.PreviousValue) > 0,
-                    ChangePercent = g.Sum(x => x.PreviousValue) > 0 ? g.Sum(x => x.Change) * 100m / g.Sum(x => x.PreviousValue) : 0,
-                    ContributionShare = totalChange == 0 ? (decimal?)null : g.Sum(x => x.Change) * 100m / totalChange })
-                .OrderByDescending(x => Math.Abs(x.Contribution)).Take(8).ToList();
+            return rows.GroupBy(r => String.IsNullOrWhiteSpace(label(r)) ? unknown : label(r))
+                .Select(g => new DashboardBreakdown
+                {
+                    Name = g.Key, Assigned = g.Count(), Received = g.Count(r => r.DataImported)
+                }).OrderByDescending(g => g.Received).ThenBy(g => g.Name).ToList();
         }
 
-        private static List<DashboardEnterpriseImpact> EnterpriseImpacts(IEnumerable<Impact> impacts, decimal totalChange)
-        {
-            return impacts.Select(x => new DashboardEnterpriseImpact
-            {
-                Name = x.Current.BusinessName, Industry = x.Current.IndustryName ?? "Chưa phân ngành",
-                ChangePercent = x.Percent, Contribution = x.Change,
-                CurrentValue = x.CurrentValue, PreviousValue = x.PreviousValue,
-                HasGrowthRate = x.HasRate,
-                ContributionShare = totalChange == 0 ? (decimal?)null : x.Change * 100m / totalChange
-            }).ToList();
-        }
-
-        private static List<string> Reasons(List<SnapshotRow> rows)
-        {
-            return rows.Where(r => r.Submitted && !String.IsNullOrWhiteSpace(r.Reason))
-                .Select(r => r.BusinessName + ": " + r.Reason.Trim()).Take(8).ToList();
-        }
-
-        private static List<DashboardOption> Years(List<SnapshotRow> rows, DashboardFilters filters)
-        {
-            return rows.Where(r => r.Submitted || r.IndustrialRevenue.HasValue || r.ExportValue.HasValue || r.ImportValue.HasValue)
-                .Select(r => r.ForMonth.Year).Concat(new[] { filters.Year, DateTime.Today.Year }).Distinct().OrderByDescending(y => y)
-                .Select(y => new DashboardOption { Value = y.ToString(), Text = y.ToString() }).ToList();
-        }
-
-        private static DashboardFilterOptions BuildFilterOptions(List<SnapshotRow> rows, DashboardFilters filters,
+        private static DashboardFilterOptions BuildOptions(List<SnapshotRow> rows, DashboardFilters filters,
             string action, bool includeMetric)
         {
+            var industryIds = rows.SelectMany(r => (r.IndustryIds ?? "").Split(','))
+                .Select(id => id.Trim()).Where(id => id.Length > 0).Distinct().ToList();
+            int total;
+            var industryNames = (new CateBusinessIndustryBiz().Get(out total, null) ?? new List<CateBusinessIndustryModel>())
+                .Where(i => i.IsActive && !i.IsDeleted)
+                .GroupBy(i => i.IndustryId).ToDictionary(g => g.Key.ToString(), g => g.First().IndustryName);
+            var industries = new List<DashboardOption> { new DashboardOption { Value = "all", Text = "Tất cả ngành trong danh mục" } };
+            industries.AddRange(industryIds.Select(id => new DashboardOption
+            {
+                Value = id, Text = industryNames.ContainsKey(id) ? industryNames[id] : "Mã ngành " + id
+            }).OrderBy(x => x.Text));
+            var years = rows.Where(r => r.DataImported || r.PrimaryValue.HasValue || r.SecondaryValue.HasValue || r.TertiaryValue.HasValue)
+                .Select(r => r.ForMonth.Year).Concat(new[] { filters.Year, DateTime.Today.Year })
+                .Distinct().OrderByDescending(y => y).Select(y => new DashboardOption { Value = y.ToString(), Text = y.ToString() }).ToList();
             return new DashboardFilterOptions
             {
-                Filters = filters, Action = action,
-                Years = Years(rows, filters),
-                Months = Enumerable.Range(1, 12).Select(month => new DashboardOption
-                {
-                    Value = month.ToString(CultureInfo.InvariantCulture),
-                    Text = Vietnamese.DateTimeFormat.GetMonthName(month)
-                }).ToList(),
+                Filters = filters, Action = action, Years = years,
+                Months = Enumerable.Range(1, 12).Select(m => new DashboardOption
+                { Value = m.ToString(), Text = Vietnamese.DateTimeFormat.GetMonthName(m) }).ToList(),
                 Areas = Options(rows, r => r.WardId, r => r.WardName, "Tất cả địa bàn"),
                 EconomicSectors = Options(rows, r => r.EconomicSectorId, r => r.EconomicSectorName, "Tất cả khu vực"),
-                Industries = Options(rows, r => r.IndustryId, r => r.IndustryName, "Tất cả ngành trong danh mục"),
-                Enterprises = Options(rows, r => r.EnterpriseId, r => r.BusinessName, "Tất cả doanh nghiệp"),
-                Metrics = includeMetric ? new List<DashboardOption>
-                {
-                    new DashboardOption { Value = "industrial", Text = "Doanh thu công nghiệp" },
-                    new DashboardOption { Value = "export", Text = "Xuất khẩu" },
-                    new DashboardOption { Value = "import", Text = "Nhập khẩu" }
-                } : new List<DashboardOption>()
+                Industries = industries,
+                Enterprises = Options(rows, r => (int?)r.EnterpriseId, r => r.BusinessName, "Tất cả doanh nghiệp"),
+                Metrics = includeMetric ? MetricSets[filters.ReportType].Select(m => new DashboardOption
+                { Value = m.Key, Text = m.Label }).ToList() : new List<DashboardOption>()
             };
         }
 
-        private static List<DashboardOption> Options(List<SnapshotRow> rows, Func<SnapshotRow, int?> id,
+        private static IList<DashboardOption> Options(List<SnapshotRow> rows, Func<SnapshotRow, int?> id,
             Func<SnapshotRow, string> label, string allLabel)
         {
             var options = new List<DashboardOption> { new DashboardOption { Value = "all", Text = allLabel } };
@@ -453,24 +366,22 @@ namespace CenIT.ReportTourism.Biz.Report
             return options;
         }
 
-        private static string Format(decimal value)
-        {
-            return value.ToString(decimal.Truncate(value) == value ? "#,##0" : "#,##0.##", Vietnamese);
-        }
-
         private sealed class SnapshotRow
         {
-            public DateTime ForMonth; public int EnterpriseId; public string BusinessName;
-            public int? WardId; public string WardName; public int? EconomicSectorId;
-            public string EconomicSectorName; public int? IndustryId; public string IndustryName;
-            public bool Submitted; public bool IsLate; public string Reason;
-            public decimal? IndustrialRevenue; public decimal? ExportValue; public decimal? ImportValue;
-        }
-
-        private sealed class Impact
-        {
-            public SnapshotRow Current; public decimal Change; public decimal Percent;
-            public decimal CurrentValue; public decimal PreviousValue; public bool HasRate;
+            public DateTime ForMonth;
+            public int EnterpriseId;
+            public string BusinessName;
+            public int? WardId;
+            public string WardName;
+            public int? EconomicSectorId;
+            public string EconomicSectorName;
+            public string IndustryIds;
+            public bool DataImported;
+            public bool FileAnyType;
+            public bool MetricConflict;
+            public decimal? PrimaryValue;
+            public decimal? SecondaryValue;
+            public decimal? TertiaryValue;
         }
     }
 }

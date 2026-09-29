@@ -1,7 +1,7 @@
 @model CenIT.ReportTourism.Models.Report.DashboardNavigationModel
 @{
     var filters = Model.Filters ?? new CenIT.ReportTourism.Models.Report.DashboardFilters();
-    var route = new { year = filters.Year, month = filters.Month, areaId = filters.AreaId,
+    var route = new { year = filters.Year, month = filters.Month, reportType = filters.ReportType, areaId = filters.AreaId,
         economicSectorId = filters.EconomicSectorId, industryId = filters.IndustryId,
         enterpriseId = filters.EnterpriseId, metric = filters.Metric };
 }
