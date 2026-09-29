@@ -1,37 +1,63 @@
 @model CenIT.ReportTourism.Models.Report.DashboardModel
-
 @using System.Linq
+
 @{
-    var maxVal = Math.Max(1, Math.Max(Model.Alerts.DeclineOver10, Math.Max(Model.Alerts.DeclineOver20, Model.Alerts.DeclineOver30)));
+    var bucket10 = Math.Max(0, Model.Alerts.DeclineOver10 - Model.Alerts.DeclineOver20);
+    var bucket20 = Math.Max(0, Model.Alerts.DeclineOver20 - Model.Alerts.DeclineOver30);
+    var bucket30 = Model.Alerts.DeclineOver30;
+    var maxVal = Math.Max(1, Math.Max(bucket10, Math.Max(bucket20, bucket30)));
 }
 
-<section class="dashboard-panel alert-panel">
-    <header class="panel-heading">
-        <div>
-            <h2>Cảnh báo biến động</h2>
-            <p>Doanh thu công nghiệp so với tháng trước</p>
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-exclamation-triangle text-danger"></i> Cảnh báo biến động</h3>
+        <div class="box-tools pull-right">
+            <a href="@Url.Action("Warnings", "Dashboard", Model.Filters)" class="btn btn-box-tool text-primary">
+                Bảng cảnh báo <i class="fa fa-arrow-circle-right"></i>
+            </a>
         </div>
-        <a class="panel-link" href="@Url.Action("Warnings", "Dashboard", Model.Filters)">Bảng cảnh báo <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-    </header>
-    @if (!Model.HasComparisonData)
-    {
-        <p class="dashboard-empty">Chưa có dữ liệu tháng trước với giá trị gốc dương để đánh giá cảnh báo.</p>
-    }
-    else
-    {
-        <div class="alert-summary">
-            <div class="alert-level level-10">
-                <div class="alert-level-label"><span>Giảm trên 10%</span><strong>@Model.Alerts.DeclineOver10</strong></div>
-                <div class="alert-track"><span style="width:@((Model.Alerts.DeclineOver10 * 100 / maxVal))%"></span></div>
+    </div>
+    <div class="box-body">
+        <p class="text-muted" style="font-size: 12px; margin-bottom: 15px;">
+            <i class="fa fa-info-circle"></i> Doanh thu công nghiệp giảm sâu so với tháng trước
+        </p>
+        @if (!Model.HasComparisonData)
+        {
+            <div class="text-center text-muted" style="padding: 30px 0;">
+                Chưa có dữ liệu tháng trước với giá trị gốc dương để đánh giá cảnh báo.
             </div>
-            <div class="alert-level level-20">
-                <div class="alert-level-label"><span>Giảm trên 20%</span><strong>@Model.Alerts.DeclineOver20</strong></div>
-                <div class="alert-track"><span style="width:@((Model.Alerts.DeclineOver20 * 100 / maxVal))%"></span></div>
+        }
+        else
+        {
+            <div class="alert-bucket-list">
+                <div class="alert-bucket-item" style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <span><i class="fa fa-warning text-yellow"></i> Giảm trên 10% đến 20%</span>
+                        <strong>@bucket10 <small class="text-muted">DN</small></strong>
+                    </div>
+                    <div class="progress progress-xs" style="margin-bottom: 0;">
+                        <div class="progress-bar progress-bar-yellow" style="width: @((bucket10 * 100 / maxVal))%"></div>
+                    </div>
+                </div>
+                <div class="alert-bucket-item" style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <span><i class="fa fa-warning text-orange" style="color: #f39c12;"></i> Giảm trên 20% đến 30%</span>
+                        <strong>@bucket20 <small class="text-muted">DN</small></strong>
+                    </div>
+                    <div class="progress progress-xs" style="margin-bottom: 0;">
+                        <div class="progress-bar progress-bar-warning" style="width: @((bucket20 * 100 / maxVal))%"></div>
+                    </div>
+                </div>
+                <div class="alert-bucket-item" style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <span><i class="fa fa-exclamation-circle text-red"></i> Giảm trên 30% (mức nghiêm trọng)</span>
+                        <strong class="text-red">@bucket30 <small class="text-muted">DN</small></strong>
+                    </div>
+                    <div class="progress progress-xs" style="margin-bottom: 0;">
+                        <div class="progress-bar progress-bar-danger" style="width: @((bucket30 * 100 / maxVal))%"></div>
+                    </div>
+                </div>
             </div>
-            <div class="alert-level level-30">
-                <div class="alert-level-label"><span>Giảm trên 30%</span><strong>@Model.Alerts.DeclineOver30</strong></div>
-                <div class="alert-track"><span style="width:@((Model.Alerts.DeclineOver30 * 100 / maxVal))%"></span></div>
-            </div>
-        </div>
-    }
-</section>
+        }
+    </div>
+</div>

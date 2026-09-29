@@ -1,30 +1,70 @@
 @model CenIT.ReportTourism.Models.Report.DashboardModel
+@{
+    var icons = new[] { "fa-industry", "fa-ship", "fa-shopping-cart" };
+    var bgColors = new[] { "bg-aqua", "bg-green", "bg-yellow" };
+    var activeKpis = Model.Kpis.Take(3).ToList();
+    int idx = 0;
+}
 
-<div class="row dashboard-kpis">
-    @foreach (var kpi in Model.Kpis)
+<div class="row">
+    @foreach (var kpi in activeKpis)
     {
-        <div class="col-xs-6 col-md-3">
-            <article class="dashboard-kpi kpi-@kpi.Tone">
-                <div class="kpi-label">@kpi.Label</div>
-                <div class="kpi-value" @(kpi.Value == "—" ? "title=\"Chưa có số liệu phát sinh trong kỳ báo cáo này\"" : "")>
-                    @kpi.Value @if (kpi.Value != "—") { <small>@kpi.Unit</small> }
+        var icon = idx < icons.Length ? icons[idx] : "fa-bar-chart";
+        var bg = idx < bgColors.Length ? bgColors[idx] : "bg-aqua";
+        idx++;
+
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-kpi-info-box">
+                <span class="info-box-icon @bg"><i class="fa @icon"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted" title="@kpi.Label">@kpi.Label</span>
+                    <span class="info-box-number" @(kpi.Value == "—" ? "title=\"Chưa có số liệu phát sinh trong kỳ báo cáo này\"" : "")>
+                        @kpi.Value
+                        @if (kpi.Value != "—")
+                        {
+                            <small class="text-muted" style="font-weight: normal; font-size: 13px;">@kpi.Unit</small>
+                        }
+                    </span>
+                    @if (!kpi.ShowComparisons)
+                    {
+                        <span class="progress-description text-muted" title="@kpi.Note" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px;">
+                            @kpi.Note
+                        </span>
+                    }
+                    else
+                    {
+                        <div class="kpi-comparisons" style="font-size: 11px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="@(kpi.Mom.HasValue ? (kpi.Mom.Value >= 0 ? "text-green" : "text-red") : "text-muted")" style="margin-right: 8px;">
+                                <i class="fa @(kpi.Mom.HasValue ? (kpi.Mom.Value >= 0 ? "fa-arrow-up" : "fa-arrow-down") : "fa-minus")"></i>
+                                T.trước: @(kpi.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", kpi.Mom.Value) : "—")
+                            </span>
+                            <span class="@(kpi.Yoy.HasValue ? (kpi.Yoy.Value >= 0 ? "text-green" : "text-red") : "text-muted")">
+                                <i class="fa @(kpi.Yoy.HasValue ? (kpi.Yoy.Value >= 0 ? "fa-arrow-up" : "fa-arrow-down") : "fa-minus")"></i>
+                                Cùng kỳ: @(kpi.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", kpi.Yoy.Value) : "—")
+                            </span>
+                        </div>
+                    }
                 </div>
-                @if (kpi.Label == "Tỷ lệ báo cáo")
-                {
-                    <div class="kpi-note"><i class="fa fa-check-circle" aria-hidden="true"></i> @kpi.Note</div>
-                }
-                else
-                {
-                    <div class="kpi-changes">
-                        <span class="@(kpi.Mom.HasValue ? (kpi.Mom.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">
-                            T.trước: @(kpi.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", kpi.Mom.Value) : "chưa đủ lịch sử")
-                        </span>
-                        <span class="@(kpi.Yoy.HasValue ? (kpi.Yoy.Value >= 0 ? "change-positive" : "change-negative") : "change-neutral")">
-                            Cùng kỳ: @(kpi.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", kpi.Yoy.Value) : "chưa đủ lịch sử")
-                        </span>
-                    </div>
-                }
-            </article>
+            </div>
         </div>
     }
+
+    @*
+    TODO [Dashboard Data Contract]:
+    Re-enable reporting coverage/status KPI after dashboard reporting contract is corrected.
+    @if (Model.Kpis.Count > 3)
+    {
+        var kpi4 = Model.Kpis[3];
+        <div class="col-lg-3 col-md-6 col-xs-12">
+            <div class="info-box dashboard-kpi-info-box">
+                <span class="info-box-icon bg-purple"><i class="fa fa-building-o"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted" title="@kpi4.Label">@kpi4.Label</span>
+                    <span class="info-box-number">@kpi4.Value <small class="text-muted">@kpi4.Unit</small></span>
+                    <span class="progress-description text-muted" title="@kpi4.Note">@kpi4.Note</span>
+                </div>
+            </div>
+        </div>
+    }
+    *@
 </div>

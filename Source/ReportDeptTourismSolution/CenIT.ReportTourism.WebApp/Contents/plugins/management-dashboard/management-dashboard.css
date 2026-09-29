@@ -951,3 +951,121 @@ body:has(.management-dashboard) .content { padding-top: 10px; }
     color: var(--md-ink);
 }
 
+/* AdminLTE Scoped Enhancements for Overview & Progress */
+.management-dashboard .dashboard-nav-tabs {
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.management-dashboard .dashboard-nav-tabs > .nav-tabs > li > a {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 18px;
+}
+
+.management-dashboard .dashboard-nav-tabs > .nav-tabs > li.active > a {
+    border-top: 3px solid #3c8dbc;
+    color: #3c8dbc;
+}
+
+.management-dashboard .dashboard-heading {
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e7edf0;
+}
+
+.management-dashboard .dashboard-filter-box {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid #d2d6de;
+    border-radius: 3px;
+}
+
+.management-dashboard .period-control-group .form-control {
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.management-dashboard .info-box {
+    min-height: 82px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+.management-dashboard .info-box-icon {
+    height: 82px;
+    width: 75px;
+    line-height: 82px;
+    font-size: 36px;
+    border-radius: 3px 0 0 3px;
+}
+
+.management-dashboard .info-box-content {
+    margin-left: 75px;
+    padding: 6px 10px;
+}
+
+.management-dashboard .info-box-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3b41;
+}
+
+.management-dashboard .box {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+.management-dashboard .box-header {
+    padding: 10px 14px;
+}
+
+.management-dashboard .box-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.management-dashboard .box-body {
+    padding: 12px 14px;
+}
+
+.management-dashboard .morris-chart {
+    height: 250px;
+    margin: 0;
+}
+
+.management-dashboard .progress-xxs {
+    height: 4px;
+}
+
+.management-dashboard .callout {
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    padding: 12px 15px;
+}
+
+.management-dashboard .callout p {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.management-dashboard .progress-worklist-empty[hidden] {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .management-dashboard .filter-bar-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .management-dashboard .filter-bar-period {
+        width: 100%;
+    }
+    .management-dashboard .filter-bar-scope {
+        width: 100%;
+    }
+}
+

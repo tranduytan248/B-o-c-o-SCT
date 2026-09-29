@@ -1,7 +1,8 @@
 @model CenIT.ReportTourism.Models.Report.DashboardProgressModel
+@using System.Linq
 
 @{
-    ViewBag.Title = "Tiến độ nộp báo cáo";
+    ViewBag.Title = "Tình hình dữ liệu báo cáo";
 }
 
 @section Title { @ViewBag.Title }
@@ -11,193 +12,389 @@
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
 
-<div class="management-dashboard">
+<div class="management-dashboard dashboard-progress-page">
     @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Progress", Filters = Model.Filters })
-    
-    <div class="dashboard-heading">
-        <div>
-            <h1 id="dashboard-content" tabindex="-1">Tiến độ nộp báo cáo thống kê</h1>
-            <p>Nhóm doanh nghiệp công nghiệp đang theo dõi và đã phân loại <span class="scope-badge">Không phải toàn bộ doanh nghiệp Khánh Hòa</span></p>
+
+    <div class="dashboard-heading" style="margin-bottom: 12px;">
+        <div class="pull-left">
+            <h1 id="dashboard-content" style="font-size: 22px; font-weight: bold; margin: 0 0 4px; color: #333;">
+                <i class="fa fa-list-alt text-success"></i> Tình hình dữ liệu & Tiến độ báo cáo
+            </h1>
+            <p class="text-muted" style="margin: 0; font-size: 13px;">
+                Theo dõi tệp báo cáo và số liệu chỉ tiêu phát sinh trong nhóm doanh nghiệp Công Thương.
+            </p>
         </div>
-        <span class="dashboard-updated"><i class="fa fa-clock-o" aria-hidden="true"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
+        <div class="pull-right hidden-xs text-right" style="padding-top: 5px;">
+            <span class="label label-default" style="font-size: 12px; padding: 5px 8px;">
+                <i class="fa fa-clock-o"></i> Kỳ @Model.Filters.Month.ToString("00")/@Model.Filters.Year
+            </span>
+        </div>
+        <div class="clearfix"></div>
     </div>
 
     @Html.Partial("_DashboardFilters", Model.FilterOptions)
 
-    <!-- Top Headline Progress Overview -->
-    <div class="progress-headline">
-        <div class="progress-headline-header">
-            <span class="progress-headline-title"><i class="fa fa-tasks" aria-hidden="true"></i> Tiến độ hoàn thành báo cáo kỳ @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
-            <span class="progress-headline-metric">
-                <strong>@Model.Submission.Submitted</strong> / @Model.Submission.TotalEnterprises doanh nghiệp
-                <span class="badge-tone tone-blue" style="margin-left: 6px; font-size: 13px;">@Model.Submission.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
-            </span>
-        </div>
-        <div class="progress-headline-track">
-            <div class="progress-headline-fill" style="width: @Model.Submission.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%;"></div>
-        </div>
-        <div class="progress-headline-footer">
-            <span>Đã hoàn thành: @Model.Submission.Submitted đơn vị</span>
-            <span>Còn thiếu: @Model.Submission.NotSubmitted đơn vị (@((100m - Model.Submission.CompletionPercent).ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN")))%)</span>
-        </div>
+    <!-- AdminLTE Callout clarifying population scope -->
+    <div class="callout callout-info" style="margin-bottom: 15px; border-left-width: 4px;">
+        <h5 style="margin-top: 0; font-weight: bold;"><i class="fa fa-info-circle"></i> Phạm vi dữ liệu & Tình trạng theo dõi</h5>
+        <p style="margin-bottom: 0; font-size: 13px; line-height: 1.5;">
+            Số liệu phản ánh nhóm <strong>@Model.Submission.TotalEnterprises</strong> doanh nghiệp đang hoạt động và có phân loại ngành Công Thương trong hệ thống.
+            Hiện CSDL <em>chưa tích hợp danh bạ toàn bộ doanh nghiệp tỉnh</em>, <em>chưa phân tách theo từng loại báo cáo</em> và <em>chưa có danh sách doanh nghiệp có nghĩa vụ nộp theo kỳ</em>.
+            Vì vậy, hệ thống phản ánh số lượng quan sát thực tế (có nộp tệp / có số liệu chỉ tiêu), không hiển thị tỷ lệ hoàn thành nghĩa vụ.
+        </p>
     </div>
 
-    <div class="row progress-kpis progress-kpis-six">
-        <div class="col-xs-6 col-md-4">
-            <article class="dashboard-kpi kpi-blue">
-                <div class="kpi-label">Dự kiến phải báo cáo</div>
-                <div class="kpi-value">@Model.Submission.TotalEnterprises</div>
-                <div class="kpi-note">Nhóm theo dõi đã phân loại</div>
-            </article>
+    <!-- POPULATION SUMMARY BOXES (ROW 1: Reflowed to 3 trustworthy factual cards) -->
+    <div class="row">
+        @*
+        TODO [Dashboard Data Contract]:
+        Enable when TotalEnterpriseCount is provided by backend.
+        <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-gray"><i class="fa fa-globe"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted" title="Tổng doanh nghiệp toàn tỉnh">DN toàn tỉnh</span>
+                    <span class="info-box-number text-muted" style="font-size: 16px;">Chưa tích hợp</span>
+                    <span class="progress-description text-muted" style="font-size: 11px;">Chưa kết nối CSDL tỉnh</span>
+                </div>
+            </div>
         </div>
-        <div class="col-xs-6 col-md-4">
-            <article class="dashboard-kpi kpi-green">
-                <div class="kpi-label">Đã nộp tệp báo cáo</div>
-                <div class="kpi-value">@Model.Submission.Submitted</div>
-                <div class="kpi-note">Có hồ sơ gửi trong kỳ</div>
-            </article>
+        *@
+
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-blue"><i class="fa fa-building"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted" title="Doanh nghiệp thuộc phạm vi quản lý Công Thương">DN Công Thương</span>
+                    <span class="info-box-number">@Model.Submission.TotalEnterprises <small class="text-muted" style="font-size: 13px; font-weight: normal;">doanh nghiệp</small></span>
+                    <span class="progress-description text-muted" style="font-size: 11px;">Phạm vi theo dõi hiện tại</span>
+                </div>
+            </div>
         </div>
-        <div class="col-xs-6 col-md-4">
-            <article class="dashboard-kpi kpi-green">
-                <div class="kpi-label">Đủ 3 chỉ tiêu dashboard</div>
-                <div class="kpi-value">@Model.Submission.CompleteIndicators</div>
-                <div class="kpi-note">Có đủ mã 0101, 06 và 07</div>
-            </article>
+
+        @*
+        TODO [Dashboard Data Contract]:
+        Enable after reporting obligation data contract is confirmed.
+        <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-bullhorn"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted">Thuộc diện báo cáo</span>
+                    <span class="info-box-number">—</span>
+                    <span class="progress-description text-muted">Chưa giao chỉ tiêu kỳ</span>
+                </div>
+            </div>
         </div>
-        <div class="col-xs-6 col-md-4">
-            <article class="dashboard-kpi kpi-amber">
-                <div class="kpi-label">Nộp nhưng thiếu chỉ tiêu</div>
-                <div class="kpi-value">@Model.Submission.MissingIndicators</div>
-                <div class="kpi-note">Thiếu ít nhất một trong 3 mã</div>
-            </article>
+        *@
+
+        @*
+        TODO [Dashboard Data Contract]:
+        Enable after report type enumeration is provided by backend.
+        <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-teal"><i class="fa fa-files-o"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted">Loại báo cáo</span>
+                    <span class="info-box-number">—</span>
+                    <span class="progress-description text-muted">Chưa phân loại mẫu biểu</span>
+                </div>
+            </div>
         </div>
-        <div class="col-xs-6 col-md-4">
-            <article class="dashboard-kpi kpi-amber">
-                <div class="kpi-label">Chưa nộp tệp báo cáo</div>
-                <div class="kpi-value">@Model.Submission.NotSubmitted</div>
-                <div class="kpi-note">Chưa gửi hồ sơ trong kỳ</div>
-            </article>
+        *@
+
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-aqua"><i class="fa fa-file-text-o"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted" title="Doanh nghiệp có tệp ghi nhận trong kỳ">Có tệp ghi nhận</span>
+                    <span class="info-box-number">@Model.Submission.Submitted <small class="text-muted" style="font-size: 13px; font-weight: normal;">doanh nghiệp</small></span>
+                    <span class="progress-description text-muted" style="font-size: 11px;">Tệp nộp trong kỳ báo cáo</span>
+                </div>
+            </div>
         </div>
-        <div class="col-xs-6 col-md-4">
-            <article class="dashboard-kpi kpi-slate">
-                <div class="kpi-label">Nộp muộn hạn định</div>
-                <div class="kpi-value">@Model.Submission.Late</div>
-                <div class="kpi-note">Nằm trong số đã nộp tệp</div>
-            </article>
+
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-check-square-o"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted" title="Doanh nghiệp có dữ liệu chỉ tiêu phát sinh">Có giá trị chỉ tiêu</span>
+                    <span class="info-box-number">@Model.ObservedIndicatorEnterprises <small class="text-muted" style="font-size: 13px; font-weight: normal;">doanh nghiệp</small></span>
+                    <span class="progress-description text-muted" style="font-size: 11px;">Phát sinh chỉ tiêu 0101, 06, 07</span>
+                </div>
+            </div>
         </div>
+
+        @*
+        TODO [Dashboard Data Contract]:
+        Enable when unsubmitted enterprises with legal reporting obligations can be determined.
+        <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="info-box dashboard-progress-info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-exclamation-circle"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted">Chưa báo cáo</span>
+                    <span class="info-box-number">—</span>
+                    <span class="progress-description text-muted">Chưa xác định nghĩa vụ</span>
+                </div>
+            </div>
+        </div>
+        *@
     </div>
 
-    <p class="dashboard-context-link">
-        <i class="fa fa-info-circle" aria-hidden="true"></i> Cần kiểm tra mã chỉ tiêu còn thiếu hoặc lịch sử đối chiếu? 
-        <a href="@Url.Action("Quality", "Dashboard", Model.Filters)">Xem báo cáo độ bao phủ dữ liệu <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-    </p>
+    <!-- ROW 2: ACTION / OPERATIONAL NOTICE -->
+    @{
+        var unobservedCount = Model.Submission.TotalEnterprises - Model.ObservedIndicatorEnterprises;
+    }
+    @if (unobservedCount > 0)
+    {
+        <div class="callout callout-warning" style="margin-top: -5px; margin-bottom: 15px; border-left-width: 4px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <h5 style="margin: 0 0 3px; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> Cần rà soát phát sinh số liệu trong kỳ:</h5>
+                    <span style="font-size: 13px;">Có <strong>@unobservedCount</strong> doanh nghiệp trong nhóm theo dõi chưa phát sinh giá trị chỉ tiêu nào trong kỳ báo cáo này (cần xác minh xem doanh nghiệp có phát sinh hoạt động hoặc được giao nộp báo cáo kỳ này hay không).</span>
+                </div>
+                <div>
+                    <a href="#progressWorklistSection" class="btn btn-xs btn-warning" style="color: #444; font-weight: bold;">
+                        <i class="fa fa-arrow-down"></i> Xem danh sách cần rà soát
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
 
-    <div class="row dashboard-row">
-        <div class="col-md-4">
-            @Html.Partial("_DashboardSubmissionDetails", new CenIT.ReportTourism.Models.Report.DashboardSubmissionDetailsModel { Submission = Model.Submission, Filters = Model.Filters })
-        </div>
-        <div class="col-md-8">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Tỷ lệ hoàn thành theo tháng</h2>
-                        <p>Tỷ lệ doanh nghiệp nộp tệp báo cáo trong năm @Model.Filters.Year</p>
+    <!-- CHARTS & BREAKDOWN ROW -->
+    <div class="row">
+        <div class="col-md-7 col-sm-12">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-line-chart text-primary"></i> Quan sát dữ liệu theo tháng</h3>
+                    <div class="box-tools pull-right">
+                        <span class="label label-default">Năm @Model.Filters.Year</span>
                     </div>
-                </header>
-                @if (Model.Trend.Count < 2)
-                {
-                    <p class="dashboard-empty">Chưa đủ tháng nộp báo cáo để thể hiện xu hướng.</p>
-                }
-                else
-                {
-                    <div id="completion-trend-chart" class="morris-chart warning-trend-chart" role="img" aria-label="Tỷ lệ hoàn thành báo cáo theo tháng"></div>
-                }
-                <script type="application/json" class="md-chart-data" data-chart="completion-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
-            </section>
-        </div>
-    </div>
-
-    <div class="row dashboard-row">
-        <div class="col-md-6">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Nộp tệp theo phường / xã</h2>
-                        <p>Tỷ lệ trong nhóm theo dõi của từng địa bàn</p>
-                    </div>
-                </header>
-                @if (Model.Areas.Count == 0)
-                {
-                    <p class="dashboard-empty">Không có địa bàn trong phạm vi lọc.</p>
-                }
-                @foreach (var area in Model.Areas)
-                {
-                    <div class="progress-breakdown-row">
-                        <div class="horizontal-share-heading">
-                            <strong>@area.Name</strong>
-                            <span>@area.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
-                        </div>
-                        <div class="ranked-bar-track">
-                            <span class="ranked-bar positive" style="width:@area.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span>
-                        </div>
-                        <small>@area.Submitted đã nộp &middot; @area.NotSubmitted chưa nộp</small>
-                    </div>
-                }
-            </section>
-        </div>
-        <div class="col-md-6">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Nộp tệp theo ngành chính</h2>
-                        <p>Tỷ lệ trong nhóm theo dõi của từng ngành</p>
-                    </div>
-                </header>
-                @if (Model.Industries.Count == 0)
-                {
-                    <p class="dashboard-empty">Không có ngành trong phạm vi lọc.</p>
-                }
-                @foreach (var industry in Model.Industries)
-                {
-                    <div class="progress-breakdown-row">
-                        <div class="horizontal-share-heading">
-                            <strong>@industry.Name</strong>
-                            <span>@industry.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
-                        </div>
-                        <div class="ranked-bar-track">
-                            <span class="ranked-bar sector-share" style="width:@industry.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span>
-                        </div>
-                        <small>@industry.Submitted đã nộp &middot; @industry.NotSubmitted chưa nộp</small>
-                    </div>
-                }
-            </section>
-        </div>
-    </div>
-
-    <div class="row dashboard-row">
-        <div class="col-xs-12">
-            <section class="dashboard-panel outstanding-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Đơn vị cần đôn đốc nộp báo cáo</h2>
-                        <p>Các địa bàn và ngành có số lượng báo cáo chưa nộp nhiều nhất trong kỳ</p>
-                    </div>
-                </header>
-                @if (Model.OutstandingAreas.Count == 0)
-                {
-                    <p class="dashboard-empty">Không có đơn vị cần theo dõi trong phạm vi lọc.</p>
-                }
-                <div class="outstanding-grid">
-                    @foreach (var item in Model.OutstandingAreas)
+                </div>
+                <div class="box-body">
+                    <p class="text-muted" style="font-size: 12px; margin-bottom: 10px;">
+                        <i class="fa fa-info-circle"></i> Số doanh nghiệp có tệp và có giá trị chỉ tiêu qua các tháng (hai tập quan sát độc lập).
+                    </p>
+                    @if (Model.ObservationTrend.Count < 2 || !Model.ObservationTrend.Any(x => x.Files > 0 || x.Indicators > 0))
                     {
-                        <div class="outstanding-item">
-                            <span>@item.Name</span>
-                            <strong>@item.NotSubmitted</strong>
-                            <small>chưa nộp</small>
+                        <div class="text-center text-muted" style="padding: 40px 0;">Chưa đủ quan sát để thể hiện xu hướng.</div>
+                    }
+                    else
+                    {
+                        <div id="observation-trend-chart" class="morris-chart" style="height: 250px;" role="img" aria-label="Số doanh nghiệp có tệp và giá trị chỉ tiêu theo tháng"></div>
+                        <div class="chart-series-legend text-center" style="margin-top: 10px; font-size: 12px;">
+                            <span style="margin-right: 15px;"><i class="fa fa-square" style="color: #1686c9;" aria-hidden="true"></i> Có tệp trong kỳ</span>
+                            <span><i class="fa fa-square" style="color: #059669;" aria-hidden="true"></i> Có giá trị chỉ tiêu</span>
+                        </div>
+                    }
+                    <script type="application/json" class="md-chart-data" data-chart="observation-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ObservationTrend))</script>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-sm-12">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-pie-chart text-info"></i> Theo khu vực kinh tế</h3>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    @if (!Model.SectorObservations.Any())
+                    {
+                        <div class="text-center text-muted" style="padding: 30px 0;">Không có khu vực trong phạm vi lọc.</div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr class="bg-gray-light">
+                                    <th>Khu vực kinh tế</th>
+                                    <th class="text-right" title="Số DN trong phạm vi theo dõi">Số DN</th>
+                                    <th class="text-right" title="Số DN có nộp tệp">Có tệp</th>
+                                    <th class="text-right" title="Số DN có phát sinh chỉ tiêu">Có chỉ tiêu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var sector in Model.SectorObservations)
+                                {
+                                    <tr>
+                                        <td><strong>@sector.Name</strong></td>
+                                        <td class="text-right"><span class="badge bg-gray">@sector.Enterprises</span></td>
+                                        <td class="text-right"><span class="label label-info">@sector.Files</span></td>
+                                        <td class="text-right"><span class="label label-success">@sector.Indicators</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AREA BREAKDOWN ROW -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-default collapsed-box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-map-marker text-primary"></i> Phân bổ theo địa bàn (phường / xã)</h3>
+                    <div class="box-tools pull-right">
+                        <span class="badge bg-gray">@Model.AreaObservations.Count địa bàn</span>
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    @if (!Model.AreaObservations.Any())
+                    {
+                        <div class="text-center text-muted" style="padding: 20px 0;">Không có địa bàn trong phạm vi lọc.</div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr class="bg-gray-light">
+                                    <th>Địa bàn (phường / xã)</th>
+                                    <th class="text-right">Số DN theo dõi</th>
+                                    <th class="text-right">Có tệp ghi nhận</th>
+                                    <th class="text-right">Có chỉ tiêu phát sinh</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var area in Model.AreaObservations)
+                                {
+                                    <tr>
+                                        <td><strong>@area.Name</strong></td>
+                                        <td class="text-right"><span class="badge bg-gray">@area.Enterprises</span></td>
+                                        <td class="text-right"><span class="label label-info">@area.Files</span></td>
+                                        <td class="text-right"><span class="label label-success">@area.Indicators</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKLIST SECTION (SECTION 16 & 17) -->
+    <div class="row" id="progressWorklistSection">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-building-o text-primary"></i> Doanh nghiệp cần theo dõi</h3>
+                    <div class="box-tools pull-right">
+                        <span class="label label-primary progress-worklist-count">@Model.EnterpriseRows.Count doanh nghiệp</span>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <p class="text-muted" style="font-size: 12px; margin-bottom: 12px;">
+                        <i class="fa fa-info-circle"></i> Tra cứu các quan sát thực tế; thiếu tệp hoặc chỉ tiêu ở đây chưa đồng nghĩa vi phạm nghĩa vụ báo cáo.
+                    </p>
+                    <div class="row" style="margin-bottom: 12px;">
+                        <div class="col-md-5 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                <input id="progressSearch" type="search" class="form-control" placeholder="Tìm kiếm theo tên doanh nghiệp..." autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-addon"><i class="fa fa-filter"></i></span>
+                                <select id="progressState" class="form-control">
+                                    <option value="all">Tất cả tình trạng quan sát</option>
+                                    <option value="file">Có tệp trong kỳ</option>
+                                    <option value="no-file">Chưa thấy tệp</option>
+                                    <option value="value">Có giá trị chỉ tiêu</option>
+                                    <option value="no-value">Chưa thấy giá trị chỉ tiêu</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    @if (!Model.EnterpriseRows.Any())
+                    {
+                        <div class="text-center text-muted" style="padding: 30px 0;">Không có doanh nghiệp trong phạm vi lọc.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive no-padding">
+                            <table class="table table-hover table-bordered table-striped">
+                                <thead>
+                                    <tr class="bg-gray-light">
+                                        <th style="min-width: 220px;">Doanh nghiệp</th>
+                                        <th style="min-width: 170px;">Địa bàn / Khu vực</th>
+                                        <th class="text-center" style="width: 130px;">Tệp trong kỳ</th>
+                                        <th class="text-center" style="width: 80px;" title="Chỉ tiêu 0101: Doanh thu công nghiệp">0101</th>
+                                        <th class="text-center" style="width: 80px;" title="Chỉ tiêu 06: Kim ngạch xuất khẩu">06</th>
+                                        <th class="text-center" style="width: 80px;" title="Chỉ tiêu 07: Kim ngạch nhập khẩu">07</th>
+                                        <th class="text-center" style="width: 80px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.EnterpriseRows)
+                                    {
+                                        var hasValue = item.HasIndustrialRevenue || item.HasExportValue || item.HasImportValue;
+                                        <tr data-progress-enterprise data-has-file="@(item.HasFile ? "true" : "false")" data-has-value="@(hasValue ? "true" : "false")">
+                                            <td><strong>@item.Name</strong></td>
+                                            <td>
+                                                <div>@(item.WardName ?? "Chưa có địa bàn")</div>
+                                                <small class="text-muted">@(item.EconomicSectorName ?? "Chưa phân khu vực")</small>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.HasFile)
+                                                {
+                                                    <span class="label label-success"><i class="fa fa-check"></i> Có tệp</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-default">Chưa thấy tệp</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.HasIndustrialRevenue)
+                                                {
+                                                    <span class="label label-info" title="Có giá trị ghi nhận"><i class="fa fa-check"></i></span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.HasExportValue)
+                                                {
+                                                    <span class="label label-info" title="Có giá trị ghi nhận"><i class="fa fa-check"></i></span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.HasImportValue)
+                                                {
+                                                    <span class="label label-info" title="Có giá trị ghi nhận"><i class="fa fa-check"></i></span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="@Url.Action("Index", "Dashboard", new { year = Model.Filters.Year, month = Model.Filters.Month, enterpriseId = item.EnterpriseId })" class="btn btn-xs btn-default" title="Xem doanh nghiệp này">
+                                                    <i class="fa fa-eye"></i> Xem
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="progress-worklist-empty text-center text-muted" style="padding: 25px 0;" hidden>
+                            <i class="fa fa-search"></i> Không có doanh nghiệp phù hợp với tìm kiếm hoặc bộ lọc.
                         </div>
                     }
                 </div>
-            </section>
+            </div>
         </div>
     </div>
 </div>

@@ -6,10 +6,19 @@
         enterpriseId = filters.EnterpriseId, metric = filters.Metric };
 }
 
-<a class="dashboard-skip" href="#dashboard-content">Chuyển đến nội dung dashboard</a>
-<nav class="dashboard-tabs" aria-label="Các trang dashboard">
-    <a class="@(Model.Active == "Overview" ? "active" : "")" aria-current="@(Model.Active == "Overview" ? "page" : null)" href="@Url.Action("Index", "Dashboard", route)"><i class="fa fa-bar-chart" aria-hidden="true"></i> Tổng quan</a>
-    <a class="@(Model.Active == "Analysis" ? "active" : "")" aria-current="@(Model.Active == "Analysis" ? "page" : null)" href="@Url.Action("Analysis", "Dashboard", route)"><i class="fa fa-sitemap" aria-hidden="true"></i> Phân tích chỉ tiêu</a>
-    <a class="@(Model.Active == "Warnings" ? "active" : "")" aria-current="@(Model.Active == "Warnings" ? "page" : null)" href="@Url.Action("Warnings", "Dashboard", route)"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Cảnh báo</a>
-    <a class="@(Model.Active == "Progress" ? "active" : "")" aria-current="@(Model.Active == "Progress" ? "page" : null)" href="@Url.Action("Progress", "Dashboard", route)"><i class="fa fa-check-square-o" aria-hidden="true"></i> Tiến độ</a>
-</nav>
+<div class="nav-tabs-custom dashboard-nav-tabs">
+    <ul class="nav nav-tabs">
+        <li class="@(Model.Active == "Overview" ? "active" : "")">
+            <a href="@Url.Action("Index", "Dashboard", route)"><i class="fa fa-bar-chart text-primary"></i> <span>Tổng quan</span></a>
+        </li>
+        <li class="@(Model.Active == "Analysis" ? "active" : "")">
+            <a href="@Url.Action("Analysis", "Dashboard", route)"><i class="fa fa-sitemap text-info"></i> <span>Phân tích chỉ tiêu</span></a>
+        </li>
+        <li class="@(Model.Active == "Warnings" ? "active" : "")">
+            <a href="@Url.Action("Warnings", "Dashboard", route)"><i class="fa fa-exclamation-triangle text-warning"></i> <span>Cảnh báo</span></a>
+        </li>
+        <li class="@(Model.Active == "Progress" ? "active" : "")">
+            <a href="@Url.Action("Progress", "Dashboard", route)"><i class="fa fa-list-alt text-success"></i> <span>Theo dõi dữ liệu</span></a>
+        </li>
+    </ul>
+</div>

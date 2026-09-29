@@ -1,31 +1,68 @@
-﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
-
+@model CenIT.ReportTourism.Models.Report.DashboardModel
 @using System.Linq
-<section class="dashboard-panel sector-panel">
-    <header class="panel-heading">
-        <div><h2>Khu vực kinh tế</h2><p>Tỷ trọng trong số giá trị có chỉ tiêu, không đại diện toàn tỉnh</p></div>
-        <i class="fa fa-pie-chart panel-icon" aria-hidden="true"></i>
-    </header>
-    @if (!Model.SectorContributions.Any()) { <p class="dashboard-empty">Chưa có giá trị dương theo khu vực kinh tế.</p> }
-    @foreach (var metric in new[] { new { Name = "Doanh thu công nghiệp", Key = "industrial" }, new { Name = "Xuất khẩu", Key = "export" }, new { Name = "Nhập khẩu", Key = "import" } })
-    {
-        if (!Model.SectorContributions.Any(s => (metric.Key == "industrial" ? s.GtsXcnShare : metric.Key == "export" ? s.ExportShare : s.ImportShare) > 0)) { continue; }
-        <div class="sector-metric">
-            <div class="sector-metric-heading"><strong>@metric.Name</strong><span>100%</span></div>
-            <div class="sector-stack" role="img" aria-label="@metric.Name theo khu vực kinh tế">
-                @foreach (var sector in Model.SectorContributions)
-                {
-                    var width = metric.Key == "industrial" ? sector.GtsXcnShare : metric.Key == "export" ? sector.ExportShare : sector.ImportShare;
-                    <span class="sector-segment" style="width:@width.ToString(System.Globalization.CultureInfo.InvariantCulture)%" title="@sector.Name: @width%"></span>
-                }
+
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-pie-chart text-info"></i> Cơ cấu khu vực kinh tế</h3>
+    </div>
+    <div class="box-body">
+        <p class="text-muted" style="font-size: 12px; margin-bottom: 12px;">
+            <i class="fa fa-info-circle"></i> Tỷ trọng trong số giá trị có chỉ tiêu, không đại diện toàn tỉnh.
+        </p>
+        @if (!Model.SectorContributions.Any())
+        {
+            <div class="text-center text-muted" style="padding: 40px 0;">
+                Chưa có giá trị dương theo khu vực kinh tế.
             </div>
-            <div class="sector-values">
-                @foreach (var sector in Model.SectorContributions)
-                {
-                    var value = metric.Key == "industrial" ? sector.GtsXcnShare : metric.Key == "export" ? sector.ExportShare : sector.ImportShare;
-                    <span>@sector.Name <b>@value%</b></span>
-                }
-            </div>
-        </div>
-    }
-</section>
+        }
+        else
+        {
+            var colors = new[] { "progress-bar-primary", "progress-bar-success", "progress-bar-warning", "progress-bar-danger", "progress-bar-info" };
+            var textColors = new[] { "text-blue", "text-green", "text-yellow", "text-red", "text-aqua" };
+
+            foreach (var metric in new[] {
+                new { Name = "Doanh thu công nghiệp", Key = "industrial" },
+                new { Name = "Kim ngạch xuất khẩu", Key = "export" },
+                new { Name = "Kim ngạch nhập khẩu", Key = "import" }
+            })
+            {
+                var hasPositive = Model.SectorContributions.Any(s => (metric.Key == "industrial" ? s.GtsXcnShare : metric.Key == "export" ? s.ExportShare : s.ImportShare) > 0);
+                if (!hasPositive) { continue; }
+
+                <div class="sector-metric-block" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <strong>@metric.Name</strong>
+                        <span class="text-muted">100%</span>
+                    </div>
+                    <div class="progress progress-sm" style="margin-bottom: 6px; height: 16px; border-radius: 3px;" role="img" aria-label="@metric.Name theo khu vực kinh tế">
+                        @{ int cIdx = 0; }
+                        @foreach (var sector in Model.SectorContributions)
+                        {
+                            var share = metric.Key == "industrial" ? sector.GtsXcnShare : metric.Key == "export" ? sector.ExportShare : sector.ImportShare;
+                            if (share > 0)
+                            {
+                                var barClass = colors[cIdx % colors.Length];
+                                <div class="progress-bar @barClass" style="width: @share.ToString(System.Globalization.CultureInfo.InvariantCulture)%" title="@sector.Name: @share%">
+                                    @if (share >= 15) { <span>@share%</span> }
+                                </div>
+                            }
+                            cIdx++;
+                        }
+                    </div>
+                    <div class="sector-metric-legend" style="font-size: 11px;">
+                        @{ cIdx = 0; }
+                        @foreach (var sector in Model.SectorContributions)
+                        {
+                            var share = metric.Key == "industrial" ? sector.GtsXcnShare : metric.Key == "export" ? sector.ExportShare : sector.ImportShare;
+                            var tColor = textColors[cIdx % textColors.Length];
+                            <span style="display: inline-block; margin-right: 12px; margin-bottom: 2px;">
+                                <i class="fa fa-circle @tColor"></i> @sector.Name: <b>@share%</b>
+                            </span>
+                            cIdx++;
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
