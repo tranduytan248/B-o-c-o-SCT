@@ -43,6 +43,10 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
         private readonly CateEnterpriseTypeCache _enterpriseTypeCache = new CateEnterpriseTypeCache();
         private readonly CateEconomicSectorCache _economicSectorCache = new CateEconomicSectorCache();
         private readonly CateEnterpriseStatusCache _enterpriseStatusCache = new CateEnterpriseStatusCache();
+        private readonly CateBusinessProductCache _businessProductCache = new CateBusinessProductCache();
+
+        // Sản phẩm chính: chỉ chọn sản phẩm cấp 7 (Cate_BusinessProduct.IsLevel) thuộc các ngành của doanh nghiệp
+        private const int MainProductLevel = 7;
 
         private readonly string _enterpriseFolder = "Enterprise";
         private readonly string _enterpriseTitle = AppProcessor.Messagor.GetMessage("Enterprise_Title");
@@ -74,9 +78,9 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 .Select(d => new ListItem(d.WardName, d.WardId.ToString()))
                 .Distinct().ToList();
 
-            model.ListBusinessIndustry = _industryCache.GetAll()
-                .OrderBy(d => d.IndustryName)
-                .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList();
+            model.ListBusinessIndustry = GetListBusinessIndustry();
+            model.MainProductId = GetMainProductId(model.EnterpriseId);
+            model.ListMainProduct = GetListMainProduct(model.IndustryIds);
 
             model.ListEnterpriseType = _enterpriseTypeCache.GetAll()
                 .OrderBy(d => d.Name)
@@ -124,6 +128,10 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
             // Trường được gửi lên thì cập nhật bình thường => muốn cho doanh nghiệp sửa chỉ cần bỏ disabled ở view.
             KeepCurrentValuesIfNotPosted(model, current);
 
+            // Dropdown "Sản phẩm chính" bị disable (không gửi lên) thì giữ nguyên, không lưu lại
+            var isMainProductPosted = IsPosted("MainProductId");
+            if (isMainProductPosted) ValidateMainProduct(model.MainProductId, model.IndustryIds);
+
             if (!ModelState.IsValid)
             {
                 model.ListProvinces = _provinceCache.GetAll()
@@ -136,9 +144,8 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                     .Select(d => new ListItem(d.WardName, d.WardId.ToString()))
                     .Distinct().ToList();
 
-                model.ListBusinessIndustry = _industryCache.GetAll()
-                    .OrderBy(d => d.IndustryName)
-                    .Select(d => new ListItem(d.IndustryName, d.IndustryId.ToString())).ToList();
+                model.ListBusinessIndustry = GetListBusinessIndustry();
+                model.ListMainProduct = GetListMainProduct(model.IndustryIds);
 
                 model.ListEnterpriseType = _enterpriseTypeCache.GetAll()
                     .OrderBy(d => d.Name)
@@ -198,6 +205,16 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                         EnumProcessType.DataExisted, EnumMsgIcon.Error);
                 return Json(new { status = true, message = errMessage });
             }
+
+            // Chỉ lưu khi sản phẩm chính thay đổi => không xoá dòng cũ không hiển thị được (sản phẩm đã bị xoá)
+            if (enterpriseId > 0 && isMainProductPosted && model.MainProductId != GetMainProductId(enterpriseId) &&
+                _enterpriseCache.SaveMainProduct(enterpriseId, model.MainProductId, User.Email) < 0)
+                return Json(new
+                {
+                    status = true,
+                    message = CreateMessage($"{AppProcessor.Messagor.GetMessage("Enterprise_MainProduct")} [{model.BusinessName}]",
+                        EnumProcessType.Edit, EnumMsgIcon.Error)
+                });
 
             if (enterpriseId > 0 && model.ListCertificateFiles != null && model.ListCertificateFiles.Count > 0)
             {
@@ -311,6 +328,12 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
             model.TypeBusiness = model.ListTypeBusinessId != null && model.ListTypeBusinessId.Count > 0
                 ? string.Join(",", model.ListTypeBusinessId)
                 : null;
+
+            if (!IsPosted("MainProductId"))
+            {
+                RemoveModelState("MainProductId");
+                model.MainProductId = GetMainProductId(current.EnterpriseId);
+            }
         }
 
         private bool IsPosted(string key)
@@ -339,6 +362,51 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 if (int.TryParse(item.Trim(), out id)) result.Add(id);
             }
             return result;
+        }
+
+        /// <summary>
+        ///     Danh sách ngành công nghiệp, hiển thị dạng "Mã - Tên"
+        /// </summary>
+        private List<ListItem> GetListBusinessIndustry()
+        {
+            return _industryCache.GetAll()
+                .OrderBy(d => d.IndustryCode, StringComparer.Ordinal)
+                .Select(d => new ListItem(FormatCodeName(d.IndustryCode, d.IndustryName), d.IndustryId.ToString()))
+                .ToList();
+        }
+
+        /// <summary>
+        ///     Danh sách sản phẩm chính thuộc các ngành industryIds ("1,2,3"), hiển thị dạng "Mã - Tên"
+        /// </summary>
+        private List<ListItem> GetListMainProduct(string industryIds)
+        {
+            // Chỉ nhận IndustryId hợp lệ, bỏ trùng, sắp xếp => tham số procedure và key cache ổn định
+            var ids = string.Join(",", SplitIds(industryIds).Where(id => id > 0).Distinct().OrderBy(id => id));
+            return _businessProductCache.GetByIndustries(ids, MainProductLevel)
+                .Select(d => new ListItem(FormatCodeName(d.ProductCode, d.ProductName), d.ProductId.ToString()))
+                .ToList();
+        }
+
+        private int? GetMainProductId(int enterpriseId)
+        {
+            var mainProduct = _enterpriseCache.GetMainProduct(enterpriseId);
+            return mainProduct != null && mainProduct.ProductId > 0 ? mainProduct.ProductId : (int?)null;
+        }
+
+        /// <summary>
+        ///     Sản phẩm chính phải thuộc danh sách sản phẩm của các ngành đã chọn
+        /// </summary>
+        private void ValidateMainProduct(int? mainProductId, string industryIds)
+        {
+            if (!mainProductId.HasValue) return;
+            var productId = mainProductId.Value.ToString();
+            if (GetListMainProduct(industryIds).Any(d => d.Value == productId)) return;
+            ModelState.AddModelError("MainProductId", "Sản phẩm chính không thuộc ngành công nghiệp đã chọn");
+        }
+
+        private static string FormatCodeName(string code, string name)
+        {
+            return string.IsNullOrWhiteSpace(code) ? name : $"{code} - {name}";
         }
 
         //[AjaxOnly]
@@ -419,6 +487,18 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
 
             var lstWardViaProvinces = _wardCache.GetByProvinceId(provinceId, out total).OrderBy(d => d.ProvinceName).ToList();
             return Json(new { Wards = lstWardViaProvinces });
+        }
+
+        /// <summary>
+        ///     Danh sách sản phẩm chính theo các ngành công nghiệp đang chọn (industryIds: "1,2,3")
+        /// </summary>
+        [AjaxOnly]
+        [HttpGet]
+        [ActionType(Type = EnumActionType.Edit)]
+        public ActionResult MainProductViaIndustries(string industryIds)
+        {
+            var products = GetListMainProduct(industryIds).Select(d => new { d.Value, d.Text }).ToList();
+            return Json(new { Products = products });
         }
 
         #endregion

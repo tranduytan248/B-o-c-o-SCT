@@ -25,6 +25,8 @@ namespace CenIT.ReportTourism.Biz.Cate
         private readonly string _cateEnterprisesImport = "Cate_Enterprises_Import";
         private readonly string _cateEnterprisesSaveDocs = "Cate_Enterprises_SaveDocs";
         private readonly string _cateEnterprisesSearch = "Cate_Enterprises_Search";
+        private readonly string _cateEnterpriseMainProductGet = "Cate_BusinessEnterpriseProduct_GetMainProduct";
+        private readonly string _cateEnterpriseMainProductSave = "Cate_BusinessEnterpriseProduct_SaveMainProduct";
 
         public List<CateEnterpriseModel> Get(out int total, SearchEnterpriseModel search)
         {
@@ -119,6 +121,23 @@ namespace CenIT.ReportTourism.Biz.Cate
                 model.SavedBy
             );
             return result.GetValueOrDefault(0);
+        }
+
+        public CateBusinessProductModel GetMainProduct(int enterpriseId)
+        {
+            return AppProcessor.ProcedureProvider.ExecuteScalarObject<CateBusinessProductModel>(
+                _cateEnterpriseMainProductGet, DATA_PROVIDER_NAME, enterpriseId);
+        }
+
+        /// <summary>
+        ///     Lưu sản phẩm chính của doanh nghiệp (productId null => bỏ sản phẩm chính).
+        ///     Trả về: productId (0 nếu bỏ sản phẩm chính), -3 sản phẩm không tồn tại, -1 lỗi
+        /// </summary>
+        public int SaveMainProduct(int enterpriseId, int? productId, string savedBy)
+        {
+            var result = AppProcessor.ProcedureProvider.Execute(_cateEnterpriseMainProductSave, DATA_PROVIDER_NAME,
+                enterpriseId, productId, savedBy);
+            return result.GetValueOrDefault(-1);
         }
 
         public int Register(CateEnterpriseModel model)

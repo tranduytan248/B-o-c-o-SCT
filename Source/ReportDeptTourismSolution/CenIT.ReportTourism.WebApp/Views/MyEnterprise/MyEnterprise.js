@@ -1,6 +1,7 @@
 ﻿var _myEnterpriseUrls = {
     enterpriseInfoUrl: "/MyEnterprise/Info/",
-    enterpriseTypeBusinessInfoUrl: "/MyEnterprise/TypeBusinessInfo/"
+    enterpriseTypeBusinessInfoUrl: "/MyEnterprise/TypeBusinessInfo/",
+    mainProductViaIndustriesUrl: "/MyEnterprise/MainProductViaIndustries"
 };
 
 function OnLoadEnterpriseInfo(cbb, eleInfo, eleTypeBusinessInfo) {
@@ -50,4 +51,48 @@ function OnChangeProvince(cbbProvince, cbbWard) {
                 });
         }
     });
+}
+
+// Nạp lại dropdown "Sản phẩm chính" theo các ngành công nghiệp đang chọn
+function OnChangeIndustries(cbbIndustry, cbbProduct) {
+    var industryIds = $.grep($(cbbIndustry).val() || [], function(id) { return id; }).join(",");
+
+    // Đổi ngành liên tục: bỏ request cũ, chỉ lấy kết quả của lần chọn cuối
+    var request = $(cbbProduct).data("request");
+    if (request) request.abort();
+
+    if (industryIds.length === 0) {
+        FillMainProducts(cbbProduct, []);
+        return;
+    }
+
+    request = $.ajax({
+        type: "GET",
+        url: _myEnterpriseUrls.mainProductViaIndustriesUrl,
+        data: { industryIds: industryIds },
+        dataType: "JSON",
+        success: function(response) {
+            FillMainProducts(cbbProduct, response.Products);
+        },
+        complete: function() {
+            if ($(cbbProduct).data("request") === request) $(cbbProduct).removeData("request");
+        }
+    });
+    $(cbbProduct).data("request", request);
+}
+
+// Giữ lại sản phẩm đang chọn nếu vẫn thuộc danh sách mới, ngược lại bỏ chọn
+function FillMainProducts(cbbProduct, products) {
+    var productId = $(cbbProduct).val();
+
+    $(cbbProduct).empty().append('<option value=""></option>');
+    $.each(products || [],
+        function(index, item) {
+            $(cbbProduct).append($("<option></option>").val(item.Value).text(item.Text));
+        });
+
+    var hasProduct = !!productId && $(cbbProduct).find("option").filter(function() {
+        return this.value === productId;
+    }).length > 0;
+    $(cbbProduct).val(hasProduct ? productId : "").trigger("change");
 }

@@ -46,6 +46,20 @@ namespace CenIT.ReportTourism.Caches.Cate
             return products;
         }
 
+        /// <summary>
+        ///     Sản phẩm thuộc các ngành (industryIds: danh sách IndustryId cách nhau bởi dấu phẩy) theo cấp sản phẩm
+        /// </summary>
+        [DataObjectMethod(DataObjectMethodType.Select, false)]
+        public List<CateBusinessProductModel> GetByIndustries(string industryIds, int isLevel)
+        {
+            if (string.IsNullOrWhiteSpace(industryIds)) return new List<CateBusinessProductModel>();
+            var rawKey = "BusinessProductsByIndustries-" + industryIds + "-" + isLevel;
+            if (GetCacheItem(rawKey) is List<CateBusinessProductModel> products) return products;
+            products = Api.GetByIndustries(industryIds, isLevel) ?? new List<CateBusinessProductModel>();
+            AddCacheItem(rawKey, products);
+            return products;
+        }
+
         [DataObjectMethod(DataObjectMethodType.Select, true)]
         public List<CateBusinessProductModel> Get(out int total, int? industryId = null, SysSearchModel search = null)
         {
