@@ -1,204 +1,48 @@
 @model CenIT.ReportTourism.Models.Report.DashboardWarningsModel
 @using System.Linq
-
 @{
-    ViewBag.Title = "Cảnh báo doanh nghiệp";
-    var maxIndWarning = Math.Max(1, Model.ByIndustry.Any() ? Model.ByIndustry.Max(x => (int)x.Contribution) : 1);
+    ViewBag.Title = "Tín hiệu biến động";
 }
-
-@section Title { @ViewBag.Title }
-
+@section Title { Tín hiệu biến động }
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
-
-<div class="management-dashboard">
+<div class="management-dashboard dashboard-warnings-page">
     @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Warnings", Filters = Model.Filters })
-    
-    <div class="dashboard-heading">
-        <div>
-            <h1 id="dashboard-content" tabindex="-1">Cảnh báo biến động doanh nghiệp</h1>
-            <p>Doanh thu công nghiệp trong nhóm theo dõi so với tháng trước <span class="scope-badge">Cần hai kỳ có dữ liệu</span></p>
-        </div>
-        <span class="dashboard-updated"><i class="fa fa-clock-o" aria-hidden="true"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
-    </div>
-
+    <div class="dashboard-heading"><div><h1 id="dashboard-content">Tín hiệu biến động</h1><p>@Model.TypeName · @Model.Metric.Label · Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year</p></div></div>
     @Html.Partial("_DashboardFilters", Model.FilterOptions)
-    
-    @if (!Model.HasComparisonData)
-    {
-        <p class="dashboard-empty">Chưa có hai tháng liên tiếp với doanh thu công nghiệp của cùng doanh nghiệp; chưa thể đánh giá mức giảm.</p>
-    }
-
-    <div class="row warning-kpis">
-        <div class="col-xs-6 col-md-3">
-            <article class="warning-kpi level-10">
-                <span>Giảm trên 10%</span>
-                <strong>@(Model.HasComparisonData ? Model.Summary.DeclineOver10.ToString() : "—")</strong>
-                <small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small>
-            </article>
+    <div class="leader-bento leader-warnings-grid">
+        <div class="box box-default leader-panel leader-warning-compared"><span class="leader-eyebrow">Có thể đối chiếu</span><strong class="leader-value">@Model.ComparableCount / @Model.Assigned</strong><span class="leader-label">doanh nghiệp được phân loại có số liệu hai kỳ</span></div>
+        @if (Model.IsIndustrial)
+        {
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 10%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver10.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 20%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver20.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 30%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver30.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+        }
+        else
+        {
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Biến động lớn nhất</span><strong class="leader-value">@(Model.Movements.Any() ? String.Format("{0:+#,##0.##;-#,##0.##;0}", Model.Movements.First().Change) : "—") <small>@Model.Metric.Unit</small></strong><span class="leader-label">@Model.Metric.Label</span></div>
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Doanh nghiệp giảm</span><strong class="leader-value">@Model.Movements.Count(x => x.Change < 0)</strong><span class="leader-label">trong danh sách biến động lớn</span></div>
+        }
+        <div class="box box-default leader-panel leader-warning-conflicts"><span class="leader-eyebrow">Dữ liệu cần đối chiếu</span><strong class="leader-value">@Model.ConflictCount</strong><span class="leader-label">doanh nghiệp có mã chỉ tiêu trùng trong kỳ</span></div>
+        <div class="box box-default leader-panel leader-warning-chart">
+            <div class="leader-panel-header"><h2>Xu hướng số doanh nghiệp giảm</h2><span>@(Model.IsIndustrial ? "Giảm trên 10%" : "Giảm so với tháng trước")</span></div>
+            <div id="warning-trend-chart" class="leader-chart" role="img" aria-label="Xu hướng số doanh nghiệp có mức giảm"></div>
+            <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Doanh nghiệp giảm</th></tr></thead><tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td>@(point.Value.HasValue ? point.Value.Value.ToString("#,##0") : "Chưa đủ cặp so sánh")</td></tr> }</tbody></table></div></details>
         </div>
-        <div class="col-xs-6 col-md-3">
-            <article class="warning-kpi level-20">
-                <span>Giảm trên 20%</span>
-                <strong>@(Model.HasComparisonData ? Model.Summary.DeclineOver20.ToString() : "—")</strong>
-                <small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small>
-            </article>
-        </div>
-        <div class="col-xs-6 col-md-3">
-            <article class="warning-kpi level-30">
-                <span>Giảm trên 30%</span>
-                <strong>@(Model.HasComparisonData ? Model.Summary.DeclineOver30.ToString() : "—")</strong>
-                <small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small>
-            </article>
-        </div>
-        <div class="col-xs-6 col-md-3">
-            <article class="warning-kpi level-urgent">
-                <span>Cần làm việc ngay</span>
-                <strong>@(Model.HasComparisonData ? Model.Summary.UrgentEnterprises.ToString() : "—")</strong>
-                <small>@(Model.HasComparisonData ? "doanh nghiệp" : "chưa đủ lịch sử")</small>
-            </article>
+        <div class="box box-default leader-panel leader-warning-list">
+            <div class="leader-panel-header"><h2>@(Model.IsIndustrial ? "Doanh nghiệp giảm trên 10%" : "Biến động lớn theo doanh nghiệp")</h2><span>@Model.Metric.Unit</span></div>
+            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có cặp giá trị phù hợp để hiển thị.</p> }
+            <div class="table-responsive"><table class="table table-hover leader-table"><thead><tr><th>Doanh nghiệp</th><th class="text-right">Kỳ trước</th><th class="text-right">Kỳ này</th><th class="text-right">Thay đổi</th><th class="text-right">Tỷ lệ</th></tr></thead><tbody>
+                @foreach (var item in Model.Movements)
+                { <tr><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td><td class="text-right">@(item.Percent.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", item.Percent.Value) : "—")</td></tr> }
+            </tbody></table></div>
         </div>
     </div>
-
-    <div class="row dashboard-row">
-        <div class="col-md-4">
-            <section class="dashboard-panel severity-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Mức độ cảnh báo</h2>
-                        <p>Phân bố theo ngưỡng giảm (các mức không trùng lặp)</p>
-                    </div>
-                </header>
-                @if (!Model.HasComparisonData)
-                {
-                    <p class="dashboard-empty">Chưa có kỳ đối chiếu hợp lệ để phân loại mức giảm.</p>
-                }
-                else if (Model.Summary.DeclineOver10 == 0)
-                {
-                    <p class="dashboard-empty">Không có doanh nghiệp giảm trên 10% trong các cặp dữ liệu hợp lệ.</p>
-                }
-                else
-                {
-                    <div id="warning-severity-chart" class="severity-chart" role="img" aria-label="Phân bố mức độ cảnh báo"></div>
-                }
-                <script type="application/json" class="md-chart-data" data-chart="severity">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.HasComparisonData ? new[] {
-                    new { label = "Giảm 10–20%", value = Model.Summary.DeclineOver10 - Model.Summary.DeclineOver20 },
-                    new { label = "Giảm 20–30%", value = Model.Summary.DeclineOver20 - Model.Summary.DeclineOver30 },
-                    new { label = "Giảm trên 30%", value = Model.Summary.DeclineOver30 }
-                } : new object[0]))</script>
-            </section>
-        </div>
-        <div class="col-md-8">
-            <section class="dashboard-panel warning-trend-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Cảnh báo theo thời gian</h2>
-                        <p>Số doanh nghiệp có mức giảm vượt ngưỡng qua các tháng</p>
-                    </div>
-                </header>
-                @if (Model.Trend.Count < 2)
-                {
-                    <p class="dashboard-empty">Chưa đủ tháng có cặp dữ liệu để hiển thị xu hướng cảnh báo.</p>
-                }
-                else
-                {
-                    <div id="warning-trend-chart" class="morris-chart warning-trend-chart" role="img" aria-label="Xu hướng cảnh báo theo tháng"></div>
-                }
-                <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
-            </section>
-        </div>
-    </div>
-
-    <div class="row dashboard-row">
-        <div class="col-md-4">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Cảnh báo theo ngành</h2>
-                        <p>Số doanh nghiệp giảm doanh thu vượt ngưỡng</p>
-                    </div>
-                </header>
-                @if (Model.ByIndustry.Count == 0)
-                {
-                    <p class="dashboard-empty">Chưa có cảnh báo theo ngành.</p>
-                }
-                @foreach (var item in Model.ByIndustry)
-                {
-                    <div class="compact-impact-row">
-                        <span title="@item.Name">@item.Name</span>
-                        <div class="ranked-bar-track">
-                            <span class="ranked-bar warning" style="width:@((item.Contribution * 100 / maxIndWarning))%"></span>
-                        </div>
-                        <strong>@item.Contribution</strong>
-                    </div>
-                }
-            </section>
-        </div>
-        <div class="col-md-8">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Danh sách doanh nghiệp cần ưu tiên xử lý</h2>
-                        <p>Sắp xếp theo mức độ sụt giảm tuyệt đối (Tỷ đồng) và tỷ lệ giảm (%)</p>
-                    </div>
-                </header>
-                @if (Model.UrgentEnterprises.Count == 0)
-                {
-                    <p class="dashboard-empty">Chưa có doanh nghiệp vượt ngưỡng cảnh báo trong kỳ báo cáo này.</p>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-enterprise table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Doanh nghiệp</th>
-                                    <th>Ngành chính</th>
-                                    <th class="num-col">Kỳ trước</th>
-                                    <th class="num-col">Kỳ này</th>
-                                    <th class="num-col">Tỷ lệ giảm</th>
-                                    <th class="num-col">Biến động (Tỷ)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.UrgentEnterprises)
-                                {
-                                    <tr>
-                                        <td>
-                                            <strong>@item.Name</strong>
-                                        </td>
-                                        <td>
-                                            <span class="badge-tone tone-slate">@item.Industry</span>
-                                        </td>
-                                        <td class="num-col">
-                                            @item.PreviousValue.ToString("#,##0.##")
-                                        </td>
-                                        <td class="num-col">
-                                            @item.CurrentValue.ToString("#,##0.##")
-                                        </td>
-                                        <td class="num-col">
-                                            <span class="badge-tone tone-red">
-                                                @String.Format("{0:+0.0;-0.0;0.0}%", item.ChangePercent)
-                                            </span>
-                                        </td>
-                                        <td class="num-col">
-                                            <strong class="text-negative">
-                                                @item.Contribution.ToString("#,##0.##")
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </section>
-        </div>
-    </div>
+    <div class="leader-data-note">Các biến động là tín hiệu từ dữ liệu nhập, không phải kết luận vi phạm hay danh sách cần xử lý. Tỷ lệ thay đổi không tính khi kỳ trước bằng 0.</div>
 </div>
-
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
     <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>

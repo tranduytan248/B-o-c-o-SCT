@@ -55,20 +55,10 @@ namespace CenIT.ReportTourism.Caches.Report
             return cached;
         }
 
-        public DashboardQualityModel GetQuality(DashboardFilters filters)
-        {
-            var key = CacheKey("Quality", filters);
-            var cached = GetCacheItem(key) as DashboardQualityModel;
-            if (cached != null) return cached;
-            cached = Api.GetQuality(filters);
-            AddCacheItem(key, cached);
-            return cached;
-        }
-
         private static string CacheKey(string page, DashboardFilters filters)
         {
             filters = filters ?? new DashboardFilters();
-            return string.Join("-", "ManagementDashboard", page, filters.Year, filters.Month,
+            return string.Join("-", "ManagementDashboard", page, filters.Year, filters.Month, filters.ReportType,
                 filters.AreaId ?? "all", filters.EconomicSectorId ?? "all", filters.IndustryId ?? "all",
                 filters.EnterpriseId ?? "all", filters.Metric ?? "industrial");
         }

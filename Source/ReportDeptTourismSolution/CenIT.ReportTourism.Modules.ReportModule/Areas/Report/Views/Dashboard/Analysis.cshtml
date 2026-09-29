@@ -1,230 +1,66 @@
 @model CenIT.ReportTourism.Models.Report.DashboardAnalysisModel
-@using System.Web.Mvc
 @using System.Linq
-
 @{
     ViewBag.Title = "Phân tích chỉ tiêu";
-    var maxIndImpact = Math.Max(1m, Model.IndustryContributions.Select(x => Math.Abs(x.Contribution)).DefaultIfEmpty(1m).Max());
-    var maxEntImpact = Math.Max(1m, Model.EnterpriseImpact.Select(x => Math.Abs(x.Contribution)).DefaultIfEmpty(1m).Max());
-    var unitName = Model.Filters.Metric == "industrial" ? "Tỷ đồng" : "1.000 USD";
 }
-
-@section Title { @ViewBag.Title }
-
+@section Title { Phân tích chỉ tiêu }
 @section HeadCss {
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
-
-<div class="management-dashboard">
+<div class="management-dashboard dashboard-analysis-page">
     @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Analysis", Filters = Model.Filters })
-    
-    <div class="dashboard-heading">
-        <div>
-            <h1 id="dashboard-content" tabindex="-1">Phân tích chỉ tiêu: @Model.MetricLabel</h1>
-            <p>Nhóm theo dõi đã phân loại <span class="breadcrumb-separator">&rsaquo;</span> Khu vực kinh tế <span class="breadcrumb-separator">&rsaquo;</span> Ngành <span class="breadcrumb-separator">&rsaquo;</span> Doanh nghiệp <span class="scope-badge">Chỉ dựa trên dữ liệu đã có</span></p>
-        </div>
-        <span class="dashboard-updated"><i class="fa fa-clock-o" aria-hidden="true"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
-    </div>
-
+    <div class="dashboard-heading"><div><h1 id="dashboard-content">Phân tích chỉ tiêu</h1><p>@Model.TypeName · Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year</p></div></div>
     @Html.Partial("_DashboardFilters", Model.FilterOptions)
-
-    <div class="row analysis-kpis">
-        <div class="col-xs-6 col-md-3">
-            <article class="dashboard-kpi kpi-blue">
-                <div class="kpi-label">@Model.MetricLabel hiện tại</div>
-                <div class="kpi-value">@Model.CurrentValue</div>
-                <div class="kpi-note">Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year &middot; @unitName</div>
-            </article>
+    <div class="leader-bento leader-analysis-grid">
+        <div class="box box-default leader-panel leader-analysis-primary">
+            <span class="leader-eyebrow">Kỳ hiện tại · @Model.SelectedMetric.Code</span>
+            <strong class="leader-value">@Model.CurrentValue <small>@Model.SelectedMetric.Unit</small></strong>
+            <span class="leader-label">@Model.SelectedMetric.Label</span>
         </div>
-        <div class="col-xs-6 col-md-3">
-            <article class="dashboard-kpi kpi-green">
-                <div class="kpi-label">So với tháng trước</div>
-                <div class="kpi-value">@(Model.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value) : "—")</div>
-                <div class="kpi-note">@(Model.Mom.HasValue ? "Cùng tập doanh nghiệp" : "Chưa đủ dữ liệu đối chiếu")</div>
-            </article>
+        <div class="box box-default leader-panel leader-analysis-mom">
+            <span class="leader-eyebrow">So với tháng trước</span>
+            <strong class="leader-value @(Model.Mom < 0 ? "text-red" : "")">@(Model.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value) : "—")</strong>
+            <span class="leader-label">@Model.MomCompared/@Model.Assigned doanh nghiệp được phân loại có số liệu hai kỳ</span>
         </div>
-        <div class="col-xs-6 col-md-3">
-            <article class="dashboard-kpi kpi-blue">
-                <div class="kpi-label">So với cùng kỳ năm trước</div>
-                <div class="kpi-value">@(Model.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value) : "—")</div>
-                <div class="kpi-note">@(Model.Yoy.HasValue ? "Cùng tập doanh nghiệp" : "Chưa đủ dữ liệu đối chiếu")</div>
-            </article>
+        <div class="box box-default leader-panel leader-analysis-yoy">
+            <span class="leader-eyebrow">So cùng kỳ</span>
+            <strong class="leader-value @(Model.Yoy < 0 ? "text-red" : "")">@(Model.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value) : "—")</strong>
+            <span class="leader-label">@Model.YoyCompared/@Model.Assigned doanh nghiệp được phân loại có số liệu hai kỳ</span>
         </div>
-        <div class="col-xs-6 col-md-3">
-            <article class="dashboard-kpi kpi-slate">
-                <div class="kpi-label">Lũy kế từ đầu năm</div>
-                <div class="kpi-value">@Model.YtdValue</div>
-                <div class="kpi-note">Cộng dồn các tháng đã báo cáo</div>
-            </article>
+        <div class="box box-default leader-panel leader-analysis-ytd">
+            <span class="leader-eyebrow">Tổng các tháng đã có dữ liệu</span>
+            <strong class="leader-value">@Model.YtdValue <small>@Model.SelectedMetric.Unit</small></strong>
+            <span class="leader-label">@Model.YtdMonths/@Model.Filters.Month tháng từ đầu năm · không phải lũy kế chính thức</span>
         </div>
-    </div>
-
-    <div class="analysis-flow" aria-label="Các cấp phân tích">
-        <span class="flow-step active"><i class="fa fa-folder-open-o" aria-hidden="true"></i> Nhóm theo dõi</span>
-        <i class="fa fa-angle-right" aria-hidden="true"></i>
-        <span class="flow-step"><i class="fa fa-building-o" aria-hidden="true"></i> Khu vực kinh tế</span>
-        <i class="fa fa-angle-right" aria-hidden="true"></i>
-        <span class="flow-step"><i class="fa fa-industry" aria-hidden="true"></i> Ngành chính</span>
-        <i class="fa fa-angle-right" aria-hidden="true"></i>
-        <span class="flow-step"><i class="fa fa-briefcase" aria-hidden="true"></i> Doanh nghiệp</span>
-    </div>
-
-    <div class="row dashboard-row">
-        <div class="col-md-5">
-            <section class="dashboard-panel sector-detail-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Đóng góp theo khu vực kinh tế</h2>
-                        <p>Tỷ trọng @Model.MetricLabel trong giá trị đã báo cáo</p>
-                    </div>
-                </header>
-                @if (Model.SectorContributions.Count == 0)
-                {
-                    <p class="dashboard-empty">Chưa có giá trị dương để phân tích.</p>
-                }
-                @foreach (var sector in Model.SectorContributions)
-                {
-                    var share = Model.Filters.Metric == "industrial" ? sector.GtsXcnShare : Model.Filters.Metric == "import" ? sector.ImportShare : sector.ExportShare;
-                    <div class="horizontal-share">
-                        <div class="horizontal-share-heading">
-                            <strong>@sector.Name</strong>
-                            <span>@share%</span>
-                        </div>
-                        <div class="ranked-bar-track">
-                            <span class="ranked-bar sector-share" style="width:@share.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span>
-                        </div>
-                    </div>
-                }
-            </section>
+        <div class="box box-default leader-panel leader-analysis-chart">
+            <div class="leader-panel-header"><h2>Xu hướng @Model.SelectedMetric.Label</h2><span>@Model.SelectedMetric.Unit</span></div>
+            <div id="analysis-trend-chart" class="leader-chart" role="img" aria-label="Xu hướng 12 tháng của @Model.SelectedMetric.Label"></div>
+            <script type="application/json" class="md-chart-data" data-chart="analysis-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+            <p class="leader-chart-note">Tháng không có giá trị để trống; số 0 đã báo cáo vẫn là 0.</p>
+            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Giá trị (@Model.SelectedMetric.Unit)</th></tr></thead><tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td>@(point.Value.HasValue ? point.Value.Value.ToString("#,##0.##") : "Chưa có dữ liệu")</td></tr> }</tbody></table></div></details>
         </div>
-        <div class="col-md-7">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Đóng góp theo ngành</h2>
-                        <p>Thay đổi tuyệt đối so với tháng trước &middot; @unitName</p>
-                    </div>
-                </header>
-                @if (Model.IndustryContributions.Count == 0)
-                {
-                    <p class="dashboard-empty">Chưa có tháng đối chiếu theo ngành.</p>
-                }
-                @foreach (var item in Model.IndustryContributions)
-                {
-                    <div class="compact-impact-row">
-                        <span title="@item.Name">@item.Name</span>
-                        <div class="ranked-bar-track">
-                            <span class="ranked-bar @(item.Contribution < 0 ? "negative" : "positive")" 
-                                  style="width:@((Math.Abs(item.Contribution) * 100m / maxIndImpact).ToString(System.Globalization.CultureInfo.InvariantCulture))%" 
-                                  title="Kỳ trước: @item.PreviousValue; kỳ này: @item.CurrentValue; tỷ trọng thay đổi: @(item.ContributionShare.HasValue ? item.ContributionShare.Value.ToString("0.##") + "%" : "không xác định")"></span>
-                        </div>
-                        <strong class="@(item.Contribution < 0 ? "text-negative" : "text-positive")">
-                            @String.Format("{0:+0.##;-0.##;0}", item.Contribution)
-                        </strong>
-                    </div>
-                }
-            </section>
+        <div class="box box-default leader-panel leader-analysis-sector">
+            <div class="leader-panel-header"><h2>Theo khu vực kinh tế</h2></div>
+            @if (!Model.Sectors.Any(x => x.Value > 0)) { <p class="text-muted">Chưa có giá trị để phân bổ.</p> }
+            @foreach (var item in Model.Sectors.Where(x => x.Value > 0).Take(6))
+            {
+                <div class="leader-bar-row"><div><span>@item.Name</span><b>@String.Format("{0:0.#}%", item.Share)</b></div><div class="leader-bar-track"><span style="width: @Math.Min(100, item.Share).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)%"></span></div></div>
+            }
+        </div>
+        <div class="box box-default leader-panel leader-analysis-movement">
+            <div class="leader-panel-header"><h2>Doanh nghiệp biến động lớn</h2><span>Trong nhóm có hai kỳ dữ liệu</span></div>
+            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có đủ dữ liệu đối chiếu.</p> }
+            <div class="table-responsive"><table class="table table-hover leader-table"><thead><tr><th>Doanh nghiệp</th><th class="text-right">Kỳ trước</th><th class="text-right">Kỳ này</th><th class="text-right">Thay đổi</th></tr></thead><tbody>
+                @foreach (var item in Model.Movements)
+                { <tr><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td></tr> }
+            </tbody></table></div>
         </div>
     </div>
-
-    <div class="row dashboard-row">
-        <div class="col-md-7">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Doanh nghiệp tác động lớn</h2>
-                        <p>Thay đổi tuyệt đối so với tháng trước &middot; @unitName</p>
-                    </div>
-                </header>
-                @if (Model.EnterpriseImpact.Count == 0)
-                {
-                    <p class="dashboard-empty">Chưa có doanh nghiệp với hai tháng dữ liệu.</p>
-                }
-                @foreach (var item in Model.EnterpriseImpact)
-                {
-                    <div class="impact-enterprise-row">
-                        <div class="ranked-copy">
-                            <strong>@item.Name</strong>
-                            <small>@item.Industry &middot; @item.PreviousValue &rarr; @item.CurrentValue &middot; @(item.ContributionShare.HasValue ? item.ContributionShare.Value.ToString("0.##") + "% biến động chung" : "chưa xác định tỷ trọng")</small>
-                        </div>
-                        <div class="ranked-bar-track">
-                            <span class="ranked-bar @(item.Contribution < 0 ? "negative" : "positive")" 
-                                  style="width:@((Math.Abs(item.Contribution) * 100m / maxEntImpact).ToString(System.Globalization.CultureInfo.InvariantCulture))%"></span>
-                        </div>
-                        <strong class="@(item.Contribution < 0 ? "text-negative" : "text-positive")">
-                            @String.Format("{0:+0.0;-0.0;0.0}", item.Contribution)
-                        </strong>
-                    </div>
-                }
-            </section>
-        </div>
-        <div class="col-md-5">
-            @Html.Partial("_ReportedReasons", Model.Reasons)
-        </div>
-    </div>
-
-    <div class="row dashboard-row">
-        <div class="col-xs-12">
-            <section class="dashboard-panel">
-                <header class="panel-heading">
-                    <div>
-                        <h2>Bảng tổng hợp chỉ tiêu theo kỳ</h2>
-                        <p>Đối chiếu toàn diện số liệu báo cáo, mức tăng trưởng và lũy kế</p>
-                    </div>
-                </header>
-                <div class="table-responsive">
-                    <table class="table table-enterprise table-hover">
-                        <thead>
-                            <tr>
-                                <th>Chỉ tiêu theo dõi</th>
-                                <th>Đơn vị tính</th>
-                                <th class="num-col">Kỳ hiện tại (@Model.Filters.Month.ToString("00")/@Model.Filters.Year)</th>
-                                <th class="num-col">So với tháng trước</th>
-                                <th class="num-col">So cùng kỳ năm trước</th>
-                                <th class="num-col">Lũy kế từ đầu năm</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>@Model.MetricLabel</strong></td>
-                                <td><span class="badge-tone tone-slate">@unitName</span></td>
-                                <td class="num-col"><strong>@Model.CurrentValue</strong></td>
-                                <td class="num-col">
-                                    @if (Model.Mom.HasValue)
-                                    {
-                                        <span class="@(Model.Mom.Value >= 0 ? "text-positive" : "text-negative")">
-                                            <strong>@String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value)</strong>
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Chưa đủ dữ liệu</span>
-                                    }
-                                </td>
-                                <td class="num-col">
-                                    @if (Model.Yoy.HasValue)
-                                    {
-                                        <span class="@(Model.Yoy.Value >= 0 ? "text-positive" : "text-negative")">
-                                            <strong>@String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value)</strong>
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Chưa đủ dữ liệu</span>
-                                    }
-                                </td>
-                                <td class="num-col">
-                                    <strong>@Model.YtdValue</strong>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-    </div>
+    <div class="leader-data-note">Các tỷ lệ MoM/YoY chỉ tính trên cùng doanh nghiệp có giá trị ở cả hai kỳ. Bộ lọc ngành thể hiện thành viên ngành, không phải tỷ trọng ngành chính.</div>
 </div>
-
 @section CustomJS {
+    <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
     <script src="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js")"></script>
 }

@@ -1,64 +1,62 @@
 @model CenIT.ReportTourism.Models.Report.DashboardModel
-@using System.Web.Mvc
-@using TSFramework.App.Processors
-
+@using System.Linq
 @{
-    ViewBag.Title = "Tổng quan sản xuất công nghiệp, xuất nhập khẩu";
+    ViewBag.Title = "Tổng quan báo cáo Công Thương";
 }
-
 @section Title { Tổng quan }
-
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
-
-<div class="management-dashboard dashboard-overview-page" id="managementDashboard">
+<div class="management-dashboard dashboard-overview-page">
     @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Overview", Filters = Model.Filters })
-
-    <div class="dashboard-heading" style="margin-bottom: 12px;">
-        <div class="pull-left">
-            <h1 id="dashboard-content" style="font-size: 22px; font-weight: bold; margin: 0 0 4px; color: #333;">
-                <i class="fa fa-dashboard text-primary"></i> Tổng quan ngành Công Thương
-            </h1>
-            <p class="text-muted" style="margin: 0; font-size: 13px;">
-                @Model.FilterSummary · Dữ liệu snapshot tổng hợp trong phạm vi theo dõi.
-            </p>
-        </div>
-        <div class="pull-right hidden-xs text-right" style="padding-top: 5px;">
-            <span class="label label-default" style="font-size: 12px; padding: 5px 8px;">
-                <i class="fa fa-clock-o"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year
-            </span>
-        </div>
-        <div class="clearfix"></div>
+    <div class="dashboard-heading">
+        <div><h1 id="dashboard-content">Tổng quan báo cáo Công Thương</h1><p>Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year · Mỗi loại báo cáo dùng chỉ tiêu và đơn vị riêng</p></div>
     </div>
-
     @Html.Partial("_DashboardFilters", Model.FilterOptions)
-
-    <!-- ROW 1: 4 KPI CARDS -->
-    @Html.Partial("_StatisticEnterprise", Model)
-
-    <!-- ROW 2: 8 COLS TREND + 4 COLS SECTOR -->
-    <div class="row">
-        <div class="col-md-8 col-sm-12">
-            @Html.Partial("_StatisticVisitor", Model)
+    <div class="leader-bento leader-overview-grid">
+        @foreach (var card in Model.TypeCards)
+        {
+            var route = new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = card.ReportType,
+                areaId = Model.Filters.AreaId, economicSectorId = Model.Filters.EconomicSectorId,
+                industryId = Model.Filters.IndustryId, enterpriseId = Model.Filters.EnterpriseId };
+            var boxTone = card.ReportType == 1 ? "primary" : card.ReportType == 2 ? "success" : "warning";
+            <a class="box box-@boxTone leader-panel leader-type-card leader-type-@card.ReportType" href="@Url.Action("Analysis", "Dashboard", route)" aria-label="Phân tích báo cáo @card.Name">
+                <span class="leader-eyebrow">Báo cáo loại @card.ReportType · @card.Name</span>
+                <strong class="leader-value">@card.Value <small>@card.Unit</small></strong>
+                <span class="leader-label">@card.MetricLabel</span>
+                <span class="leader-card-footer"><b>@card.Received/@card.Assigned</b> doanh nghiệp có dữ liệu nhập <i class="fa fa-angle-right" aria-hidden="true"></i></span>
+            </a>
+        }
+        <div class="box box-default leader-panel leader-classification">
+            <span class="leader-eyebrow">Phân loại doanh nghiệp · Toàn tỉnh</span>
+            <strong class="leader-value">@Model.Classification.NeedsClassification.ToString("N0")</strong>
+            <span class="leader-label">doanh nghiệp cần bổ sung phân loại</span>
+            <div class="leader-fact-list">
+                <span>Thiếu hồ sơ Công Thương <b>@Model.Classification.MissingBusinessRow.ToString("N0")</b></span>
+                <span>Thiếu ngành <b>@Model.Classification.MissingIndustry.ToString("N0")</b></span>
+                <span>Thiếu loại báo cáo <b>@Model.Classification.MissingReportType.ToString("N0")</b></span>
+            </div>
+            <small>Các nhóm thiếu thông tin có thể trùng nhau và không nằm trong mẫu số của từng loại báo cáo.</small>
         </div>
-        <div class="col-md-4 col-sm-12">
-            @Html.Partial("_StatisticTypeBusiness", Model)
+        <div class="box box-default leader-panel leader-overview-chart">
+            <div class="leader-panel-header"><h2>Doanh nghiệp có dữ liệu nhập</h2><span>12 tháng · theo loại báo cáo</span></div>
+            <div id="receipt-overview-chart" class="leader-chart" role="img" aria-label="Xu hướng số doanh nghiệp có dữ liệu nhập theo ba loại báo cáo"></div>
+            <div class="leader-legend"><span>● Loại 1</span><span>● Loại 2</span><span>● Loại 3</span></div>
+            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Loại 1</th><th>Loại 2</th><th>Loại 3</th></tr></thead><tbody>@foreach (var point in Model.ReceiptTrend) { <tr><td>@point.Month</td><td>@point.Type1</td><td>@point.Type2</td><td>@point.Type3</td></tr> }</tbody></table></div></details>
+            <script type="application/json" class="md-chart-data" data-chart="receipt-overview">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReceiptTrend))</script>
+        </div>
+        <div class="box box-default leader-panel leader-overview-movement">
+            <div class="leader-panel-header"><h2>Biến động lớn · Loại 1</h2><a href="@Url.Action("Analysis", "Dashboard", new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = 1, areaId = Model.Filters.AreaId, economicSectorId = Model.Filters.EconomicSectorId, industryId = Model.Filters.IndustryId, enterpriseId = Model.Filters.EnterpriseId })">Xem phân tích</a></div>
+            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có cặp tháng để so sánh.</p> }
+            @foreach (var item in Model.Movements)
+            {
+                <div class="leader-movement"><span title="@item.Name">@item.Name</span><strong class="@(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change) Tỷ đồng</strong></div>
+            }
         </div>
     </div>
-
-    <!-- ROW 3: 6 COLS ENTERPRISE MOVEMENT + 6 COLS ALERTS -->
-    <div class="row">
-        <div class="col-md-6 col-sm-12">
-            @Html.Partial("_EnterpriseMovement", Model)
-        </div>
-        <div class="col-md-6 col-sm-12">
-            @Html.Partial("_DashboardAlerts", Model)
-        </div>
-    </div>
+    <div class="leader-data-note">Dữ liệu nhập theo từng loại không chứng minh đã nộp tệp cho loại đó. Mã loại 0 trong kỳ: @Model.Classification.TypeZeroRows; dòng có kỳ tương lai: @Model.Classification.FutureDatedRows.</div>
 </div>
-
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
     <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
