@@ -1,0 +1,66 @@
+@model CenIT.ReportTourism.Models.Report.DashboardAnalysisModel
+@using System.Linq
+@{
+    ViewBag.Title = "Phân tích chỉ tiêu";
+}
+@section Title { Phân tích chỉ tiêu }
+@section HeadCss {
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
+}
+<div class="management-dashboard dashboard-analysis-page">
+    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Analysis", Filters = Model.Filters })
+    <div class="dashboard-heading"><div><h1 id="dashboard-content">Phân tích chỉ tiêu</h1><p>@Model.TypeName · Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year</p></div></div>
+    @Html.Partial("_DashboardFilters", Model.FilterOptions)
+    <div class="leader-bento leader-analysis-grid">
+        <div class="box box-default leader-panel leader-analysis-primary">
+            <span class="leader-eyebrow">Kỳ hiện tại · @Model.SelectedMetric.Code</span>
+            <strong class="leader-value">@Model.CurrentValue <small>@Model.SelectedMetric.Unit</small></strong>
+            <span class="leader-label">@Model.SelectedMetric.Label</span>
+        </div>
+        <div class="box box-default leader-panel leader-analysis-mom">
+            <span class="leader-eyebrow">So với tháng trước</span>
+            <strong class="leader-value @(Model.Mom < 0 ? "text-red" : "")">@(Model.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value) : "—")</strong>
+            <span class="leader-label">@Model.MomCompared/@Model.Assigned doanh nghiệp được phân loại có số liệu hai kỳ</span>
+        </div>
+        <div class="box box-default leader-panel leader-analysis-yoy">
+            <span class="leader-eyebrow">So cùng kỳ</span>
+            <strong class="leader-value @(Model.Yoy < 0 ? "text-red" : "")">@(Model.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value) : "—")</strong>
+            <span class="leader-label">@Model.YoyCompared/@Model.Assigned doanh nghiệp được phân loại có số liệu hai kỳ</span>
+        </div>
+        <div class="box box-default leader-panel leader-analysis-ytd">
+            <span class="leader-eyebrow">Tổng các tháng đã có dữ liệu</span>
+            <strong class="leader-value">@Model.YtdValue <small>@Model.SelectedMetric.Unit</small></strong>
+            <span class="leader-label">@Model.YtdMonths/@Model.Filters.Month tháng từ đầu năm · không phải lũy kế chính thức</span>
+        </div>
+        <div class="box box-default leader-panel leader-analysis-chart">
+            <div class="leader-panel-header"><h2>Xu hướng @Model.SelectedMetric.Label</h2><span>@Model.SelectedMetric.Unit</span></div>
+            <div id="analysis-trend-chart" class="leader-chart" role="img" aria-label="Xu hướng 12 tháng của @Model.SelectedMetric.Label"></div>
+            <script type="application/json" class="md-chart-data" data-chart="analysis-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+            <p class="leader-chart-note">Tháng không có giá trị để trống; số 0 đã báo cáo vẫn là 0.</p>
+            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Giá trị (@Model.SelectedMetric.Unit)</th></tr></thead><tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td>@(point.Value.HasValue ? point.Value.Value.ToString("#,##0.##") : "Chưa có dữ liệu")</td></tr> }</tbody></table></div></details>
+        </div>
+        <div class="box box-default leader-panel leader-analysis-sector">
+            <div class="leader-panel-header"><h2>Theo khu vực kinh tế</h2></div>
+            @if (!Model.Sectors.Any(x => x.Value > 0)) { <p class="text-muted">Chưa có giá trị để phân bổ.</p> }
+            @foreach (var item in Model.Sectors.Where(x => x.Value > 0).Take(6))
+            {
+                <div class="leader-bar-row"><div><span>@item.Name</span><b>@String.Format("{0:0.#}%", item.Share)</b></div><div class="leader-bar-track"><span style="width: @Math.Min(100, item.Share).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)%"></span></div></div>
+            }
+        </div>
+        <div class="box box-default leader-panel leader-analysis-movement">
+            <div class="leader-panel-header"><h2>Doanh nghiệp biến động lớn</h2><span>Trong nhóm có hai kỳ dữ liệu</span></div>
+            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có đủ dữ liệu đối chiếu.</p> }
+            <div class="table-responsive"><table class="table table-hover leader-table"><thead><tr><th>Doanh nghiệp</th><th class="text-right">Kỳ trước</th><th class="text-right">Kỳ này</th><th class="text-right">Thay đổi</th></tr></thead><tbody>
+                @foreach (var item in Model.Movements)
+                { <tr><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td></tr> }
+            </tbody></table></div>
+        </div>
+    </div>
+    <div class="leader-data-note">Các tỷ lệ MoM/YoY chỉ tính trên cùng doanh nghiệp có giá trị ở cả hai kỳ. Bộ lọc ngành thể hiện thành viên ngành, không phải tỷ trọng ngành chính.</div>
+</div>
+@section CustomJS {
+    <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js")"></script>
+}

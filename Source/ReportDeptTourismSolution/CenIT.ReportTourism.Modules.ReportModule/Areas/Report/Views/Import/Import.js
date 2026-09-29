@@ -97,7 +97,8 @@ function initTableDataImport() {
                                 "/Report/Import/Edit?enterpriseId=" +
                                 row.EnterpriseId +
                                 "&onMonth=" +
-                                moment(row.ForMonth).format("YYYY-MM-DD"),
+                                moment(row.ForMonth).format("YYYY-MM-DD") +
+                                "&typeReport=" + row.TypeReport,
                                 "",
                                 "Chỉnh sửa báo cáo",
                                 1024);
@@ -109,7 +110,8 @@ function initTableDataImport() {
                             "/Report/Import/View?enterpriseId=" +
                             row.EnterpriseId +
                             "&onMonth=" +
-                            moment(row.ForMonth).format("YYYY-MM-DD"),
+                            moment(row.ForMonth).format("YYYY-MM-DD") +
+                            "&typeReport=" + row.TypeReport,
                             "",
                             "Xem dữ liệu báo cáo",
                             "1024px");

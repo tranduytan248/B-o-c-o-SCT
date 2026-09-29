@@ -1,0 +1,63 @@
+@model CenIT.ReportTourism.Models.Report.DashboardFilterOptions
+@using System.Web.Mvc
+@{
+    var filters = Model.Filters;
+    var isOverview = Model.Action == "Index";
+    var hasSecondary = filters.AreaId != "all" || filters.EconomicSectorId != "all" ||
+        filters.IndustryId != "all" || filters.EnterpriseId != "all";
+}
+<div class="box box-solid box-default dashboard-filter-box">
+    <div class="box-body">
+        <form class="dashboard-filter-toolbar" method="get" action="@Url.Action(Model.Action, "Dashboard")">
+            <div class="dashboard-filter-main-bar">
+                <div class="dashboard-main-control">
+                    <label for="filterMonth">Kỳ báo cáo</label>
+                    <div class="dashboard-period-controls">
+                        <select name="month" id="filterMonth" class="form-control input-sm">
+                            @foreach (var item in Model.Months)
+                            { <option value="@item.Value" @(item.Value == filters.Month.ToString() ? "selected" : "")>@item.Text</option> }
+                        </select>
+                        <select name="year" id="filterYear" class="form-control input-sm" aria-label="Năm báo cáo">
+                            @foreach (var item in Model.Years)
+                            { <option value="@item.Value" @(item.Value == filters.Year.ToString() ? "selected" : "")>@item.Text</option> }
+                        </select>
+                    </div>
+                </div>
+                @if (!isOverview)
+                {
+                    <div class="dashboard-main-control">
+                        <label for="filterReportType">Loại báo cáo</label>
+                        <select name="reportType" id="filterReportType" class="form-control input-sm">
+                            <option value="1" @(filters.ReportType == 1 ? "selected" : "")>Sản xuất, kinh doanh</option>
+                            <option value="2" @(filters.ReportType == 2 ? "selected" : "")>Thương mại, dịch vụ</option>
+                            <option value="3" @(filters.ReportType == 3 ? "selected" : "")>Xuất nhập khẩu</option>
+                        </select>
+                    </div>
+                }
+                @if (Model.Metrics.Count > 0)
+                {
+                    <div class="dashboard-main-control">
+                        <label for="metricSelect">Chỉ tiêu</label>
+                        <select name="metric" id="metricSelect" class="form-control input-sm">
+                            @foreach (var item in Model.Metrics)
+                            { <option value="@item.Value" @(item.Value == filters.Metric ? "selected" : "")>@item.Text</option> }
+                        </select>
+                    </div>
+                }
+                <div class="dashboard-filter-actions">
+                    <button type="button" class="btn btn-default btn-sm" data-toggle="collapse" data-target="#advancedFiltersPanel" aria-expanded="@(hasSecondary ? "true" : "false")" aria-controls="advancedFiltersPanel"><i class="fa fa-sliders" aria-hidden="true"></i> Bộ lọc</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Áp dụng</button>
+                </div>
+            </div>
+            <div id="advancedFiltersPanel" class="collapse @(hasSecondary ? "in" : "") dashboard-advanced-filters">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6"><label for="areaId">Phường / xã</label>@Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", filters.AreaId), new { @class = "form-control input-sm select2", id = "areaId" })</div>
+                    <div class="col-md-3 col-sm-6"><label for="economicSectorId">Khu vực kinh tế</label>@Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", filters.EconomicSectorId), new { @class = "form-control input-sm select2", id = "economicSectorId" })</div>
+                    <div class="col-md-3 col-sm-6"><label for="industryId">Ngành trong danh mục</label>@Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", filters.IndustryId), new { @class = "form-control input-sm select2", id = "industryId" })</div>
+                    <div class="col-md-3 col-sm-6"><label for="enterpriseId">Doanh nghiệp</label>@Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", filters.EnterpriseId), new { @class = "form-control input-sm select2", id = "enterpriseId" })</div>
+                </div>
+                <p class="text-muted dashboard-filter-note">Bộ lọc ngành chọn doanh nghiệp có mã ngành trong danh mục; chưa xác định ngành chính.</p>
+            </div>
+        </form>
+    </div>
+</div>

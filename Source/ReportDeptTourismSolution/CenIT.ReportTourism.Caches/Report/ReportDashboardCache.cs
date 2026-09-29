@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System;
 using CenIT.ReportTourism.Biz.Report;
 using CenIT.ReportTourism.Models.Report;
 using TSFramework.Core.Members.Caching;
@@ -17,70 +15,52 @@ namespace CenIT.ReportTourism.Caches.Report
             "ReportDashboardCache", "DataImportCache", "ReportExtendInfosCache", "EnterprisesCache", "CENIT.APP.Cache"
         };
 
-
-        [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public ReportStatisticEnterpriseModel GetStatisticEnterprise(DateTime? forMonth)
+        public DashboardModel GetDashboard(DashboardFilters filters)
         {
-            var rawKey = $"StatisticEnterpriseOnMonth--{forMonth}";
-            // See if the item is in the cache
-            var statisticEnterprise = GetCacheItem(rawKey) as ReportStatisticEnterpriseModel;
-            if (statisticEnterprise != null) return statisticEnterprise;
-            // Item not found in cache - retrieve it and insert it into the cache
-            statisticEnterprise = Api.GetStatisticEnterprise(forMonth);
-            AddCacheItem(rawKey, statisticEnterprise);
-            return statisticEnterprise;
+            var key = CacheKey("Overview", filters);
+            var cached = GetCacheItem(key) as DashboardModel;
+            if (cached != null) return cached;
+            cached = Api.GetDashboard(filters);
+            AddCacheItem(key, cached);
+            return cached;
         }
 
-        [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public List<ReportStatisticTypeBusinessModel> GetStatisticTypeBusiness(DateTime? forMonth)
+        public DashboardAnalysisModel GetAnalysis(DashboardFilters filters)
         {
-            var rawKey = $"DataStatisticTypeBusinessOnMonth--{forMonth}";
-            // See if the item is in the cache
-            var dataStatisticTypeBusiness = GetCacheItem(rawKey) as List<ReportStatisticTypeBusinessModel>;
-            if (dataStatisticTypeBusiness != null) return dataStatisticTypeBusiness;
-            // Item not found in cache - retrieve it and insert it into the cache
-            dataStatisticTypeBusiness = Api.GetStatisticTypeBusiness(forMonth);
-            AddCacheItem(rawKey, dataStatisticTypeBusiness);
-            return dataStatisticTypeBusiness;
+            var key = CacheKey("Analysis", filters);
+            var cached = GetCacheItem(key) as DashboardAnalysisModel;
+            if (cached != null) return cached;
+            cached = Api.GetAnalysis(filters);
+            AddCacheItem(key, cached);
+            return cached;
         }
 
-        [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public List<ReportStatisticVisitorModel> GetStatisticVisitor(DateTime? forMonth)
+        public DashboardWarningsModel GetWarnings(DashboardFilters filters)
         {
-            var rawKey = $"DataStatisticVisitorOnMonth--{forMonth}";
-            // See if the item is in the cache
-            var dataStatisticVisitors = GetCacheItem(rawKey) as List<ReportStatisticVisitorModel>;
-            if (dataStatisticVisitors != null) return dataStatisticVisitors;
-            // Item not found in cache - retrieve it and insert it into the cache
-            dataStatisticVisitors = Api.GetStatisticVisitor(forMonth);
-            AddCacheItem(rawKey, dataStatisticVisitors);
-            return dataStatisticVisitors;
+            var key = CacheKey("Warnings", filters);
+            var cached = GetCacheItem(key) as DashboardWarningsModel;
+            if (cached != null) return cached;
+            cached = Api.GetWarnings(filters);
+            AddCacheItem(key, cached);
+            return cached;
         }
 
-        [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public List<ReportStatisticMapVisitorModel> GetStatisticMapVisitor(DateTime? forMonth)
+        public DashboardProgressModel GetProgress(DashboardFilters filters)
         {
-            var rawKey = $"DataStatisticMapVisitorOnMonth--{forMonth}";
-            // See if the item is in the cache
-            var dataStatisticMapVisitors = GetCacheItem(rawKey) as List<ReportStatisticMapVisitorModel>;
-            if (dataStatisticMapVisitors != null) return dataStatisticMapVisitors;
-            // Item not found in cache - retrieve it and insert it into the cache
-            dataStatisticMapVisitors = Api.GetStatisticMapVisitor(forMonth);
-            AddCacheItem(rawKey, dataStatisticMapVisitors);
-            return dataStatisticMapVisitors;
+            var key = CacheKey("Progress", filters);
+            var cached = GetCacheItem(key) as DashboardProgressModel;
+            if (cached != null) return cached;
+            cached = Api.GetProgress(filters);
+            AddCacheItem(key, cached);
+            return cached;
         }
 
-        [DataObjectMethod(DataObjectMethodType.Select, true)]
-        public List<ReportStatisticIncomeModel> GetStatisticIncome(DateTime? forMonth, int? typeStatistic)
+        private static string CacheKey(string page, DashboardFilters filters)
         {
-            var rawKey = $"DataStatisticIncomeOnMonth--{forMonth}-{typeStatistic}";
-            // See if the item is in the cache
-            var dataStatisticIncomes = GetCacheItem(rawKey) as List<ReportStatisticIncomeModel>;
-            if (dataStatisticIncomes != null) return dataStatisticIncomes;
-            // Item not found in cache - retrieve it and insert it into the cache
-            dataStatisticIncomes = Api.GetStatisticIncome(forMonth, typeStatistic);
-            AddCacheItem(rawKey, dataStatisticIncomes);
-            return dataStatisticIncomes;
+            filters = filters ?? new DashboardFilters();
+            return string.Join("-", "ManagementDashboard", page, filters.Year, filters.Month, filters.ReportType,
+                filters.AreaId ?? "all", filters.EconomicSectorId ?? "all", filters.IndustryId ?? "all",
+                filters.EnterpriseId ?? "all", filters.Metric ?? "industrial");
         }
     }
 }

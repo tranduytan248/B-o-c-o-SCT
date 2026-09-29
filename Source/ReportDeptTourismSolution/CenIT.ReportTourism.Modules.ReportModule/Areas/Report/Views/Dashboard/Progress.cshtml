@@ -1,0 +1,49 @@
+@model CenIT.ReportTourism.Models.Report.DashboardProgressModel
+@using System.Linq
+@{
+    ViewBag.Title = "Theo dõi dữ liệu";
+}
+@section Title { Theo dõi dữ liệu }
+@section HeadCss {
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
+}
+<div class="management-dashboard dashboard-progress-page">
+    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Progress", Filters = Model.Filters })
+    <div class="dashboard-heading"><div><h1 id="dashboard-content">Theo dõi dữ liệu</h1><p>@Model.TypeName · Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year · theo phân loại hiện tại</p></div></div>
+    @Html.Partial("_DashboardFilters", Model.FilterOptions)
+    <div class="leader-bento leader-progress-grid">
+        <div class="box box-default leader-panel leader-progress-headline"><span class="leader-eyebrow">Dữ liệu đã nhập / doanh nghiệp được phân loại</span><strong class="leader-value">@Model.Received / @Model.Assigned</strong><span class="leader-label">@String.Format("{0:0.#}%", Model.CoveragePercent) · tỷ lệ quan sát trong nhóm hiện tại</span><div class="leader-bar-track"><span style="width: @Model.CoveragePercent.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)%"></span></div></div>
+        <div class="box box-default leader-panel"><span class="leader-eyebrow">Có giá trị chỉ tiêu chính</span><strong class="leader-value">@Model.MetricValues</strong><span class="leader-label">doanh nghiệp · gồm giá trị 0</span></div>
+        <div class="box box-default leader-panel"><span class="leader-eyebrow">Mã chỉ tiêu trùng</span><strong class="leader-value">@Model.Conflicts</strong><span class="leader-label">doanh nghiệp cần đối chiếu dữ liệu</span></div>
+        <div class="box box-default leader-panel leader-progress-chart"><div class="leader-panel-header"><h2>Doanh nghiệp có dữ liệu nhập theo tháng</h2><span>12 tháng</span></div><div id="observation-trend-chart" class="leader-chart" role="img" aria-label="Xu hướng số doanh nghiệp có dữ liệu nhập loại @Model.Filters.ReportType"></div><script type="application/json" class="md-chart-data" data-chart="observation-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReceiptTrend))</script><details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Doanh nghiệp có dữ liệu</th></tr></thead><tbody>@foreach (var point in Model.ReceiptTrend) { <tr><td>@point.Month</td><td>@point.Value</td></tr> }</tbody></table></div></details></div>
+        <div class="box box-default leader-panel leader-progress-metrics"><div class="leader-panel-header"><h2>Mức hiện diện chỉ tiêu</h2></div>
+            @foreach (var item in Model.MetricPresence)
+            { <div class="leader-count-row"><span>@item.Name</span><b>@item.Received / @item.Assigned</b></div> }
+            <p class="leader-chart-note">Giá trị 0 được tính là có dữ liệu; mã trùng được để trống để đối chiếu.</p>
+        </div>
+        <div class="box box-default leader-panel leader-progress-sector"><div class="leader-panel-header"><h2>Theo khu vực kinh tế</h2></div>
+            @foreach (var item in Model.Sectors.Take(6))
+            { <div class="leader-count-row"><span>@item.Name</span><b>@item.Received / @item.Assigned</b></div> }
+            @if (!Model.Sectors.Any()) { <p class="text-muted">Không có doanh nghiệp được phân loại trong phạm vi lọc.</p> }
+        </div>
+        <div class="box box-default leader-panel leader-progress-area"><div class="leader-panel-header"><h2>Theo địa bàn</h2></div>
+            @foreach (var item in Model.Areas.Take(10))
+            { <div class="leader-count-row"><span>@item.Name</span><b>@item.Received / @item.Assigned</b></div> }
+        </div>
+        <div class="box box-default leader-panel leader-progress-file"><span class="leader-eyebrow">Có tệp bất kỳ loại</span><strong class="leader-value">@Model.FileAnyType</strong><span class="leader-label">không chứng minh đã nộp loại @Model.Filters.ReportType</span></div>
+        <div class="box box-default leader-panel leader-progress-worklist"><div class="leader-panel-header"><h2>Danh sách theo dõi</h2><span>@Model.Enterprises.Count doanh nghiệp</span></div>
+            <div class="table-responsive"><table class="table table-hover leader-table"><thead><tr><th>Doanh nghiệp</th><th>Địa bàn</th><th>Dữ liệu loại @Model.Filters.ReportType</th><th>Chỉ tiêu còn thiếu</th><th>Dữ liệu trùng</th></tr></thead><tbody>
+                @foreach (var item in Model.Enterprises.Take(50))
+                { <tr><td>@item.Name</td><td>@item.WardName</td><td>@(item.DataImported ? "Có dữ liệu" : "Chưa có dữ liệu")</td><td>@(String.IsNullOrEmpty(item.MissingMetricCodes) ? "Đủ 3 mã có giá trị" : item.MissingMetricCodes)</td><td>@(item.MetricConflict ? "Cần đối chiếu" : "—")</td></tr> }
+            </tbody></table></div>
+            @if (Model.Enterprises.Count > 50) { <p class="leader-chart-note">Hiển thị 50 doanh nghiệp đầu theo trạng thái cần theo dõi.</p> }
+        </div>
+    </div>
+    <div class="leader-data-note">Tỷ lệ này đo dữ liệu nhập trong nhóm doanh nghiệp được phân loại hiện tại. Không phải tỷ lệ nộp hoặc hoàn thành báo cáo chính thức; lịch sử phân loại theo tháng chưa có.</div>
+</div>
+@section CustomJS {
+    <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js")"></script>
+}

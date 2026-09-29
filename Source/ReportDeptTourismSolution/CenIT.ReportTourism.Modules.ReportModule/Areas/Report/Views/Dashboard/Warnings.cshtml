@@ -1,0 +1,50 @@
+@model CenIT.ReportTourism.Models.Report.DashboardWarningsModel
+@using System.Linq
+@{
+    ViewBag.Title = "Tín hiệu biến động";
+}
+@section Title { Tín hiệu biến động }
+@section HeadCss {
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
+}
+<div class="management-dashboard dashboard-warnings-page">
+    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Warnings", Filters = Model.Filters })
+    <div class="dashboard-heading"><div><h1 id="dashboard-content">Tín hiệu biến động</h1><p>@Model.TypeName · @Model.Metric.Label · Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year</p></div></div>
+    @Html.Partial("_DashboardFilters", Model.FilterOptions)
+    <div class="leader-bento leader-warnings-grid">
+        <div class="box box-default leader-panel leader-warning-compared"><span class="leader-eyebrow">Có thể đối chiếu</span><strong class="leader-value">@Model.ComparableCount / @Model.Assigned</strong><span class="leader-label">doanh nghiệp được phân loại có số liệu hai kỳ</span></div>
+        @if (Model.IsIndustrial)
+        {
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 10%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver10.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 20%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver20.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 30%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver30.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+        }
+        else
+        {
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Biến động lớn nhất</span><strong class="leader-value">@(Model.Movements.Any() ? String.Format("{0:+#,##0.##;-#,##0.##;0}", Model.Movements.First().Change) : "—") <small>@Model.Metric.Unit</small></strong><span class="leader-label">@Model.Metric.Label</span></div>
+            <div class="box box-default leader-panel"><span class="leader-eyebrow">Doanh nghiệp giảm</span><strong class="leader-value">@Model.Movements.Count(x => x.Change < 0)</strong><span class="leader-label">trong danh sách biến động lớn</span></div>
+        }
+        <div class="box box-default leader-panel leader-warning-conflicts"><span class="leader-eyebrow">Dữ liệu cần đối chiếu</span><strong class="leader-value">@Model.ConflictCount</strong><span class="leader-label">doanh nghiệp có mã chỉ tiêu trùng trong kỳ</span></div>
+        <div class="box box-default leader-panel leader-warning-chart">
+            <div class="leader-panel-header"><h2>Xu hướng số doanh nghiệp giảm</h2><span>@(Model.IsIndustrial ? "Giảm trên 10%" : "Giảm so với tháng trước")</span></div>
+            <div id="warning-trend-chart" class="leader-chart" role="img" aria-label="Xu hướng số doanh nghiệp có mức giảm"></div>
+            <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Doanh nghiệp giảm</th></tr></thead><tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td>@(point.Value.HasValue ? point.Value.Value.ToString("#,##0") : "Chưa đủ cặp so sánh")</td></tr> }</tbody></table></div></details>
+        </div>
+        <div class="box box-default leader-panel leader-warning-list">
+            <div class="leader-panel-header"><h2>@(Model.IsIndustrial ? "Doanh nghiệp giảm trên 10%" : "Biến động lớn theo doanh nghiệp")</h2><span>@Model.Metric.Unit</span></div>
+            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có cặp giá trị phù hợp để hiển thị.</p> }
+            <div class="table-responsive"><table class="table table-hover leader-table"><thead><tr><th>Doanh nghiệp</th><th class="text-right">Kỳ trước</th><th class="text-right">Kỳ này</th><th class="text-right">Thay đổi</th><th class="text-right">Tỷ lệ</th></tr></thead><tbody>
+                @foreach (var item in Model.Movements)
+                { <tr><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td><td class="text-right">@(item.Percent.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", item.Percent.Value) : "—")</td></tr> }
+            </tbody></table></div>
+        </div>
+    </div>
+    <div class="leader-data-note">Các biến động là tín hiệu từ dữ liệu nhập, không phải kết luận vi phạm hay danh sách cần xử lý. Tỷ lệ thay đổi không tính khi kỳ trước bằng 0.</div>
+</div>
+@section CustomJS {
+    <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/morris/morris.js")"></script>
+    <script src="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.js")"></script>
+}
