@@ -99,14 +99,30 @@ namespace CenIT.ReportTourism.Caches.Cate
             return enterpriseId;
         }
 
-        [DataObjectMethod(DataObjectMethodType.Update, false)]
-        public int SaveInfo(CateEnterpriseModel model)
+        /// <summary>
+        ///     Sản phẩm chính của doanh nghiệp, ProductId = 0 nếu doanh nghiệp chưa có sản phẩm chính
+        /// </summary>
+        [DataObjectMethod(DataObjectMethodType.Select, false)]
+        public CateBusinessProductModel GetMainProduct(int enterpriseId)
         {
-            var enterpriseId = Api.SaveInfo(model);
-            if (enterpriseId > 0)
+            if (enterpriseId <= 0) return new CateBusinessProductModel();
+            var rawKey = string.Concat("EnterpriseMainProduct-", enterpriseId);
+            // See if the item is in the cache
+            if (GetCacheItem(rawKey) is CateBusinessProductModel product) return product;
+            // Item not found in cache - retrieve it and insert it into the cache
+            product = Api.GetMainProduct(enterpriseId) ?? new CateBusinessProductModel();
+            AddCacheItem(rawKey, product);
+            return product;
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Update, false)]
+        public int SaveMainProduct(int enterpriseId, int? productId, string savedBy)
+        {
+            var result = Api.SaveMainProduct(enterpriseId, productId, savedBy);
+            if (result >= 0)
                 // Invalidate the cache
                 InvalidateCache();
-            return enterpriseId;
+            return result;
         }
 
         [DataObjectMethod(DataObjectMethodType.Insert, false)]

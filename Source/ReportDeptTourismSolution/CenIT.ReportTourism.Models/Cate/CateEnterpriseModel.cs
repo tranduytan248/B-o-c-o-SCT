@@ -67,6 +67,14 @@ namespace CenIT.ReportTourism.Models.Cate
         public List<ListItem> ListBusinessIndustry { get; set; } = new List<ListItem>();
 
         /// <summary>
+        /// Sản phẩm chính (Cate_BusinessEnterpriseProduct.IsMainProduct = 1)
+        /// </summary>
+        [CustomDisplayName("Enterprise_MainProduct")]
+        public int? MainProductId { get; set; }
+
+        public List<ListItem> ListMainProduct { get; set; } = new List<ListItem>();
+
+        /// <summary>
         /// Loại hình doanh nghiệp
         /// </summary>
         [CustomDisplayName("Enterprise_EnterpriseType")]

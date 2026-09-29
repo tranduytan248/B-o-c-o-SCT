@@ -12,6 +12,7 @@ namespace CenIT.ReportTourism.Biz.Cate
         private const string GetViaEnterpriseProcedure = "Cate_BusinessProducts_GetViaEnterprise";
         private const string GetByPrefixProcedure = "Cate_BusinessProducts_GetByPrefix";
         private const string GetUnconfiguredByPrefixProcedure = "Cate_BusinessProducts_GetUnconfiguredByPrefix";
+        private const string GetByIndustriesProcedure = "Cate_BusinessProducts_GetByIndustries";
         private readonly string _cateBusinessProductDelete = "Cate_BusinessProduct_Delete";
         private readonly string _cateBusinessProductGet = "Cate_BusinessProduct_Get";
         private readonly string _cateBusinessProductGetByID = "Cate_BusinessProduct_GetByID";
@@ -33,6 +34,12 @@ namespace CenIT.ReportTourism.Biz.Cate
         {
             return AppProcessor.ProcedureProvider.ExecuteTypedList<CateBusinessProductModel>(
                 GetUnconfiguredByPrefixProcedure, DATA_PROVIDER_NAME, enterpriseId, productCodePrefix);
+        }
+
+        public List<CateBusinessProductModel> GetByIndustries(string industryIds, int isLevel)
+        {
+            return AppProcessor.ProcedureProvider.ExecuteTypedList<CateBusinessProductModel>(
+                GetByIndustriesProcedure, DATA_PROVIDER_NAME, industryIds, isLevel);
         }
 
         public List<CateBusinessProductModel> Get(out int total, int? industryId, SysSearchModel search)
