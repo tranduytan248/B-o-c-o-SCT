@@ -19,7 +19,6 @@ namespace CenIT.ReportTourism.Biz.Cate
         private readonly string _cateEnterprisePermissionsSave = "Cate_EnterprisePermissions_Save";
         private readonly string _cateEnterpriseRegister = "Cate_Enterprises_Register";
         private readonly string _cateEnterpriseSave = "Cate_Enterprises_Save";
-        private readonly string _cateEnterpriseSaveInfo = "Cate_Enterprises_SaveInfo";
         private readonly string _cateEnterprisesChangeStatus = "Cate_Enterprises_ChangeStatus";
         private readonly string _cateEnterprisesGetNotSumitReportYet = "Cate_Enterprises_GetNotSumitReportYet";
         private readonly string _cateEnterprisesGetViaUser = "Cate_Enterprises_GetViaUser";
@@ -92,20 +91,7 @@ namespace CenIT.ReportTourism.Biz.Cate
 
         public int Save(CateEnterpriseModel model)
         {
-            return Save(_cateEnterpriseSave, model);
-        }
-
-        /// <summary>
-        ///     Doanh nghiệp tự cập nhật thông tin (MyEnterprise): giữ nguyên Tỉnh khi không xác định được từ Xã/Phường
-        /// </summary>
-        public int SaveInfo(CateEnterpriseModel model)
-        {
-            return Save(_cateEnterpriseSaveInfo, model);
-        }
-
-        private int Save(string procedureName, CateEnterpriseModel model)
-        {
-            var result = AppProcessor.ProcedureProvider.Execute(procedureName, DATA_PROVIDER_NAME,
+            var result = AppProcessor.ProcedureProvider.Execute(_cateEnterpriseSave, DATA_PROVIDER_NAME,
                 model.EnterpriseId,
                 model.OwnerEnterpriseName,
                 model.BusinessName,

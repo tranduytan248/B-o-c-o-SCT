@@ -111,7 +111,6 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
             // Tạm thời bỏ ràng buộc bắt buộc nhập "Lý do"
             RemoveModelState("Reason");
 
-            // Các trường bị khóa (disabled) trên form không được gửi lên => lấy lại giá trị hiện tại để không bị ghi đè rỗng
             var current = _enterpriseCache.GetById(model.EnterpriseId);
             if (current == null || current.EnterpriseId <= 0)
                 return Json(new
@@ -121,30 +120,9 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                         EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 });
 
-            RemoveModelState("OwnerEnterpriseName", "BusinessName", "TaxCode", "EconomicSectorId", "EconomicSectorName",
-                "EnterpriseTypeId", "EnterpriseTypeName", "EnterpriseStatusId", "EnterpriseStatusName", "BusinessAddress",
-                "StreetName", "ProvinceId", "ProvinceName", "WardId", "WardName", "ListIndustryId", "IndustryIds",
-                "ListTypeBusinessId", "TypeBusiness");
-            var currentProvince = _provinceCache.GetViaWard(current.WardId);
-            model.OwnerEnterpriseName = current.OwnerEnterpriseName;
-            model.BusinessName = current.BusinessName;
-            model.TaxCode = current.TaxCode;
-            model.EconomicSectorId = current.EconomicSectorId;
-            model.EconomicSectorName = current.EconomicSectorName;
-            model.EnterpriseTypeId = current.EnterpriseTypeId;
-            model.EnterpriseTypeName = current.EnterpriseTypeName;
-            model.EnterpriseStatusId = current.EnterpriseStatusId;
-            model.EnterpriseStatusName = current.EnterpriseStatusName;
-            model.BusinessAddress = current.BusinessAddress;
-            model.StreetName = current.StreetName;
-            model.WardId = current.WardId;
-            model.WardName = current.WardName;
-            model.ProvinceId = currentProvince?.ProvinceId ?? current.ProvinceId;
-            model.ProvinceName = currentProvince?.ProvinceName ?? current.ProvinceName;
-            model.IndustryIds = current.IndustryIds;
-            model.TypeBusiness = current.TypeBusiness;
-            model.ListIndustryId = SplitIds(current.IndustryIds).Select(id => (int?)id).ToList();
-            model.ListTypeBusinessId = SplitIds(current.TypeBusiness);
+            // Trường bị disable (hoặc ẩn) ở view thì trình duyệt không gửi lên => giữ nguyên giá trị hiện tại.
+            // Trường được gửi lên thì cập nhật bình thường => muốn cho doanh nghiệp sửa chỉ cần bỏ disabled ở view.
+            KeepCurrentValuesIfNotPosted(model, current);
 
             if (!ModelState.IsValid)
             {
@@ -182,8 +160,7 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 return PartialView("_Info", model);
             }
 
-            // SaveInfo (p_Cate_Enterprises_Save_BK_C): giữ nguyên Tỉnh khi doanh nghiệp chưa có Xã/Phường
-            var enterpriseId = _enterpriseCache.SaveInfo(new CateEnterpriseModel
+            var enterpriseId = _enterpriseCache.Save(new CateEnterpriseModel
             {
                 EnterpriseId = model.EnterpriseId,
                 OwnerEnterpriseName = model.OwnerEnterpriseName,
@@ -239,6 +216,106 @@ namespace CenIT.ReportTourism.Modules.CateModule.Controllers
                 EnumProcessType.Edit,
                 enterpriseId > 0 ? EnumMsgIcon.Success : EnumMsgIcon.Error);
             return Json(new { status = true, message = response }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        ///     Trường không có trong dữ liệu gửi lên (input bị disabled/ẩn ở view) thì lấy lại giá trị hiện tại
+        ///     và bỏ qua validate của trường đó; trường có gửi lên thì giữ nguyên giá trị người dùng nhập
+        /// </summary>
+        private void KeepCurrentValuesIfNotPosted(CateEnterpriseModel model, CateEnterpriseModel current)
+        {
+            if (!IsPosted("OwnerEnterpriseName"))
+            {
+                RemoveModelState("OwnerEnterpriseName");
+                model.OwnerEnterpriseName = current.OwnerEnterpriseName;
+            }
+
+            if (!IsPosted("BusinessName"))
+            {
+                RemoveModelState("BusinessName");
+                model.BusinessName = current.BusinessName;
+            }
+
+            if (!IsPosted("TaxCode"))
+            {
+                RemoveModelState("TaxCode");
+                model.TaxCode = current.TaxCode;
+            }
+
+            if (!IsPosted("EconomicSectorId"))
+            {
+                RemoveModelState("EconomicSectorId", "EconomicSectorName");
+                model.EconomicSectorId = current.EconomicSectorId;
+                model.EconomicSectorName = current.EconomicSectorName;
+            }
+
+            if (!IsPosted("EnterpriseTypeId"))
+            {
+                RemoveModelState("EnterpriseTypeId", "EnterpriseTypeName");
+                model.EnterpriseTypeId = current.EnterpriseTypeId;
+                model.EnterpriseTypeName = current.EnterpriseTypeName;
+            }
+
+            if (!IsPosted("EnterpriseStatusId"))
+            {
+                RemoveModelState("EnterpriseStatusId", "EnterpriseStatusName");
+                model.EnterpriseStatusId = current.EnterpriseStatusId;
+                model.EnterpriseStatusName = current.EnterpriseStatusName;
+            }
+
+            if (!IsPosted("BusinessAddress"))
+            {
+                RemoveModelState("BusinessAddress");
+                model.BusinessAddress = current.BusinessAddress;
+            }
+
+            if (!IsPosted("StreetName"))
+            {
+                RemoveModelState("StreetName");
+                model.StreetName = current.StreetName;
+            }
+
+            if (!IsPosted("WardId"))
+            {
+                RemoveModelState("WardId", "WardName");
+                model.WardId = current.WardId;
+                model.WardName = current.WardName;
+            }
+
+            // Tỉnh được xác định theo Xã/Phường khi lưu (SP), nên chỉ lấy lại để hiển thị/validate
+            if (!IsPosted("ProvinceId"))
+            {
+                RemoveModelState("ProvinceId", "ProvinceName");
+                var province = _provinceCache.GetViaWard(model.WardId);
+                model.ProvinceId = province?.ProvinceId ?? current.ProvinceId;
+                model.ProvinceName = province?.ProvinceName ?? current.ProvinceName;
+            }
+
+            // Lưu ý: multi-select không chọn giá trị nào cũng không được gửi lên => được giữ nguyên giá trị hiện tại
+            RemoveModelState("IndustryIds");
+            if (!IsPosted("ListIndustryId"))
+            {
+                RemoveModelState("ListIndustryId");
+                model.ListIndustryId = SplitIds(current.IndustryIds).Select(id => (int?)id).ToList();
+            }
+            model.IndustryIds = model.ListIndustryId != null && model.ListIndustryId.Count > 0
+                ? string.Join(",", model.ListIndustryId)
+                : null;
+
+            RemoveModelState("TypeBusiness");
+            if (!IsPosted("ListTypeBusinessId"))
+            {
+                RemoveModelState("ListTypeBusinessId");
+                model.ListTypeBusinessId = SplitIds(current.TypeBusiness);
+            }
+            model.TypeBusiness = model.ListTypeBusinessId != null && model.ListTypeBusinessId.Count > 0
+                ? string.Join(",", model.ListTypeBusinessId)
+                : null;
+        }
+
+        private bool IsPosted(string key)
+        {
+            return Request.Form[key] != null;
         }
 
         private void RemoveModelState(params string[] propertyNames)
