@@ -1,8 +1,17 @@
 using System;
 using System.Collections.Generic;
+using TSFramework.App.Processors;
 
 namespace CenIT.ReportTourism.Models.Report
 {
+    public static class DashboardText
+    {
+        public static string Get(string key)
+        {
+            return AppProcessor.Messagor.GetMessage("Dashboard_" + key);
+        }
+    }
+
     public class DashboardFilters
     {
         public int Year { get; set; }

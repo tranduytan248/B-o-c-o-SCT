@@ -1,61 +1,141 @@
 @model CenIT.ReportTourism.Models.Report.DashboardModel
+@using CenIT.ReportTourism.Models.Report
 @using System.Linq
 @{
-    ViewBag.Title = "Tổng quan báo cáo Công Thương";
+    ViewBag.Title = DashboardText.Get("Overview_Title");
 }
-@section Title { Tổng quan }
+@section Title { @ViewBag.Title <small class="dashboard-subtitle">@DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year · @DashboardText.Get("Overview_Subtitle")</small> }
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
+@{
+    var invariant = System.Globalization.CultureInfo.InvariantCulture;
+    var maxMovement = Model.Movements.Any() ? Model.Movements.Max(x => Math.Abs(x.Change)) : 0m;
+}
 <div class="management-dashboard dashboard-overview-page">
-    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Overview", Filters = Model.Filters })
-    <div class="dashboard-heading">
-        <div><h1 id="dashboard-content">Tổng quan báo cáo Công Thương</h1><p>Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year · Mỗi loại báo cáo dùng chỉ tiêu và đơn vị riêng</p></div>
+    <div class="nav-tabs-custom">
+        @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Overview", Filters = Model.Filters })
+        <div class="tab-content">
+            @Html.Partial("_DashboardFilters", Model.FilterOptions)
+        </div>
     </div>
-    @Html.Partial("_DashboardFilters", Model.FilterOptions)
-    <div class="leader-bento leader-overview-grid">
+
+    <div class="row">
         @foreach (var card in Model.TypeCards)
         {
             var route = new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = card.ReportType,
                 areaId = Model.Filters.AreaId, economicSectorId = Model.Filters.EconomicSectorId,
                 industryId = Model.Filters.IndustryId, enterpriseId = Model.Filters.EnterpriseId };
-            var boxTone = card.ReportType == 1 ? "primary" : card.ReportType == 2 ? "success" : "warning";
-            <a class="box box-@boxTone leader-panel leader-type-card leader-type-@card.ReportType" href="@Url.Action("Analysis", "Dashboard", route)" aria-label="Phân tích báo cáo @card.Name">
-                <span class="leader-eyebrow">Báo cáo loại @card.ReportType · @card.Name</span>
-                <strong class="leader-value">@card.Value <small>@card.Unit</small></strong>
-                <span class="leader-label">@card.MetricLabel</span>
-                <span class="leader-card-footer"><b>@card.Received/@card.Assigned</b> doanh nghiệp có dữ liệu nhập <i class="fa fa-angle-right" aria-hidden="true"></i></span>
-            </a>
-        }
-        <div class="box box-default leader-panel leader-classification">
-            <span class="leader-eyebrow">Phân loại doanh nghiệp · Toàn tỉnh</span>
-            <strong class="leader-value">@Model.Classification.NeedsClassification.ToString("N0")</strong>
-            <span class="leader-label">doanh nghiệp cần bổ sung phân loại</span>
-            <div class="leader-fact-list">
-                <span>Thiếu hồ sơ Công Thương <b>@Model.Classification.MissingBusinessRow.ToString("N0")</b></span>
-                <span>Thiếu ngành <b>@Model.Classification.MissingIndustry.ToString("N0")</b></span>
-                <span>Thiếu loại báo cáo <b>@Model.Classification.MissingReportType.ToString("N0")</b></span>
+            var tone = card.ReportType == 1 ? "bg-light-blue" : card.ReportType == 2 ? "bg-green" : "bg-yellow";
+            var icon = card.ReportType == 1 ? "fa-industry" : card.ReportType == 2 ? "fa-shopping-cart" : "fa-ship";
+            <div class="col-xs-12 col-md-4">
+                <div class="small-box @tone">
+                    <div class="inner">
+                        <h3>@card.Value <sup>@card.Unit</sup></h3>
+                        <p><b>@DashboardText.Get("Overview_Type") @card.ReportType · @card.Name</b><br />@card.MetricLabel</p>
+                    </div>
+                    <div class="icon"><i class="fa @icon" aria-hidden="true"></i></div>
+                    <a class="small-box-footer" href="@Url.Action("Analysis", "Dashboard", route)" aria-label="@DashboardText.Get("Overview_AnalyzeReport") @card.Name">
+                        <b>@card.Received/@card.Assigned</b> @DashboardText.Get("Overview_ReceivedAnalyze") <i class="fa fa-arrow-circle-right" aria-hidden="true"></i>
+                    </a>
+                </div>
             </div>
-            <small>Các nhóm thiếu thông tin có thể trùng nhau và không nằm trong mẫu số của từng loại báo cáo.</small>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-md-8">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-bar-chart text-light-blue" aria-hidden="true"></i> @DashboardText.Get("Overview_ReceivedTitle")</h3>
+                    <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Overview_TrendSubtitle")</span></div>
+                </div>
+                <div class="box-body">
+                    <div id="receipt-overview-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartType1"), DashboardText.Get("ChartType2"), DashboardText.Get("ChartType3") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart" style="height: 260px;" role="img" aria-label="@DashboardText.Get("Overview_TrendAria")"></div>
+                    <ul class="list-inline text-center no-margin">
+                        <li><i class="fa fa-square text-light-blue" aria-hidden="true"></i> @DashboardText.Get("ChartType1")</li>
+                        <li><i class="fa fa-square text-green" aria-hidden="true"></i> @DashboardText.Get("ChartType2")</li>
+                        <li><i class="fa fa-square text-yellow" aria-hidden="true"></i> @DashboardText.Get("ChartType3")</li>
+                    </ul>
+                    <script type="application/json" class="md-chart-data" data-chart="receipt-overview">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReceiptTrend))</script>
+                </div>
+                <div class="box-footer">
+                    <a data-toggle="collapse" href="#receipt-overview-values" aria-expanded="false" aria-controls="receipt-overview-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</a>
+                    <div id="receipt-overview-values" class="collapse">
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-striped">
+                                <thead><tr><th>@DashboardText.Get("Month")</th><th class="text-right">@DashboardText.Get("ChartType1")</th><th class="text-right">@DashboardText.Get("ChartType2")</th><th class="text-right">@DashboardText.Get("ChartType3")</th></tr></thead>
+                                <tbody>@foreach (var point in Model.ReceiptTrend) { <tr><td>@point.Month</td><td class="text-right">@point.Type1</td><td class="text-right">@point.Type2</td><td class="text-right">@point.Type3</td></tr> }</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="box box-default leader-panel leader-overview-chart">
-            <div class="leader-panel-header"><h2>Doanh nghiệp có dữ liệu nhập</h2><span>12 tháng · theo loại báo cáo</span></div>
-            <div id="receipt-overview-chart" class="leader-chart" role="img" aria-label="Xu hướng số doanh nghiệp có dữ liệu nhập theo ba loại báo cáo"></div>
-            <div class="leader-legend"><span>● Loại 1</span><span>● Loại 2</span><span>● Loại 3</span></div>
-            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Loại 1</th><th>Loại 2</th><th>Loại 3</th></tr></thead><tbody>@foreach (var point in Model.ReceiptTrend) { <tr><td>@point.Month</td><td>@point.Type1</td><td>@point.Type2</td><td>@point.Type3</td></tr> }</tbody></table></div></details>
-            <script type="application/json" class="md-chart-data" data-chart="receipt-overview">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReceiptTrend))</script>
-        </div>
-        <div class="box box-default leader-panel leader-overview-movement">
-            <div class="leader-panel-header"><h2>Biến động lớn · Loại 1</h2><a href="@Url.Action("Analysis", "Dashboard", new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = 1, areaId = Model.Filters.AreaId, economicSectorId = Model.Filters.EconomicSectorId, industryId = Model.Filters.IndustryId, enterpriseId = Model.Filters.EnterpriseId })">Xem phân tích</a></div>
-            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có cặp tháng để so sánh.</p> }
-            @foreach (var item in Model.Movements)
-            {
-                <div class="leader-movement"><span title="@item.Name">@item.Name</span><strong class="@(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change) Tỷ đồng</strong></div>
-            }
+
+        <div class="col-xs-12 col-md-4">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-tags text-yellow" aria-hidden="true"></i> @DashboardText.Get("Overview_Classification")</h3>
+                    <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Overview_ProvinceWide")</span></div>
+                </div>
+                <div class="box-body">
+                    <h2 class="no-margin"><b>@Model.Classification.NeedsClassification.ToString("N0")</b> <small>@DashboardText.Get("Overview_NeedsClassification")</small></h2>
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">@DashboardText.Get("Overview_MissingBusiness") <span class="badge bg-yellow">@Model.Classification.MissingBusinessRow.ToString("N0")</span></li>
+                        <li class="list-group-item">@DashboardText.Get("Overview_MissingIndustry") <span class="badge bg-yellow">@Model.Classification.MissingIndustry.ToString("N0")</span></li>
+                        <li class="list-group-item">@DashboardText.Get("Overview_MissingReportType") <span class="badge bg-yellow">@Model.Classification.MissingReportType.ToString("N0")</span></li>
+                    </ul>
+                    <p class="text-muted small no-margin">@DashboardText.Get("Overview_ClassificationNote")</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="leader-data-note">Dữ liệu nhập theo từng loại không chứng minh đã nộp tệp cho loại đó. Mã loại 0 trong kỳ: @Model.Classification.TypeZeroRows; dòng có kỳ tương lai: @Model.Classification.FutureDatedRows.</div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-exchange" aria-hidden="true"></i> @DashboardText.Get("Overview_LargestChanges") · @DashboardText.Get("ChartType1")</h3>
+                    <div class="box-tools pull-right">
+                        <a class="btn btn-box-tool" href="@Url.Action("Analysis", "Dashboard", new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = 1, areaId = Model.Filters.AreaId, economicSectorId = Model.Filters.EconomicSectorId, industryId = Model.Filters.IndustryId, enterpriseId = Model.Filters.EnterpriseId })">@DashboardText.Get("Overview_ViewAnalysis") <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="box-body @(Model.Movements.Any() ? "no-padding" : "")">
+                    @if (!Model.Movements.Any())
+                    {
+                        <p class="text-muted text-center no-margin">@DashboardText.Get("Overview_NoComparison")</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead><tr><th style="width: 40px;">#</th><th>@DashboardText.Get("Enterprise")</th><th style="width: 30%;">@DashboardText.Get("Overview_ChangeSize")</th><th class="text-right">@DashboardText.Get("Change") (@DashboardText.Get("Unit_BillionVnd"))</th></tr></thead>
+                                <tbody>
+                                    @{ var rank = 0; }
+                                    @foreach (var item in Model.Movements)
+                                    {
+                                        rank++;
+                                        var tone = item.Change < 0 ? "red" : "green";
+                                        var width = maxMovement > 0 ? Math.Abs(item.Change) * 100m / maxMovement : 0m;
+                                        <tr>
+                                            <td>@(rank).</td>
+                                            <td>@item.Name</td>
+                                            <td><div class="progress progress-xs"><div class="progress-bar progress-bar-@tone" style="width: @width.ToString("0.#", invariant)%"></div></div></td>
+                                            <td class="text-right"><span class="badge bg-@tone">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted small"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Overview_ReceiptNote") @Model.Classification.TypeZeroRows; @DashboardText.Get("Overview_FutureRows") @Model.Classification.FutureDatedRows.</p>
 </div>
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
