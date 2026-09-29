@@ -12,6 +12,10 @@
     <i class="fa fa-plus"></i>
 }
 
+@section SubmitControl{
+    <button type="submit" id="btnSave" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;Lưu &amp; gửi báo cáo</button>
+}
+
 @section FormBody{
     @*<link href="~/Areas/Report/Views/Import/_Import.css" rel="stylesheet" />*@
     <link href="~/Contents/Modules/Report/plugins/Import/_Import.css" rel="stylesheet"/>
@@ -58,9 +62,6 @@
 
         $(document).ready(function() {
             $('button[type="submit"]').prop('disabled', true);
-            $('input[type="number"]').focusout(function() {
-                ValidMinNumber(this);
-            });
         });
 
     </script>

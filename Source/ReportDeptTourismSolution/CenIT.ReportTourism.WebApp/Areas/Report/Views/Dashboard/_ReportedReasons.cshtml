@@ -1,0 +1,29 @@
+@model IList<string>
+
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-commenting-o text-muted"></i> Lý do / Ý kiến doanh nghiệp</h3>
+    </div>
+    <div class="box-body">
+        <p class="text-muted" style="font-size: 12px; margin-bottom: 10px;">
+            <i class="fa fa-info-circle"></i> Ghi nhận từ các báo cáo gần đây của doanh nghiệp
+        </p>
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="text-center text-muted" style="padding: 25px 0;">
+                Chưa có lý do hoặc ý kiến gửi trong kỳ báo cáo này.
+            </div>
+        }
+        else
+        {
+            <div class="reason-list">
+                @foreach (var reason in Model)
+                {
+                    <div class="callout callout-default" style="background-color: #f9fafb; border-left: 3px solid #3c8dbc; padding: 8px 12px; margin-bottom: 8px; font-size: 12px;">
+                        <i class="fa fa-quote-left text-muted" style="margin-right: 5px;"></i> @reason
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

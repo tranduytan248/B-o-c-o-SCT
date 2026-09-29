@@ -1,0 +1,21 @@
+@model CenIT.ReportTourism.Models.Report.DashboardSubmissionDetailsModel
+
+<section class="dashboard-panel submission-panel">
+    <header class="panel-heading">
+        <div><h2>Tình hình nộp báo cáo</h2><p>@Model.Submission.Submitted/@Model.Submission.TotalEnterprises đơn vị thuộc nhóm theo dõi đã gửi tệp</p></div>
+        @if (Model.ShowDetailsLink) { <a class="panel-link" href="@Url.Action("Progress", "Dashboard", Model.Filters)">Chi tiết <i class="fa fa-angle-right" aria-hidden="true"></i></a> }
+    </header>
+    @if (Model.Submission.TotalEnterprises == 0) { <p class="dashboard-empty">Không có doanh nghiệp trong phạm vi lọc. Hãy chọn lại địa bàn, ngành hoặc doanh nghiệp.</p> }
+    else {
+    <div class="submission-visuals">
+        <div class="submission-ring" style="--completion:@Model.Submission.CompletionPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)%" role="img" aria-label="@Model.Submission.Submitted trên @Model.Submission.TotalEnterprises doanh nghiệp đã nộp tệp, @Model.Submission.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN")) phần trăm">
+            <div class="submission-ring-center"><strong>@Model.Submission.CompletionPercent.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</strong><span>đã nộp</span></div>
+        </div>
+        <div class="submission-legend">
+            <div><i class="submitted-dot" aria-hidden="true"></i><span>Đã nộp tệp</span><strong>@Model.Submission.Submitted</strong></div>
+            <div><i class="missing-dot" aria-hidden="true"></i><span>Chưa nộp tệp</span><strong>@Model.Submission.NotSubmitted</strong></div>
+            <div class="submission-footnote">@Model.Submission.CompleteIndicators đủ ba mã · @Model.Submission.MissingIndicators thiếu mã · @Model.Submission.Late nộp muộn</div>
+        </div>
+    </div>
+    }
+</section>

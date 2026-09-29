@@ -83,7 +83,7 @@ div.validation-summary-errors {
     }
 }
 
-@media screen and (max-width: 1600px) {
+@media screen and (max-width: 1250px) {
     .signin { /*width: 23%;*/
         width: 370px;
     }

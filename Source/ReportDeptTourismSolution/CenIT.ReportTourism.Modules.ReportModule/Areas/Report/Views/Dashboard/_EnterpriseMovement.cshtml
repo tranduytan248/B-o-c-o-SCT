@@ -1,0 +1,76 @@
+@model CenIT.ReportTourism.Models.Report.DashboardModel
+@using System.Linq
+
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-exchange text-primary"></i> Doanh nghiệp tác động lớn</h3>
+        <div class="box-tools pull-right">
+            <a href="@Url.Action("Analysis", "Dashboard", new { Model.Filters.Year, Model.Filters.Month, Model.Filters.AreaId, Model.Filters.EconomicSectorId, Model.Filters.IndustryId, Model.Filters.EnterpriseId, metric = "industrial" })" class="btn btn-box-tool text-primary">
+                Xem phân tích <i class="fa fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        <p class="text-muted" style="font-size: 12px; margin-bottom: 12px;">
+            <i class="fa fa-info-circle"></i> Biến động doanh thu công nghiệp so với tháng trước &middot; Đơn vị: Tỷ đồng
+        </p>
+        @if (!Model.IncreasingEnterprises.Any() && !Model.DecreasingEnterprises.Any())
+        {
+            <div class="text-center text-muted" style="padding: 30px 0;">
+                Chưa có dữ liệu tháng đối chiếu cho cùng doanh nghiệp.
+            </div>
+        }
+        else
+        {
+            var maxImpact = Math.Max(1m, Model.IncreasingEnterprises.Concat(Model.DecreasingEnterprises).Select(x => Math.Abs(x.Contribution)).DefaultIfEmpty(1m).Max());
+            <div class="row">
+                <div class="col-sm-6 col-xs-12" style="margin-bottom: 10px;">
+                    <h5 class="text-green text-bold" style="margin-top: 0; margin-bottom: 10px; font-size: 13px;">
+                        <i class="fa fa-arrow-up"></i> TĂNG NHIỀU NHẤT
+                    </h5>
+                    @if (!Model.IncreasingEnterprises.Any())
+                    {
+                        <div class="text-muted" style="font-size: 12px;">Không có doanh nghiệp tăng</div>
+                    }
+                    @foreach (var item in Model.IncreasingEnterprises)
+                    {
+                        var pct = (Math.Abs(item.Contribution) * 100m / maxImpact).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        <div class="impact-item" style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span class="text-bold" title="@item.Name" style="max-width: 70%; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Name</span>
+                                <span class="text-green text-bold">+@item.Contribution.ToString("#,##0.##")</span>
+                            </div>
+                            <div class="progress progress-xxs" style="height: 4px; margin: 3px 0 2px;">
+                                <div class="progress-bar progress-bar-success" style="width: @pct%"></div>
+                            </div>
+                            <small class="text-muted" style="font-size: 11px;">@item.PreviousValue.ToString("#,##0.##") &rarr; @item.CurrentValue.ToString("#,##0.##") tỷ đồng</small>
+                        </div>
+                    }
+                </div>
+                <div class="col-sm-6 col-xs-12">
+                    <h5 class="text-red text-bold" style="margin-top: 0; margin-bottom: 10px; font-size: 13px;">
+                        <i class="fa fa-arrow-down"></i> GIẢM NHIỀU NHẤT
+                    </h5>
+                    @if (!Model.DecreasingEnterprises.Any())
+                    {
+                        <div class="text-muted" style="font-size: 12px;">Không có doanh nghiệp giảm</div>
+                    }
+                    @foreach (var item in Model.DecreasingEnterprises)
+                    {
+                        var pct = (Math.Abs(item.Contribution) * 100m / maxImpact).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        <div class="impact-item" style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span class="text-bold" title="@item.Name" style="max-width: 70%; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Name</span>
+                                <span class="text-red text-bold">@item.Contribution.ToString("#,##0.##")</span>
+                            </div>
+                            <div class="progress progress-xxs" style="height: 4px; margin: 3px 0 2px;">
+                                <div class="progress-bar progress-bar-danger" style="width: @pct%"></div>
+                            </div>
+                            <small class="text-muted" style="font-size: 11px;">@item.PreviousValue.ToString("#,##0.##") &rarr; @item.CurrentValue.ToString("#,##0.##") tỷ đồng</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
