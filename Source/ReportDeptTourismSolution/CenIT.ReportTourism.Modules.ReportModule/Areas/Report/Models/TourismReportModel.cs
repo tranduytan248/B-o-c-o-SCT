@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Web.UI.WebControls;
@@ -50,5 +50,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
         public string ReportFile { get; set; }
 
         public bool EnableSignDigitalDoc { get; set; } = false;
+
+        public bool IsEnterpriseUser { get; set; } = false;
     }
 }
