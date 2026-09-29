@@ -29,34 +29,83 @@
     }
 
     <script type="text/javascript">
+        var additionalReportPosts = [];
+        function finishAddReport(response) {
+            if (response.status != undefined) {
+                if (!response.status && response.errorCode == 1) {
+                    eval(response.message);
+                    response.status = undefined;
+                } else {
+                    $("#ModalContent #modal_AddReport").modal("hide");
+                    $("#ModalContent #modal_AddReport").on('hidden.bs.modal', function() {
+                        if (response.status != undefined) {
+                            eval(response.message);
+                            _tableDataImport.ajax.reload(null, true);
+                            $("#ActionArea").load("/Report/Import/ViewAction");
+                            response.status = undefined;
+                        }
+                    });
+                }
+            } else {
+                $("#ModalContent #modal_AddReport #bodyForm").html(response);
+            }
+        }
+        function postNextAdditionalReport($form) {
+            if (!additionalReportPosts.length) return null;
+            var data = additionalReportPosts.shift();
+            $.ajax({ url: $form.attr("action"), type: "POST", data: $.param(data), success: function(response) {
+                if (response && response.status === true && additionalReportPosts.length) postNextAdditionalReport($form);
+                else finishAddReport(response);
+            }, error: function() { finishAddReport({ status: false, errorCode: 1, message: "alert('Không thể lưu biểu mẫu báo cáo còn lại.');" }); } });
+            return true;
+        }
         $('form#AddReport').ajaxForm({
-            beforeSubmit: function() {
+            beforeSubmit: function(arr, $form) {
                 if (ValidForm()) {
+                    additionalReportPosts = [];
+                    var enterpriseId = $form.find("#EnterpriseId").val(), currentType = $form.find("#TypeReportSelect").val();
+                    var configuredTypes = ($form.find("#EnterpriseTypeBusiness").val() || "").toString().split(",");
+                    var drafts = $form.data("reportFormDrafts") || {};
+                    var typeNames = { "1": "sản xuất, kinh doanh", "2": "thương mại, dịch vụ", "3": "xuất, nhập khẩu" };
+                    var currentValues = {};
+                    $.each(arr, function(_, item) { currentValues[item.name] = item.value; });
+                    var hasEnteredData = function(values) {
+                        var entered = false;
+                        $.each(values || {}, function(name, value) {
+                            if (!/^(PerformPreviousPeriod|PerformInPeriod|AccumulatedBeginingOfYear|CompareSamePeriodLastYear)_/.test(name)) return;
+                            var number = parseFloat((value || "").toString().replace(/\./g, "").replace(",", "."));
+                            if (!isNaN(number) && number !== 0) { entered = true; return false; }
+                        });
+                        return entered;
+                    };
+                    var emptyTypes = [];
+                    $.each(configuredTypes, function(_, type) {
+                        type = $.trim(type);
+                        if (!type) return;
+                        var values = type === currentType ? currentValues : (drafts[(enterpriseId || "") + "_" + type] || (window.GetReportDraftForSubmit && window.GetReportDraftForSubmit(enterpriseId, type, $form.find("#ForMonth").val())));
+                        if (!hasEnteredData(values)) emptyTypes.push(typeNames[type] || ("loại " + type));
+                    });
+                    if (emptyTypes.length && !window.confirm("Bạn chưa nhập thông tin mẫu " + emptyTypes.join(", ") + ". Bạn vẫn muốn thực hiện lưu báo cáo?")) return false;
+                    $.each(configuredTypes, function(_, type) {
+                        type = $.trim(type);
+                        if (!type || type === currentType) return;
+                        var values = drafts[(enterpriseId || "") + "_" + type];
+                        if (!values && window.GetReportDraftForSubmit) values = window.GetReportDraftForSubmit(enterpriseId, type, $form.find("#ForMonth").val());
+                        if (!values) return;
+                        var post = $.grep(arr, function(item) { return !/^(Target|Unit|Index|Level|Code|PerformPreviousPeriod|PerformInPeriod|AccumulatedBeginingOfYear|ComparedSamePeriodLastYear)_|^(BusinessProductReport|TradingReport|ImportExportReport|TypeReport|TypeReportName)$/.test(item.name); });
+                        post.push({ name: "TypeReport", value: type });
+                        post.push({ name: "TypeReportName", value: type === "2" ? "Doanh nghiệp thương mại, dịch vụ" : type === "3" ? "Doanh nghiệp xuất, nhập khẩu" : "Doanh nghiệp sản xuất, kinh doanh" });
+                        $.each(values, function(name, value) { post.push({ name: name, value: value }); });
+                        additionalReportPosts.push(post);
+                    });
                     return true; //it will continue your submission.
                 } else {
                     return false; //ti will stop your submission.
                 }
             },
             success: function(response) {
-                if (response.status != undefined) {
-                    if (!response.status && response.errorCode == 1) {
-                        eval(response.message);
-                        response.status = undefined;
-                    } else {
-                        $("#ModalContent #modal_AddReport").modal("hide");
-                        $("#ModalContent #modal_AddReport").on('hidden.bs.modal',
-                            function() {
-                                if (response.status != undefined) {
-                                    eval(response.message);
-                                    _tableDataImport.ajax.reload(null, true);
-                                    $("#ActionArea").load("/Report/Import/ViewAction");
-                                    response.status = undefined;
-                                }
-                            });
-                    }
-                } else {
-                    $("#ModalContent #modal_AddReport" + " #bodyForm").html(response);
-                }
+                if (response && response.status === true && postNextAdditionalReport($('form#AddReport'))) return;
+                finishAddReport(response);
             }
         });
 

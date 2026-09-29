@@ -16,6 +16,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
 
         [CustomDisplayName("DataImport_Label_Enterprise")]
         public string EnterpriseName { get; set; }
+        public string EnterpriseTypeBusiness { get; set; }
 
         [CustomDisplayName("DataImport_Label_ForMonth")]
         [CustomRequired]
@@ -27,8 +28,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
         public string SavedBy { get; set; }
 
         public List<ListItem> ListEnterprises { get; set; }
-        public List<ListItem> ListTypeBusiness { get; set; }
-
         public List<ListItem> ListTypeBusiness { get; set; }
 
         public DataTable DataImports { get; set; }

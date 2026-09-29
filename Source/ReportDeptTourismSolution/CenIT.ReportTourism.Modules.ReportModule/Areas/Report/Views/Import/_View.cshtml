@@ -35,6 +35,7 @@
     <script type="text/javascript">
         var enterpriseId = @Model.EnterpriseId;
         var forMonth = '@Model.ForMonth.Value.ToString("yyyy-MM-dd")';
+        var typeReport = @(Model.TypeReport.HasValue ? Model.TypeReport.Value.ToString() : "null");
 
     </script>
     <script src="@Url.Content("~/Areas/Report/Views/Import/ViewDataImport.js")"></script>

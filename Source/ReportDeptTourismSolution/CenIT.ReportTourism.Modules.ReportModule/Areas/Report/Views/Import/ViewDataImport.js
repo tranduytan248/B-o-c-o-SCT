@@ -33,7 +33,8 @@ function initTableViewDataImport() {
             "dataType": "JSON",
             "data": {
                 "EnterpriseId": function() { return enterpriseId; },
-                "ForMonth": function() { return forMonth; }
+                "ForMonth": function() { return forMonth; },
+                "TypeReport": function() { return typeReport; }
             }
         },
         "columnDefs": [

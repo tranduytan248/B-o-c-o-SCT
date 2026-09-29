@@ -51,5 +51,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
 
         [CustomDisplayName("DataImport_Label_ForMonth")]
         public DateTime? ForMonth { get; set; }
+
+        public int? TypeReport { get; set; }
     }
 }
