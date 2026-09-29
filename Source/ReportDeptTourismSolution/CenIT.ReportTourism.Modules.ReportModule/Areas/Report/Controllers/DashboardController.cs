@@ -17,7 +17,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             string economicSectorId, string industryId, string enterpriseId)
         {
             var filters = CreateFilters(year, month, reportType, areaId, economicSectorId, industryId, enterpriseId);
-            ViewBag.Title = "Tổng quan báo cáo Công Thương";
             return View(_dashboardCache.GetDashboard(filters));
         }
 
@@ -26,7 +25,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             string economicSectorId, string industryId, string enterpriseId, string metric)
         {
             var filters = CreateFilters(year, month, reportType, areaId, economicSectorId, industryId, enterpriseId, metric);
-            ViewBag.Title = "Phân tích chỉ tiêu";
             return View(_dashboardCache.GetAnalysis(filters));
         }
 
@@ -35,7 +33,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             string economicSectorId, string industryId, string enterpriseId)
         {
             var filters = CreateFilters(year, month, reportType, areaId, economicSectorId, industryId, enterpriseId);
-            ViewBag.Title = "Tín hiệu biến động";
             return View(_dashboardCache.GetWarnings(filters));
         }
 
@@ -44,7 +41,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             string economicSectorId, string industryId, string enterpriseId)
         {
             var filters = CreateFilters(year, month, reportType, areaId, economicSectorId, industryId, enterpriseId);
-            ViewBag.Title = "Theo dõi dữ liệu";
             return View(_dashboardCache.GetProgress(filters));
         }
 

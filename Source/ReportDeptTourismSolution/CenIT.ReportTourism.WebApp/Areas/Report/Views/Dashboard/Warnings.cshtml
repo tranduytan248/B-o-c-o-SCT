@@ -1,47 +1,145 @@
 @model CenIT.ReportTourism.Models.Report.DashboardWarningsModel
+@using CenIT.ReportTourism.Models.Report
 @using System.Linq
 @{
-    ViewBag.Title = "Tín hiệu biến động";
+    ViewBag.Title = DashboardText.Get("Warnings_Title");
 }
-@section Title { Tín hiệu biến động }
+@section Title { @ViewBag.Title <small class="dashboard-subtitle">@Model.TypeName · @Model.Metric.Label · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</small> }
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
+@{
+    var invariant = System.Globalization.CultureInfo.InvariantCulture;
+    var comparablePercent = Model.Assigned > 0 ? Math.Min(100m, 100m * Model.ComparableCount / Model.Assigned) : 0m;
+}
 <div class="management-dashboard dashboard-warnings-page">
-    @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Warnings", Filters = Model.Filters })
-    <div class="dashboard-heading"><div><h1 id="dashboard-content">Tín hiệu biến động</h1><p>@Model.TypeName · @Model.Metric.Label · Tháng @Model.Filters.Month.ToString("00")/@Model.Filters.Year</p></div></div>
-    @Html.Partial("_DashboardFilters", Model.FilterOptions)
-    <div class="leader-bento leader-warnings-grid">
-        <div class="box box-default leader-panel leader-warning-compared"><span class="leader-eyebrow">Có thể đối chiếu</span><strong class="leader-value">@Model.ComparableCount / @Model.Assigned</strong><span class="leader-label">doanh nghiệp được phân loại có số liệu hai kỳ</span></div>
+    <div class="nav-tabs-custom">
+        @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Warnings", Filters = Model.Filters })
+        <div class="tab-content">
+            @Html.Partial("_DashboardFilters", Model.FilterOptions)
+        </div>
+    </div>
+
+    <div class="row">
         @if (Model.IsIndustrial)
         {
-            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 10%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver10.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
-            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 20%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver20.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
-            <div class="box box-default leader-panel"><span class="leader-eyebrow">Tín hiệu giảm trên 30%</span><strong class="leader-value">@(Model.ComparableCount > 0 ? Model.DeclineOver30.ToString() : "—")</strong><span class="leader-label">doanh nghiệp</span></div>
+            <div class="col-xs-12 col-sm-4">
+                <div class="small-box bg-yellow">
+                    <div class="inner"><h3>@(Model.ComparableCount > 0 ? Model.DeclineOver10.ToString() : "—")</h3><p><b>@DashboardText.Get("Warnings_Decline10")</b><br />@DashboardText.Get("Enterprises")</p></div>
+                    <div class="icon"><i class="fa fa-arrow-down" aria-hidden="true"></i></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <div class="small-box bg-orange">
+                    <div class="inner"><h3>@(Model.ComparableCount > 0 ? Model.DeclineOver20.ToString() : "—")</h3><p><b>@DashboardText.Get("Warnings_Decline20")</b><br />@DashboardText.Get("Enterprises")</p></div>
+                    <div class="icon"><i class="fa fa-level-down" aria-hidden="true"></i></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <div class="small-box bg-red">
+                    <div class="inner"><h3>@(Model.ComparableCount > 0 ? Model.DeclineOver30.ToString() : "—")</h3><p><b>@DashboardText.Get("Warnings_Decline30")</b><br />@DashboardText.Get("Enterprises")</p></div>
+                    <div class="icon"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></div>
+                </div>
+            </div>
         }
         else
         {
-            <div class="box box-default leader-panel"><span class="leader-eyebrow">Biến động lớn nhất</span><strong class="leader-value">@(Model.Movements.Any() ? String.Format("{0:+#,##0.##;-#,##0.##;0}", Model.Movements.First().Change) : "—") <small>@Model.Metric.Unit</small></strong><span class="leader-label">@Model.Metric.Label</span></div>
-            <div class="box box-default leader-panel"><span class="leader-eyebrow">Doanh nghiệp giảm</span><strong class="leader-value">@Model.Movements.Count(x => x.Change < 0)</strong><span class="leader-label">trong danh sách biến động lớn</span></div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="small-box bg-light-blue">
+                    <div class="inner"><h3>@(Model.Movements.Any() ? String.Format("{0:+#,##0.##;-#,##0.##;0}", Model.Movements.First().Change) : "—") <sup>@Model.Metric.Unit</sup></h3><p><b>@DashboardText.Get("Warnings_LargestChange")</b><br />@Model.Metric.Label</p></div>
+                    <div class="icon"><i class="fa fa-exchange" aria-hidden="true"></i></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="small-box bg-red">
+                    <div class="inner"><h3>@Model.Movements.Count(x => x.Change < 0)</h3><p><b>@DashboardText.Get("Warnings_DecliningEnterprises")</b><br />@DashboardText.Get("Warnings_InLargestList")</p></div>
+                    <div class="icon"><i class="fa fa-arrow-down" aria-hidden="true"></i></div>
+                </div>
+            </div>
         }
-        <div class="box box-default leader-panel leader-warning-conflicts"><span class="leader-eyebrow">Dữ liệu cần đối chiếu</span><strong class="leader-value">@Model.ConflictCount</strong><span class="leader-label">doanh nghiệp có mã chỉ tiêu trùng trong kỳ</span></div>
-        <div class="box box-default leader-panel leader-warning-chart">
-            <div class="leader-panel-header"><h2>Xu hướng số doanh nghiệp giảm</h2><span>@(Model.IsIndustrial ? "Giảm trên 10%" : "Giảm so với tháng trước")</span></div>
-            <div id="warning-trend-chart" class="leader-chart" role="img" aria-label="Xu hướng số doanh nghiệp có mức giảm"></div>
-            <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
-            <details class="leader-chart-values"><summary>Số liệu biểu đồ theo tháng</summary><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>Tháng</th><th>Doanh nghiệp giảm</th></tr></thead><tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td>@(point.Value.HasValue ? point.Value.Value.ToString("#,##0") : "Chưa đủ cặp so sánh")</td></tr> }</tbody></table></div></details>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-md-8">
+            <div class="box box-danger">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-bar-chart text-red" aria-hidden="true"></i> @DashboardText.Get("Warnings_Trend")</h3>
+                    <div class="box-tools pull-right"><span class="label label-default">@(Model.IsIndustrial ? DashboardText.Get("Warnings_DeclineOver10") : DashboardText.Get("Warnings_DeclineMom"))</span></div>
+                </div>
+                <div class="box-body">
+                    <div id="warning-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartDecliningEnterprises") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart" style="height: 240px;" role="img" aria-label="@DashboardText.Get("Warnings_TrendAria")"></div>
+                    <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+                </div>
+                <div class="box-footer">
+                    <a data-toggle="collapse" href="#warning-trend-values" aria-expanded="false" aria-controls="warning-trend-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</a>
+                    <div id="warning-trend-values" class="collapse">
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-striped">
+                                <thead><tr><th>@DashboardText.Get("Month")</th><th class="text-right">@DashboardText.Get("Warnings_DecliningEnterprises")</th></tr></thead>
+                                <tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td class="text-right">@(point.Value.HasValue ? point.Value.Value.ToString("#,##0") : DashboardText.Get("Warnings_NoPairs"))</td></tr> }</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="box box-default leader-panel leader-warning-list">
-            <div class="leader-panel-header"><h2>@(Model.IsIndustrial ? "Doanh nghiệp giảm trên 10%" : "Biến động lớn theo doanh nghiệp")</h2><span>@Model.Metric.Unit</span></div>
-            @if (!Model.Movements.Any()) { <p class="text-muted">Chưa có cặp giá trị phù hợp để hiển thị.</p> }
-            <div class="table-responsive"><table class="table table-hover leader-table"><thead><tr><th>Doanh nghiệp</th><th class="text-right">Kỳ trước</th><th class="text-right">Kỳ này</th><th class="text-right">Thay đổi</th><th class="text-right">Tỷ lệ</th></tr></thead><tbody>
-                @foreach (var item in Model.Movements)
-                { <tr><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td><td class="text-right">@(item.Percent.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", item.Percent.Value) : "—")</td></tr> }
-            </tbody></table></div>
+
+        <div class="col-xs-12 col-md-4">
+            <div class="info-box bg-aqua">
+                <span class="info-box-icon"><i class="fa fa-balance-scale" aria-hidden="true"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">@DashboardText.Get("Warnings_Comparable")</span>
+                    <span class="info-box-number">@Model.ComparableCount / @Model.Assigned</span>
+                    <div class="progress"><div class="progress-bar" style="width: @comparablePercent.ToString("0.#", invariant)%"></div></div>
+                    <span class="progress-description" title="@DashboardText.Get("Analysis_ComparedCoverage")">@DashboardText.Get("Analysis_ComparedCoverage")</span>
+                </div>
+            </div>
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-files-o" aria-hidden="true"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">@DashboardText.Get("Warnings_Conflict")</span>
+                    <span class="info-box-number">@Model.ConflictCount</span>
+                    <span class="text-muted small">@DashboardText.Get("Warnings_ConflictDescription")</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="leader-data-note">Các biến động là tín hiệu từ dữ liệu nhập, không phải kết luận vi phạm hay danh sách cần xử lý. Tỷ lệ thay đổi không tính khi kỳ trước bằng 0.</div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-list-ol" aria-hidden="true"></i> @(Model.IsIndustrial ? DashboardText.Get("Warnings_DeclineList") : DashboardText.Get("Warnings_ChangeList"))</h3>
+                    <div class="box-tools pull-right"><span class="label label-default">@Model.Metric.Unit</span></div>
+                </div>
+                <div class="box-body">
+                    @if (!Model.Movements.Any())
+                    {
+                        <p class="text-muted text-center no-margin">@DashboardText.Get("Warnings_NoChanges")</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover no-margin">
+                                <thead><tr><th style="width: 40px;">#</th><th>@DashboardText.Get("Enterprise")</th><th class="text-right">@DashboardText.Get("PreviousPeriod")</th><th class="text-right">@DashboardText.Get("CurrentPeriod")</th><th class="text-right">@DashboardText.Get("Change")</th><th class="text-right">@DashboardText.Get("Rate")</th></tr></thead>
+                                <tbody>
+                                    @{ var rank = 0; }
+                                    @foreach (var item in Model.Movements)
+                                    {
+                                        rank++;
+                                        <tr><td>@(rank).</td><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right text-bold @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td><td class="text-right @(item.Percent < 0 ? "text-red" : "")">@(item.Percent.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", item.Percent.Value) : "—")</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted small"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Warnings_Note")</p>
 </div>
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
