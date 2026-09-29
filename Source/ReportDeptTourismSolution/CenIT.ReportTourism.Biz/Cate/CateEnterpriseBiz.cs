@@ -123,6 +123,7 @@ namespace CenIT.ReportTourism.Biz.Cate
             return result.GetValueOrDefault(0);
         }
 
+
         public CateBusinessProductModel GetMainProduct(int enterpriseId)
         {
             return AppProcessor.ProcedureProvider.ExecuteScalarObject<CateBusinessProductModel>(
