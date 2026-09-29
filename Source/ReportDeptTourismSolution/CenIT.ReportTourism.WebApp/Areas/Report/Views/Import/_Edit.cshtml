@@ -15,11 +15,13 @@
     <i class="fa fa-plus"></i>
 }
 
-type="text/css"
+@section SubmitControl{
+    <button type="submit" id="btnSave" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;Lưu &amp; gửi báo cáo</button>
+}
 
 @section FormBody{
     @*<link href="~/Areas/Report/Views/Import/_Import.css" rel="stylesheet" type="text/css" />*@
-    <link href="~/Contents/Modules/Report/plugins/Import/_Import.css" rel="stylesheet"/>
+    <link href="~/Contents/Modules/Report/plugins/Import/_Import.css" rel="stylesheet" />
 
     @using (Html.BeginForm("Edit", "Import", FormMethod.Post, new { encType = "multipart/form-data", id = "EditReport", @class = "form-horizontal" }))
 
@@ -33,14 +35,14 @@ type="text/css"
                         <h4><i class="icon fa fa-bullhorn"></i> Quá hạn nộp báo cáo tháng @DateTime.Now.ToString("MM/yyyy")!</h4>
                         <p>Đã qua hạn nộp báo cáo lúc <b>24h00 ngày @Model.DayDeadlineSendReport</b> hàng tháng. Báo cáo nộp sau ngày <b>@Model.DayDeadlineSendReport</b> sẽ được xem là trễ hạn.</p>
                     </div>
-                    <hr/>
+                    <hr />
                 }
                 var visibleInfoSmartCA = string.IsNullOrEmpty(Model.AccessToken) || !Model.EnableSignDigitalDoc ? "hidden" : "";
                 var visibleSmartCA = string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc ? "" : "hidden";
 
                 <div class="form-group col-md-12 @visibleSmartCA" id="ButtonLoginSmartCA">
                     <a id="LoginSmartCA" href="@Url.Action("LoginSmartCA")" data-modal="true" data-modal-id="LoginSmartCA" class="pull-right btn btn-sm btn-default">
-                        <img class="pull-right" alt="" src="~/Contents/imgs/VNPT SmartCA_sm.png"/>
+                        <img class="pull-right" alt="" src="~/Contents/imgs/VNPT SmartCA_sm.png" />
                     </a>
                 </div>
             }
@@ -67,33 +69,38 @@ type="text/css"
             @Html.HiddenFor(model => model.ForMonth)
             @Html.HiddenFor(model => model.EnterpriseId)
             @Html.HiddenFor(model => model.EnterpriseName)
+            @Html.HiddenFor(model => model.TypeReport)
 
             <div class="form-group">
-                @Html.LabelFor(model => model.EnterpriseName, new { @class = "control-label col-md-3" })
-                <div class="col-md-9">
-                    @Html.TextBoxFor(model => model.EnterpriseName, new { @readonly = true, @class = "col-md-10" })
+                <div class="col-md-12">
+                    @Html.LabelFor(model => model.EnterpriseName, new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.EnterpriseName, new { @readonly = true, @class = "col-md-12 form-control" })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.TypeReport, new { @class = "control-label col-md-3" })
-                <div class="col-md-4">
-                    @Html.TextBoxFor(model => model.TypeReportName, new { @readonly = true, @class = "col-md-12" })
+                <div class="col-md-6">
+                    @Html.LabelFor(model => model.TypeReport, new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.TypeReportName, new { @readonly = true, @class = "col-md-12 form-control", style = "background-color: #eee; cursor: not-allowed;" })
                 </div>
-                @Html.LabelFor(model => model.ForMonth, new { @class = "control-label col-md-2" })
                 <div class="col-md-3">
-                    <div class="input-group col-md-7">
-                        <div class="input-group-addon">
+                    @Html.LabelFor(model => model.ForMonth, new { @class = "control-label" })
+                    <div class="input-group">
+                        <div class="input-group-addon" style="background-color: #eee; cursor: not-allowed;">
                             <i class="fa fa-calendar"></i>
                         </div>
-                        @Html.TextBoxFor(model => model.ForMonth, "{0:MM/yyyy}", new { @readonly = true, @class = "form-control", placeholder = "MM/yyyy" })
+                        <input type="text" class="col-md-12 form-control" value="@Model.ForMonth.ToString("MM/yyyy")" disabled="disabled" style="cursor: not-allowed; background-color: #eee;" placeholder="MM/yyyy" />
                     </div>
                 </div>
             </div>
 
-            <hr/>
+            <hr />
 
-            @if (ViewBag.IsBusinessProductReport == true)
+            @if (Model.TypeReport == EnumTypeBusiness.Trading)
+            {
+                @Html.Partial("_NoTemplateReport")
+            }
+            else if (ViewBag.IsBusinessProductReport == true)
             {
                 @Html.Partial("_BusinessProductReport", Model.ListDataImports)
             }
@@ -111,7 +118,7 @@ type="text/css"
             // Mẫu báo cáo sản xuất/thương mại không dùng các validator du lịch cũ.
             function ValidForm() {
                 var isValid = true;
-                $("#DataReport input[type='number']").each(function() {
+                $("#DataReport input[type='number']").each(function () {
                     var value = $(this).val();
                     if (value !== "" && !isNaN(value) && parseFloat(value) < 0) {
                         TooltipErrInput(this, "Giá trị phải lớn hơn hoặc bằng 0");
@@ -158,14 +165,11 @@ type="text/css"
         });
 
         $(document).ready(function() {
-            $('input[type="number"]').focusout(function() {
-                ValidMinNumber(this);
-            });
 
             @{
                 if (string.IsNullOrEmpty(Model.AccessToken) && Model.EnableSignDigitalDoc)
                 {
-                    @Html.Raw($"var a = document.createElement('a');a.style.display = 'none';a.href = '{Url.Action("LoginSmartCA")}';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
+                    @Html.Raw("var a = document.createElement('a');a.style.display = 'none';a.href = '" + Url.Action("LoginSmartCA") + "';a.class = 'btn hidden';a.setAttribute('data-modal', 'true');a.setAttribute('data-modal-id', 'LoginSmartCA');document.body.appendChild(a);a.click();")
                     @Html.Raw("$('#modal_EditReport button[type=\"submit\"]').prop('disabled', true);")
                     ;
                 }

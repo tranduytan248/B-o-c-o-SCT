@@ -82,7 +82,6 @@
                 if (!string.IsNullOrEmpty(Model.ListPathCertificateFiles))
                 {
                     @Html.Raw(Model.ListPathCertificateFiles)
-                    ;
                 }
             }
 
@@ -156,6 +155,7 @@
 </div>
 
 <script type="text/javascript">
+    //debugger;
     $(document).ready(function () {
         $("a[name='DownloadRefDoc']").on('click',
             function () {
@@ -173,16 +173,16 @@
                 });
             });
 
-        OnChangeProvince('select#ProvinceId', 'select#WardId');
+        OnChangeProvince('#Enterprise select#ProvinceId', '#Enterprise select#WardId');
         ////$("#@Html.IdFor(model => model.ListIndustryId)").val(@Model.IndustryIds).trigger('change');
         @{
             if (!string.IsNullOrEmpty(Model.IndustryIds))
             {
-                @Html.Raw($"$('#{Html.IdFor(model => model.ListIndustryId)}').val('{Model.IndustryIds}'.split(',')).trigger('change');")
+                @Html.Raw($"$('#Enterprise #{Html.IdFor(model => model.ListIndustryId)}').val('{Model.IndustryIds}'.split(',')).trigger('change');")
             }
             if (!string.IsNullOrEmpty(Model.TypeBusiness))
             {
-                @Html.Raw($"$('#{Html.IdFor(model => model.ListTypeBusinessId)}').val('{Model.TypeBusiness}'.split(',')).trigger('change');")
+                @Html.Raw($"$('#Enterprise #{Html.IdFor(model => model.ListTypeBusinessId)}').val('{Model.TypeBusiness}'.split(',')).trigger('change');")
             }
         }
     });

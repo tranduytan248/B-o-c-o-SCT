@@ -5,6 +5,18 @@
                                  ?? new List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>();
     var importBusinessProductOptions = ViewBag.ImportBusinessProductOptions as List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>
                                  ?? new List<CenIT.ReportTourism.Models.Report.ReportDataImportModel>();
+
+    DateTime forMonth = ViewBag.ForMonth is DateTime ? (DateTime)ViewBag.ForMonth : DateTime.Now;
+    int currentMonth = forMonth.Month;
+    int prevMonth = currentMonth == 1 ? 12 : currentMonth - 1;
+}
+
+@functions {
+    public static string FormatNumberVN(double? val)
+    {
+        if (!val.HasValue) return "";
+        return val.Value.ToString("#,##0.##", new System.Globalization.CultureInfo("vi-VN"));
+    }
 }
 
 <div class="row">
@@ -12,17 +24,19 @@
         <input type="hidden" name="BusinessProductReport" value="true" />
         <style>
             #DataReport tr.business-summary td { font-weight: 700; }
+            .btn-remove-trade { cursor: pointer; margin-left: 8px; font-size: 14px; }
+            .btn-remove-trade:hover { color: #a94442 !important; }
         </style>
         <div id="TradeProductTemplates" style="display: none;">
-            <select id="ExportProductTemplate">
-                <option value="">Chọn 1 giá trị</option>
+            <select id="ExportProductTemplate" class="none-select2">
+                <option value=""></option>
                 @foreach (var option in exportBusinessProductOptions)
                 {
                     <option value="@option.Code" data-unit="@option.Unit" data-name="@option.Targets">@option.Targets (@option.Code)</option>
                 }
             </select>
-            <select id="ImportProductTemplate">
-                <option value="">Chọn 1 giá trị</option>
+            <select id="ImportProductTemplate" class="none-select2">
+                <option value=""></option>
                 @foreach (var option in importBusinessProductOptions)
                 {
                     <option value="@option.Code" data-unit="@option.Unit" data-name="@option.Targets">@option.Targets (@option.Code)</option>
@@ -41,14 +55,14 @@
                 <thead>
                     <tr>
                         <th rowspan="2" width="5%">TT</th>
-                        <th rowspan="2" width="33%">Chỉ tiêu</th>
-                        <th rowspan="2" width="11%">Đơn vị tính</th>
-                        <th rowspan="2" width="13%">Kế hoạch năm báo cáo</th>
-                        <th colspan="2">Năm báo cáo</th>
+                        <th rowspan="2" width="32%">Chỉ tiêu</th>
+                        <th rowspan="2" width="9%">Đơn vị tính</th>
+                        <th rowspan="2" width="20%">Kế hoạch năm báo cáo</th>
+                        <th colspan="2" width="34%">Năm báo cáo</th>
                     </tr>
                     <tr>
-                        <th>Thực hiện tháng trước</th>
-                        <th>Ước thực hiện tháng báo cáo</th>
+                        <th width="17%">Thực hiện T@(prevMonth)</th>
+                        <th width="17%">Ước thực hiện T@(currentMonth)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,28 +81,72 @@
                                             || product.Targets == "Kim ngạch nhập khẩu";
                             var isTradeHeader = product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu"
                                                 || product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu";
-                            <tr class="@(isSummary ? "business-summary" : "")">
+
+                            string rowDataSummary = "";
+                            string rowDataGroup = "";
+
+                            if (product.Code == "06" || product.Targets == "Kim ngạch xuất khẩu")
+                            {
+                                rowDataSummary = "XK";
+                            }
+                            else if (product.Code == "07" || product.Targets == "Kim ngạch nhập khẩu")
+                            {
+                                rowDataSummary = "NK";
+                            }
+                            else if (!string.IsNullOrEmpty(product.Code) && product.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase))
+                            {
+                                rowDataGroup = "XK";
+                            }
+                            else if (!string.IsNullOrEmpty(product.Code) && product.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase))
+                            {
+                                rowDataGroup = "NK";
+                            }
+
+                            string rowDataRole = "";
+                            if (product.Code == "01" || product.Targets == "Tổng doanh thu")
+                            {
+                                rowDataRole = "total-revenue";
+                            }
+                            else if (product.Code == "0101" || product.Targets == "Trong đó doanh thu công nghiệp")
+                            {
+                                rowDataRole = "industry-revenue";
+                            }
+
+                            var isTradeSummary = !string.IsNullOrEmpty(rowDataSummary);
+
+                            <tr class="@(isSummary ? "business-summary" : "")" @(!string.IsNullOrEmpty(rowDataSummary) ? "data-summary=" + rowDataSummary : "") @(!string.IsNullOrEmpty(rowDataGroup) ? "data-group=" + rowDataGroup : "") @(!string.IsNullOrEmpty(rowDataRole) ? "data-role=" + rowDataRole : "")>
                                 @if (string.IsNullOrEmpty(product.Code))
                                 {
-                                    <td class="text-center">@index</td>
+                                    <td class="text-center">@product.Level</td>
                                     <td colspan="5" style="text-align: left !important;">
-                                        <strong>@Html.Hidden($"Target_{index}", product.Targets)@Html.Hidden($"Unit_{index}", product.Unit)@Html.Hidden($"Code_{index}", product.Code)@product.Targets</strong>
+                                        <strong>@Html.Hidden("Target_" + index, product.Targets)@Html.Hidden("Unit_" + index, product.Unit)@Html.Hidden("Code_" + index, product.Code)@Html.Hidden("Index_" + index, product.Index)@Html.Hidden("Level_" + index, product.Level)@product.Targets</strong>
                                     </td>
                                 }
                                 else
                                 {
-                                    <td class="text-center">@index</td>
+                                    <td class="text-center">@product.Level</td>
                                     <td style="text-align: left !important;">
-                                        @Html.Hidden($"Target_{index}", product.Targets)
+                                        @Html.Hidden("Target_" + index, product.Targets)
+                                        @Html.Hidden("Index_" + index, product.Index)
+                                        @Html.Hidden("Level_" + index, product.Level)
                                         @if (isSummary) { <strong>@product.Targets</strong> } else { @product.Targets }
                                     </td>
                                     <td>
-                                        @Html.Hidden($"Unit_{index}", product.Unit)
+                                        @Html.Hidden("Unit_" + index, product.Unit)
                                         @if (isSummary) { <strong>@product.Unit</strong> } else { @product.Unit }
                                     </td>
-                                    <td>@Html.TextBox($"AccumulatedBeginingOfYear_{index}", product.AccumulatedBeginingOfYear, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })</td>
-                                    <td>@Html.TextBox($"PerformPreviousPeriod_{index}", product.PerformPreviousPeriod ?? product.ComparedSamePeriodLastYear, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })</td>
-                                    <td>@Html.TextBox($"PerformInPeriod_{index}", product.PerformInPeriod, new { type = "number", min = "0", @class = "form-control text-right", placeholder = "0" })@Html.Hidden($"Code_{index}", product.Code)</td>
+                                    if (isTradeSummary)
+                                    {
+                                        <td><input type="text" id="AccumulatedBeginingOfYear_@index" name="AccumulatedBeginingOfYear_@index" value="@FormatNumberVN(product.AccumulatedBeginingOfYear)" class="form-control text-right number-separator trade-summary-input" placeholder="0" autocomplete="off" readonly="readonly" tabindex="-1" style="background-color: #f0f3f5; cursor: not-allowed;" /></td>
+                                        <td><input type="text" id="PerformPreviousPeriod_@index" name="PerformPreviousPeriod_@index" value="@FormatNumberVN(product.PerformPreviousPeriod ?? product.ComparedSamePeriodLastYear)" class="form-control text-right number-separator trade-summary-input" placeholder="0" autocomplete="off" readonly="readonly" tabindex="-1" style="background-color: #f0f3f5; cursor: not-allowed;" /></td>
+                                        <td><input type="text" id="PerformInPeriod_@index" name="PerformInPeriod_@index" value="@FormatNumberVN(product.PerformInPeriod)" class="form-control text-right number-separator trade-summary-input" placeholder="0" autocomplete="off" readonly="readonly" tabindex="-1" style="background-color: #f0f3f5; cursor: not-allowed;" />@Html.Hidden("Code_" + index, product.Code)</td>
+                                    }
+                                    else
+                                    {
+                                        <td><input type="text" id="AccumulatedBeginingOfYear_@index" name="AccumulatedBeginingOfYear_@index" value="@FormatNumberVN(product.AccumulatedBeginingOfYear)" class="form-control text-right number-separator" placeholder="0" autocomplete="off" inputmode="decimal" /></td>
+                                        <td><input type="text" id="PerformPreviousPeriod_@index" name="PerformPreviousPeriod_@index" value="@FormatNumberVN(product.PerformPreviousPeriod ?? product.ComparedSamePeriodLastYear)" class="form-control text-right number-separator" placeholder="0" autocomplete="off" inputmode="decimal" /></td>
+                                        <td><input type="text" id="PerformInPeriod_@index" name="PerformInPeriod_@index" value="@FormatNumberVN(product.PerformInPeriod)" class="form-control text-right number-separator" placeholder="0" autocomplete="off" inputmode="decimal" />@Html.Hidden("Code_" + index, product.Code)</td>
+                                    }
                                 }
                             </tr>
                             var addTradePrefix = string.Empty;
@@ -147,26 +205,330 @@
             }
         });
 
+        if (!isValid) return false;
+
+        if (!validateRevenueConstraint(true)) {
+            return false;
+        }
+
         return isValid;
     }
-</script>
 
-<script type="text/javascript">
+    function parseVNFloat(val) {
+        if (!val) return 0;
+        var s = val.toString().replace(/\./g, "").replace(",", ".");
+        var num = parseFloat(s);
+        return isNaN(num) ? 0 : num;
+    }
+
+    function hasVNValue(val) {
+        if (!val) return false;
+        var s = val.toString().replace(/\./g, "").replace(",", "").trim();
+        return s.length > 0;
+    }
+
+    function formatVNNumber(num) {
+        if (num === null || num === undefined || isNaN(num)) return "";
+        var rounded = Math.round(num * 10000) / 10000;
+        var parts = rounded.toString().split(".");
+        var intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if (parts.length > 1) {
+            return intPart + "," + parts[1];
+        }
+        return intPart;
+    }
+
+    function validateRevenueConstraint(showAlert) {
+        var $totalRow = $("#DataReport tr[data-role='total-revenue']");
+        var $indRow = $("#DataReport tr[data-role='industry-revenue']");
+        if (!$totalRow.length || !$indRow.length) return true;
+
+        var fields = [
+            { key: "AccumulatedBeginingOfYear", label: "Kế hoạch năm" },
+            { key: "PerformPreviousPeriod", label: "Thực hiện tháng trước" },
+            { key: "PerformInPeriod", label: "Ước thực hiện tháng báo cáo" }
+        ];
+
+        var isValid = true;
+        for (var i = 0; i < fields.length; i++) {
+            var f = fields[i];
+            var $totalInput = $totalRow.find("input[name^='" + f.key + "_']");
+            var $indInput = $indRow.find("input[name^='" + f.key + "_']");
+            if ($totalInput.length && $indInput.length) {
+                var totalVal = parseVNFloat($totalInput.val());
+                var indVal = parseVNFloat($indInput.val());
+                if (indVal > totalVal) {
+                    var msg = "Doanh thu công nghiệp (" + formatVNNumber(indVal) + ") không được lớn hơn Tổng doanh thu (" + formatVNNumber(totalVal) + ") ở cột " + f.label + ".";
+                    TooltipErrInput($indInput, msg);
+                    if (showAlert) {
+                        alert(msg);
+                        $indInput.focus();
+                    }
+                    isValid = false;
+                    break;
+                } else {
+                    ClearTooltipErrInput($indInput);
+                }
+            }
+        }
+        return isValid;
+    }
+
+    function recalculateTradeSummary(group) {
+        if (!group) return;
+        var fields = ["AccumulatedBeginingOfYear", "PerformPreviousPeriod", "PerformInPeriod"];
+        var $summaryRow = $("#DataReport tr[data-summary='" + group + "']");
+        if (!$summaryRow.length) return;
+
+        var $subRows = $("#DataReport tr[data-group='" + group + "']");
+
+        fields.forEach(function (field) {
+            var $summaryInput = $summaryRow.find("input[name^='" + field + "_']");
+            if (!$summaryInput.length) return;
+
+            var sum = 0;
+
+            $subRows.each(function () {
+                var $subInput = $(this).find("input[name^='" + field + "_']");
+                if ($subInput.length) {
+                    var raw = $subInput.val();
+                    if (hasVNValue(raw)) {
+                        sum += parseVNFloat(raw);
+                    }
+                }
+            });
+
+            $summaryInput.val(formatVNNumber(sum));
+            $summaryInput.prop("readonly", true).css({
+                "background-color": "#f0f3f5",
+                "cursor": "not-allowed"
+            });
+        });
+    }
+
+    function formatNumberString(val) {
+        if (val === null || val === undefined) return "";
+        var s = val.toString().trim();
+        if (!s) return "";
+
+        var clean = s.replace(/\./g, "");
+        var parts = clean.split(",");
+        var intDigits = parts[0].replace(/\D/g, "");
+
+        var formattedInt = intDigits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        if (parts.length > 1) {
+            var decDigits = parts.slice(1).join("").replace(/\D/g, "").substring(0, 4);
+            if (formattedInt === "") formattedInt = "0";
+            return formattedInt + "," + decDigits;
+        }
+        return formattedInt;
+    }
+
+    $(document).off("focus.summary", ".trade-summary-input").on("focus.summary", ".trade-summary-input", function () {
+        $(this).blur();
+    });
+
+    $(document).off("keydown.summary", ".trade-summary-input").on("keydown.summary", ".trade-summary-input", function (e) {
+        e.preventDefault();
+        return false;
+    });
+
+    $(document).off("keydown.numSep", ".number-separator").on("keydown.numSep", ".number-separator", function (e) {
+        if ($(this).prop("readonly") || $(this).hasClass("trade-summary-input")) {
+            e.preventDefault();
+            return false;
+        }
+
+        if (e.key === "Backspace" || e.which === 8) {
+            var pos = this.selectionStart;
+            if (pos === this.selectionEnd && pos > 0 && this.value[pos - 1] === ".") {
+                var val = this.value;
+                this.value = val.substring(0, pos - 2) + val.substring(pos);
+                this.setSelectionRange(pos - 2, pos - 2);
+                $(this).trigger("input");
+                e.preventDefault();
+                return;
+            }
+            return;
+        }
+
+        if (e.which === 9 || e.which === 13 || e.which === 27 || e.which === 46) {
+            return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) && (e.which === 65 || e.which === 67 || e.which === 86 || e.which === 88 || e.which === 90 || e.which === 89)) {
+            return;
+        }
+
+        if (e.which >= 35 && e.which <= 40) {
+            return;
+        }
+
+        if (e.shiftKey) {
+            e.preventDefault();
+            return false;
+        }
+
+        if ((e.which >= 48 && e.which <= 57) || (e.which >= 96 && e.which <= 105)) {
+            return;
+        }
+
+        if (e.which === 188 || e.which === 190 || e.which === 110) {
+            var currentVal = this.value || "";
+            if (currentVal.indexOf(",") !== -1) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.which === 190 || e.which === 110) {
+                e.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                this.value = currentVal.substring(0, start) + "," + currentVal.substring(end);
+                this.setSelectionRange(start + 1, start + 1);
+                $(this).trigger("input");
+                return false;
+            }
+            return;
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+    $(document).off("paste.numFilter", ".number-separator").on("paste.numFilter", ".number-separator", function (e) {
+        if ($(this).prop("readonly") || $(this).hasClass("trade-summary-input")) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    $(document).off("drop.numFilter", ".number-separator").on("drop.numFilter", ".number-separator", function (e) {
+        if ($(this).prop("readonly") || $(this).hasClass("trade-summary-input")) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    $(document).off("input.numSep", ".number-separator").on("input.numSep", ".number-separator", function () {
+        if ($(this).prop("readonly") || $(this).hasClass("trade-summary-input")) {
+            return;
+        }
+
+        var raw = this.value;
+        var cursorPos = this.selectionEnd;
+
+        var numCharsBefore = (raw.substring(0, cursorPos).match(/[\d,]/g) || []).length;
+
+        var formatted = formatNumberString(raw);
+        this.value = formatted;
+
+        var newPos = 0;
+        var counted = 0;
+        while (newPos < formatted.length && counted < numCharsBefore) {
+            if (/[\d,]/.test(formatted[newPos])) {
+                counted++;
+            }
+            newPos++;
+        }
+        this.setSelectionRange(newPos, newPos);
+
+        var $tr = $(this).closest("tr");
+        var group = $tr.data("group");
+        if (group) {
+            recalculateTradeSummary(group);
+        }
+    });
+
+    $(document).off("blur.numSep", ".number-separator").on("blur.numSep", ".number-separator", function () {
+        if (this.value && this.value.endsWith(",")) {
+            this.value = this.value.slice(0, -1);
+        }
+    });
+
+    $(document).off("input.clearRevenueErr", "tr[data-role='total-revenue'] input, tr[data-role='industry-revenue'] input")
+        .on("input.clearRevenueErr", "tr[data-role='total-revenue'] input, tr[data-role='industry-revenue'] input", function () {
+            ClearTooltipErrInput(this);
+        });
+
+    $(document).off("click.removeTrade", ".btn-remove-trade").on("click.removeTrade", ".btn-remove-trade", function () {
+        var $row = $(this).closest("tr");
+        var group = $row.data("group");
+        var $sel = $row.find("select.TradeProductSelect");
+        if ($sel.length && $sel.data("select2")) {
+            $sel.select2("destroy");
+        }
+        $row.remove();
+        if (group) {
+            recalculateTradeSummary(group);
+        }
+    });
+
+    if ($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.prototype.enforceFocus) {
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+    }
+    $(document).off("focusin.bs.modal");
+
+    $(document).off("click.s2forceOpen", ".select2-container").on("click.s2forceOpen", ".select2-container", function (e) {
+        var $sel = $(this).prev("select.TradeProductSelect");
+        if (!$sel.length) {
+            $sel = $(this).siblings("select.TradeProductSelect");
+        }
+        if ($sel.length && $sel.data("select2")) {
+            if (!$sel.data("select2").isOpen()) {
+                $sel.select2("open");
+            }
+        }
+    });
+
+    $(document).off("select2:open.fixModalScroll").on("select2:open.fixModalScroll", function (e) {
+        var s2 = $(e.target).data("select2");
+        var id = s2 ? s2.id : "";
+        setTimeout(function () {
+            $(e.target).parents().off("scroll.select2." + id).off("scroll.select2");
+            $(".modal").off("scroll.select2." + id).off("scroll.select2");
+            $(window).off("scroll.select2." + id).off("scroll.select2");
+            $(document).off("focusin.bs.modal");
+        }, 0);
+    });
+
+    $(document).off("scroll.closeS2", ".modal").on("scroll.closeS2", ".modal", function () {
+        $("select.TradeProductSelect").each(function () {
+            var s2 = $(this).data("select2");
+            if (s2 && s2.isOpen()) {
+                $(this).select2("close");
+            }
+        });
+    });
+
     function AddTradeProduct(button, prefix) {
         var indices = $("#DataReport input[name^='Target_']").map(function () {
             return parseInt(this.name.replace("Target_", ""), 10) || 0;
         }).get();
         var index = (indices.length ? Math.max.apply(null, indices) : 0) + 1;
-        var input = function (name, type, css) {
-            return $("<input />", { id: name, name: name, type: type, "class": css });
+        var input = function (name, css) {
+            return $("<input />", { id: name, name: name, type: "text", "class": css, placeholder: "0", autocomplete: "off", inputmode: "decimal" });
         };
-        var row = $("<tr class='business-product-custom'></tr>");
-        row.append($("<td class='text-center'></td>").text(index));
+        var row = $("<tr class='business-product-custom' data-group='" + prefix + "'></tr>");
+        var sectionLevel = prefix === "XK" ? "5" : "6";
+        var childNumber = $("#DataReport input[name^='Level_']").map(function () {
+            var level = $(this).val() || "";
+            return level.indexOf(sectionLevel + ".") === 0 ? parseInt(level.split(".")[1], 10) || 0 : 0;
+        }).get();
+        var level = sectionLevel + "." + ((childNumber.length ? Math.max.apply(null, childNumber) : 0) + 1);
+        var storedIndices = $("#DataReport input[name^='Index_']").map(function () {
+            return parseInt($(this).val(), 10) || 0;
+        }).get();
+        var storedIndex = (storedIndices.length ? Math.max.apply(null, storedIndices) : -1) + 1;
+        row.append($("<td class='text-center'></td>").text(level));
         var templateId = prefix === "XK"
             ? "#ExportProductTemplate"
             : "#ImportProductTemplate";
 
+        var selectId = "TradeProductSelect_" + prefix + "_" + index;
         var select = $("<select></select>")
+            .attr("id", selectId)
+            .attr("name", selectId)
             .addClass("form-control TradeProductSelect");
 
         $(templateId).find("option").each(function () {
@@ -174,20 +536,31 @@
         });
         var target = $("<input />", { id: "Target_" + index, name: "Target_" + index, type: "hidden" });
         var unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden" });
+        var rowIndex = $("<input />", { id: "Index_" + index, name: "Index_" + index, type: "hidden", value: storedIndex });
+        var rowLevel = $("<input />", { id: "Level_" + index, name: "Level_" + index, type: "hidden", value: level });
         var unitText = $("<span></span>");
-        row.append($("<td style='text-align:left !important;'></td>").append(target).append(select));
+        var removeBtn = $("<a href='javascript:void(0)' class='text-danger btn-remove-trade' title='Xóa mặt hàng' style='flex-shrink: 0;'><i class='fa fa-trash'></i></a>");
+        var selectWrapper = $("<div style='flex: 1; min-width: 0;'></div>").append(select);
+        var selectContainer = $("<div style='display: flex; align-items: center; width: 100%;'></div>").append(selectWrapper).append(removeBtn);
+
+        row.append($("<td style='text-align:left !important;'></td>").append(target).append(rowIndex).append(rowLevel).append(selectContainer));
         row.append($("<td></td>").append(unit).append(unitText));
-        row.append($("<td></td>").append(input("AccumulatedBeginingOfYear_" + index, "number", "form-control text-right").attr("min", "0")));
-        row.append($("<td></td>").append(input("PerformPreviousPeriod_" + index, "number", "form-control text-right").attr("min", "0")));
+        row.append($("<td></td>").append(input("AccumulatedBeginingOfYear_" + index, "form-control text-right number-separator")));
+        row.append($("<td></td>").append(input("PerformPreviousPeriod_" + index, "form-control text-right number-separator")));
         row.append($("<td></td>")
-            .append(input("PerformInPeriod_" + index, "number", "form-control text-right").attr("min", "0"))
+            .append(input("PerformInPeriod_" + index, "form-control text-right number-separator"))
             .append($("<input />", { id: "Code_" + index, name: "Code_" + index, type: "hidden" })));
-        select.on("change", function () {
+
+        select.on("change select2:select", function () {
             var selected = $(this).find("option:selected");
             var sourceCode = selected.val();
             if (sourceCode && $("#DataReport input[name^='Code_']").not("#Code_" + index).filter(function () { return $(this).val() === sourceCode; }).length) {
                 alert("Sản phẩm này đã có trong nhóm.");
-                $(this).val("");
+                $(this).val("").trigger("change.select2");
+                target.val("");
+                unit.val("");
+                unitText.text("");
+                $("#Code_" + index).val("");
                 return;
             }
             target.val(selected.data("name") || "");
@@ -195,17 +568,39 @@
             unitText.text(selected.data("unit") || "");
             $("#Code_" + index).val(sourceCode || "");
         });
+
+        select.on("select2:open", function () {
+            var s2 = $(this).data("select2");
+            var id = s2 ? s2.id : "";
+            $(".modal").off("scroll.select2." + id).off("scroll.select2");
+            $(window).off("scroll.select2." + id).off("scroll.select2");
+            $(this).parents().off("scroll.select2." + id).off("scroll.select2");
+            $(document).off("focusin.bs.modal");
+        });
+
         $(button).closest("tr").before(row);
+        var $modalContent = select.closest(".modal-content");
         if ($.fn.select2) {
             select.select2({
                 allowClear: true,
                 placeholder: "Chọn 1 giá trị",
-                width: "element",
-                dropdownParent: select.parent()
+                width: "100%",
+                dropdownParent: $modalContent.length ? $modalContent : select.parent()
             });
         }
-        select.trigger("focus");
+        recalculateTradeSummary(prefix);
     }
 
     $(".AddTradeProduct").off("click").on("click", function () { AddTradeProduct(this, $(this).data("prefix")); });
+
+    recalculateTradeSummary("XK");
+    recalculateTradeSummary("NK");
+    $(document).ready(function () {
+        recalculateTradeSummary("XK");
+        recalculateTradeSummary("NK");
+        if ($('#ButtonLoginSmartCA').hasClass('hidden') || !$('#ButtonLoginSmartCA').length) {
+            $('#modal_AddReport button[type="submit"], #modal_EditReport button[type="submit"]').removeAttr('disabled');
+        }
+    });
 </script>
+
