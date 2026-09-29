@@ -40,8 +40,9 @@ namespace CenIT.ReportTourism.Biz.Report
                 Kpis = new List<DashboardKpi>
                 {
                     industrial, exports, imports,
-                    new DashboardKpi { Label = "Tỷ lệ báo cáo", Value = submission.CompletionPercent.ToString("0.0", Vietnamese),
-                        Unit = "%", Tone = "blue", Note = submission.Submitted + " / " + submission.TotalEnterprises + " đơn vị trong nhóm theo dõi đã nộp" }
+                    new DashboardKpi { Label = "DN có giá trị chỉ tiêu", Value = current.Count(HasObservedIndicator).ToString(Vietnamese),
+                        Unit = "/ " + current.Count.ToString(Vietnamese), Tone = "blue",
+                        Note = "Có ít nhất một giá trị 0101, 06 hoặc 07; chưa xác định nghĩa vụ báo cáo" }
                 },
                 MonthlyTrend = trend,
                 SectorContributions = SectorShares(current),
@@ -128,30 +129,54 @@ namespace CenIT.ReportTourism.Biz.Report
             filters = Normalize(filters);
             var rows = GetRows(filters);
             var current = At(rows, filters.Year, filters.Month).ToList();
-            var area = Breakdown(current, r => r.WardName ?? "Chưa có địa bàn");
-            var industry = Breakdown(current, r => r.IndustryName ?? "Chưa phân ngành");
-            var trend = new List<DashboardTrendPoint>();
-            foreach (var month in Enumerable.Range(1, filters.Month))
-            {
-                var monthRows = At(rows, filters.Year, month).ToList();
-                if (!monthRows.Any(r => r.Submitted)) continue;
-                trend.Add(new DashboardTrendPoint
-                {
-                    Month = filters.Year + "-" + month.ToString("00"),
-                    Completion = Submission(monthRows).CompletionPercent
-                });
-            }
             return new DashboardProgressModel
             {
                 Filters = filters,
                 FilterOptions = BuildFilterOptions(rows, filters, "Progress", false),
                 Submission = Submission(current),
-                Trend = trend,
-                Areas = area,
-                Industries = industry,
-                OutstandingAreas = area.Concat(industry).Where(x => x.NotSubmitted > 0)
-                    .OrderByDescending(x => x.NotSubmitted).Take(4).ToList()
+                ObservedIndicatorEnterprises = current.Count(HasObservedIndicator),
+                ObservationTrend = Enumerable.Range(1, filters.Month).Select(month =>
+                {
+                    var monthRows = At(rows, filters.Year, month).ToList();
+                    return new DashboardObservationPoint
+                    {
+                        Month = filters.Year + "-" + month.ToString("00"),
+                        Files = monthRows.Count(r => r.Submitted),
+                        Indicators = monthRows.Count(HasObservedIndicator)
+                    };
+                }).ToList(),
+                AreaObservations = ObservationBreakdown(current, r => r.WardName, "Chưa có địa bàn"),
+                SectorObservations = ObservationBreakdown(current, r => r.EconomicSectorName, "Chưa phân khu vực"),
+                EnterpriseRows = current.OrderBy(r => r.BusinessName).Select(r => new DashboardProgressEnterprise
+                {
+                    EnterpriseId = r.EnterpriseId,
+                    Name = r.BusinessName,
+                    WardName = r.WardName,
+                    EconomicSectorName = r.EconomicSectorName,
+                    HasFile = r.Submitted,
+                    HasIndustrialRevenue = r.IndustrialRevenue.HasValue,
+                    HasExportValue = r.ExportValue.HasValue,
+                    HasImportValue = r.ImportValue.HasValue
+                }).ToList()
             };
+        }
+
+        private static bool HasObservedIndicator(SnapshotRow row)
+        {
+            return row.IndustrialRevenue.HasValue || row.ExportValue.HasValue || row.ImportValue.HasValue;
+        }
+
+        private static IList<DashboardObservationBreakdown> ObservationBreakdown(
+            IEnumerable<SnapshotRow> rows, Func<SnapshotRow, string> name, string unknownLabel)
+        {
+            return rows.GroupBy(r => String.IsNullOrWhiteSpace(name(r)) ? unknownLabel : name(r))
+                .Select(g => new DashboardObservationBreakdown
+                {
+                    Name = g.Key,
+                    Enterprises = g.Count(),
+                    Files = g.Count(r => r.Submitted),
+                    Indicators = g.Count(HasObservedIndicator)
+                }).OrderByDescending(g => g.Indicators).ThenBy(g => g.Name).ToList();
         }
 
         public DashboardQualityModel GetQuality(DashboardFilters filters)
@@ -249,7 +274,8 @@ namespace CenIT.ReportTourism.Biz.Report
             {
                 Label = label, Value = values.Count == 0 ? "—" : Format(values.Sum(v => v.Value)),
                 Unit = unit, Tone = tone, Mom = Rate(rows, filters, metric, -1),
-                Yoy = Rate(rows, filters, metric, -12), Note = "Số liệu doanh nghiệp đã nhập"
+                Yoy = Rate(rows, filters, metric, -12), Note = "Số liệu doanh nghiệp đã nhập",
+                ShowComparisons = true
             };
         }
 
@@ -379,15 +405,6 @@ namespace CenIT.ReportTourism.Biz.Report
             }).ToList();
         }
 
-        private static List<DashboardProgressBreakdown> Breakdown(List<SnapshotRow> rows, Func<SnapshotRow, string> key)
-        {
-            return rows.GroupBy(key).Select(g => new DashboardProgressBreakdown
-            {
-                Name = g.Key, Submitted = g.Count(r => r.Submitted), NotSubmitted = g.Count(r => !r.Submitted),
-                CompletionPercent = g.Count(r => r.Submitted) * 100m / g.Count()
-            }).OrderByDescending(x => x.NotSubmitted).Take(10).ToList();
-        }
-
         private static List<string> Reasons(List<SnapshotRow> rows)
         {
             return rows.Where(r => r.Submitted && !String.IsNullOrWhiteSpace(r.Reason))
@@ -415,7 +432,7 @@ namespace CenIT.ReportTourism.Biz.Report
                 }).ToList(),
                 Areas = Options(rows, r => r.WardId, r => r.WardName, "Tất cả địa bàn"),
                 EconomicSectors = Options(rows, r => r.EconomicSectorId, r => r.EconomicSectorName, "Tất cả khu vực"),
-                Industries = Options(rows, r => r.IndustryId, r => r.IndustryName, "Tất cả ngành chính"),
+                Industries = Options(rows, r => r.IndustryId, r => r.IndustryName, "Tất cả ngành trong danh mục"),
                 Enterprises = Options(rows, r => r.EnterpriseId, r => r.BusinessName, "Tất cả doanh nghiệp"),
                 Metrics = includeMetric ? new List<DashboardOption>
                 {

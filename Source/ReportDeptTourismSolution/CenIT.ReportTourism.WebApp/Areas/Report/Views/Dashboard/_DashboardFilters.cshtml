@@ -1,42 +1,158 @@
 @model CenIT.ReportTourism.Models.Report.DashboardFilterOptions
+@using System.Linq
 @using System.Web.Mvc
+@{
+    var filters = Model.Filters;
+    var hasArea = filters.AreaId != "all";
+    var hasSector = filters.EconomicSectorId != "all";
+    var hasIndustry = filters.IndustryId != "all";
+    var hasEnterprise = filters.EnterpriseId != "all";
+    var areaName = Model.Areas.FirstOrDefault(x => x.Value == filters.AreaId);
+    var sectorName = Model.EconomicSectors.FirstOrDefault(x => x.Value == filters.EconomicSectorId);
+    var industryName = Model.Industries.FirstOrDefault(x => x.Value == filters.IndustryId);
+    var enterpriseName = Model.Enterprises.FirstOrDefault(x => x.Value == filters.EnterpriseId);
+    var scopeName = hasEnterprise ? (enterpriseName == null ? "Doanh nghiệp đã chọn" : enterpriseName.Text)
+        : hasArea ? (areaName == null ? "Địa bàn đã chọn" : areaName.Text)
+        : hasSector ? (sectorName == null ? "Khu vực đã chọn" : sectorName.Text)
+        : hasIndustry ? (industryName == null ? "Ngành đã chọn" : industryName.Text)
+        : "Toàn tỉnh · phạm vi theo dõi";
+    var activeFilterCount = new[] { hasArea, hasSector, hasIndustry, hasEnterprise }.Count(x => x);
+}
 
-<form class="dashboard-filters" method="get" action="@Url.Action(Model.Action, "Dashboard")" aria-label="Lọc nhóm doanh nghiệp theo dõi" autocomplete="off">
-    <div class="row">
-        @if (Model.Metrics.Count > 0)
-        {
-            <div class="filter-field col-xs-6 col-sm-4 col-md-2">
-                <label for="metric">Chỉ tiêu</label>
-                @Html.DropDownList("metric", new SelectList(Model.Metrics, "Value", "Text", Model.Filters.Metric), new { @class = "form-control select2", id = "metric" })
+<div class="box box-solid box-default dashboard-filter-box" style="margin-bottom: 15px;">
+    <div class="box-body" style="padding: 10px 15px;">
+        <form class="dashboard-filter-toolbar" method="get" action="@Url.Action(Model.Action, "Dashboard")" autocomplete="off">
+            @if (Model.Metrics.Count > 0)
+            {
+                <input type="hidden" name="metric" id="hiddenFilterMetric" value="@filters.Metric" />
+            }
+
+            <div class="dashboard-filter-main-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <!-- Group 1: Kỳ báo cáo compact -->
+                <div class="filter-bar-period" style="display: flex; align-items: center; gap: 8px;">
+                    <label class="control-label" style="margin: 0; font-size: 13px; font-weight: 600; white-space: nowrap;">
+                        <i class="fa fa-calendar text-muted"></i> Kỳ báo cáo:
+                    </label>
+                    <div class="input-group input-group-sm period-control-group" style="display: inline-flex; width: auto;">
+                        <select name="month" id="filterMonth" class="form-control" style="width: 100px; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                            @foreach (var m in Model.Months)
+                            {
+                                <option value="@m.Value" @(m.Value == filters.Month.ToString() ? "selected" : "")>@m.Text</option>
+                            }
+                        </select>
+                        <select name="year" id="filterYear" class="form-control" style="width: 85px; border-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                            @foreach (var y in Model.Years)
+                            {
+                                <option value="@y.Value" @(y.Value == filters.Year.ToString() ? "selected" : "")>@y.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Group 2: Phạm vi hiển thị -->
+                <div class="filter-bar-scope" style="font-size: 13px;">
+                    <span class="text-muted"><i class="fa fa-map-marker text-muted"></i> Phạm vi:</span>
+                    <strong class="text-primary" style="margin-left: 4px;" title="@scopeName">@scopeName</strong>
+                </div>
+
+                <!-- Group 3: Nút mở Bộ lọc & Xem dữ liệu -->
+                <div class="filter-bar-actions" style="display: flex; align-items: center; gap: 6px;">
+                    <button type="button" class="btn btn-sm btn-default" data-toggle="collapse" data-target="#advancedFiltersPanel" aria-expanded="@(activeFilterCount > 0 ? "true" : "false")">
+                        <i class="fa fa-sliders"></i> Bộ lọc
+                        @if (activeFilterCount > 0)
+                        {
+                            <span class="badge bg-blue" style="margin-left: 3px;">@activeFilterCount</span>
+                        }
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fa fa-search"></i> Áp dụng
+                    </button>
+                </div>
             </div>
-        }
-        <div class="filter-field col-xs-6 col-sm-2 col-md-1">
-            <label for="year">Năm</label>
-            @Html.DropDownList("year", new SelectList(Model.Years, "Value", "Text", Model.Filters.Year.ToString()), new { @class = "form-control select2", id = "year" })
-        </div>
-        <div class="filter-field col-xs-6 col-sm-2 col-md-1">
-            <label for="month">Tháng</label>
-            @Html.DropDownList("month", new SelectList(Model.Months, "Value", "Text", Model.Filters.Month.ToString()), new { @class = "form-control select2", id = "month" })
-        </div>
-        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
-            <label for="areaId">Phường / xã</label>
-            @Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", Model.Filters.AreaId), new { @class = "form-control select2", id = "areaId" })
-        </div>
-        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
-            <label for="economicSectorId">Khu vực kinh tế</label>
-            @Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", Model.Filters.EconomicSectorId), new { @class = "form-control select2", id = "economicSectorId" })
-        </div>
-        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
-            <label for="industryId">Ngành chính</label>
-            @Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", Model.Filters.IndustryId), new { @class = "form-control select2", id = "industryId" })
-        </div>
-        <div class="filter-field col-xs-6 col-sm-4 col-md-2">
-            <label for="enterpriseId">Doanh nghiệp</label>
-            @Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", Model.Filters.EnterpriseId), new { @class = "form-control select2", id = "enterpriseId" })
-        </div>
-        <div class="filter-actions col-xs-12 col-sm-4 col-md-2">
-            <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Lọc</button>
-            <a class="btn btn-default" href="@Url.Action(Model.Action, "Dashboard")">Đặt lại</a>
-        </div>
+
+            <!-- Advanced Filters collapse -->
+            <div id="advancedFiltersPanel" class="collapse @(activeFilterCount > 0 ? "in" : "")" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e0e0e0;">
+                <div class="row">
+                    @if (Model.Metrics.Count > 0)
+                    {
+                        <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                            <label for="metricSelect" style="font-size: 12px; margin-bottom: 3px;">Chỉ tiêu</label>
+                            @Html.DropDownList("metricSelect", new SelectList(Model.Metrics, "Value", "Text", filters.Metric), new { @class = "form-control input-sm select2", id = "metricSelect", style = "width: 100%;" })
+                        </div>
+                    }
+                    <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                        <label for="areaId" style="font-size: 12px; margin-bottom: 3px;">Phường / xã</label>
+                        @Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", filters.AreaId), new { @class = "form-control input-sm select2", id = "areaId", style = "width: 100%;" })
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                        <label for="economicSectorId" style="font-size: 12px; margin-bottom: 3px;">Khu vực kinh tế</label>
+                        @Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", filters.EconomicSectorId), new { @class = "form-control input-sm select2", id = "economicSectorId", style = "width: 100%;" })
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                        <label for="industryId" style="font-size: 12px; margin-bottom: 3px;">Ngành trong danh mục</label>
+                        @Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", filters.IndustryId), new { @class = "form-control input-sm select2", id = "industryId", style = "width: 100%;" })
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 8px;">
+                        <label for="enterpriseId" style="font-size: 12px; margin-bottom: 3px;">Doanh nghiệp</label>
+                        @Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", filters.EnterpriseId), new { @class = "form-control input-sm select2", id = "enterpriseId", style = "width: 100%;" })
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 4px;">
+                    <div class="col-sm-8 col-xs-12 text-muted" style="font-size: 12px; padding-top: 4px;">
+                        <i class="fa fa-info-circle"></i> Danh mục ngành từ phân loại hiện có trong hệ thống; chưa xác định ngành chính.
+                    </div>
+                    <div class="col-sm-4 col-xs-12 text-right" style="margin-top: 4px;">
+                        <a class="btn btn-sm btn-default" href="@Url.Action(Model.Action, "Dashboard", new { year = filters.Year, month = filters.Month, metric = filters.Metric })">
+                            <i class="fa fa-undo"></i> Đặt lại
+                        </a>
+                        <button class="btn btn-sm btn-primary" type="submit">
+                            <i class="fa fa-check"></i> Áp dụng bộ lọc
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active filter badges (Section 6) -->
+            <div class="dashboard-active-filter-badges" style="margin-top: 8px; font-size: 12px;">
+                <span class="text-muted" style="margin-right: 4px;">Phạm vi áp dụng:</span>
+                <span class="label label-primary" style="font-size: 11px; padding: 3px 6px;">
+                    <i class="fa fa-calendar"></i> Kỳ: @filters.Month.ToString("00")/@filters.Year
+                </span>
+                @if (hasArea)
+                {
+                    <span class="label label-info" style="font-size: 11px; padding: 3px 6px; margin-left: 3px;">
+                        <i class="fa fa-map-marker"></i> @(areaName == null ? "Địa bàn " + filters.AreaId : areaName.Text)
+                        <a href="@Url.Action(Model.Action, "Dashboard", new { year = filters.Year, month = filters.Month, areaId = "all", economicSectorId = filters.EconomicSectorId, industryId = filters.IndustryId, enterpriseId = filters.EnterpriseId, metric = filters.Metric })" style="color: #fff; margin-left: 4px; text-decoration: none;">&times;</a>
+                    </span>
+                }
+                @if (hasSector)
+                {
+                    <span class="label label-info" style="font-size: 11px; padding: 3px 6px; margin-left: 3px;">
+                        <i class="fa fa-briefcase"></i> @(sectorName == null ? "Khu vực " + filters.EconomicSectorId : sectorName.Text)
+                        <a href="@Url.Action(Model.Action, "Dashboard", new { year = filters.Year, month = filters.Month, areaId = filters.AreaId, economicSectorId = "all", industryId = filters.IndustryId, enterpriseId = filters.EnterpriseId, metric = filters.Metric })" style="color: #fff; margin-left: 4px; text-decoration: none;">&times;</a>
+                    </span>
+                }
+                @if (hasIndustry)
+                {
+                    <span class="label label-info" style="font-size: 11px; padding: 3px 6px; margin-left: 3px;">
+                        <i class="fa fa-cogs"></i> @(industryName == null ? "Ngành " + filters.IndustryId : industryName.Text)
+                        <a href="@Url.Action(Model.Action, "Dashboard", new { year = filters.Year, month = filters.Month, areaId = filters.AreaId, economicSectorId = filters.EconomicSectorId, industryId = "all", enterpriseId = filters.EnterpriseId, metric = filters.Metric })" style="color: #fff; margin-left: 4px; text-decoration: none;">&times;</a>
+                    </span>
+                }
+                @if (hasEnterprise)
+                {
+                    <span class="label label-info" style="font-size: 11px; padding: 3px 6px; margin-left: 3px;">
+                        <i class="fa fa-building-o"></i> @(enterpriseName == null ? "Doanh nghiệp " + filters.EnterpriseId : enterpriseName.Text)
+                        <a href="@Url.Action(Model.Action, "Dashboard", new { year = filters.Year, month = filters.Month, areaId = filters.AreaId, economicSectorId = filters.EconomicSectorId, industryId = filters.IndustryId, enterpriseId = "all", metric = filters.Metric })" style="color: #fff; margin-left: 4px; text-decoration: none;">&times;</a>
+                    </span>
+                }
+                @if (hasArea || hasSector || hasIndustry || hasEnterprise)
+                {
+                    <a class="btn btn-xs btn-link text-danger" href="@Url.Action(Model.Action, "Dashboard", new { year = filters.Year, month = filters.Month, metric = filters.Metric })" style="padding: 0 4px; margin-left: 4px;">
+                        <i class="fa fa-times"></i> Xóa bộ lọc
+                    </a>
+                }
+            </div>
+        </form>
     </div>
-</form>
+</div>

@@ -1,16 +1,31 @@
-﻿@model CenIT.ReportTourism.Models.Report.DashboardModel
+@model CenIT.ReportTourism.Models.Report.DashboardModel
 @using System.Linq
-<section class="dashboard-panel trend-panel">
-    <header class="panel-heading">
-        <div><h2>Doanh thu công nghiệp theo tháng</h2><p>Tỷ đồng; chỉ hiển thị tháng có chỉ tiêu 0101</p></div>
-        <span class="panel-period">@Model.Filters.Year</span>
-    </header>
-    @if (Model.MonthlyTrend.Count(x => x.GtsXcnIndex.HasValue) < 2) { <p class="dashboard-empty">Chưa đủ tháng báo cáo để thể hiện xu hướng.</p> }
-    else { <div id="management-trend-chart" class="morris-chart" role="img" aria-label="Xu hướng doanh thu công nghiệp theo tháng"></div> }
-    @if (Model.MonthlyTrend.Count(x => x.GtsXcnIndex.HasValue) >= 2) {
-        <div class="chart-series-legend">
-            <span><i class="series-gtsxcn" aria-hidden="true"></i> Doanh thu công nghiệp</span>
+
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-line-chart text-primary"></i> Xu hướng doanh thu công nghiệp theo tháng</h3>
+        <div class="box-tools pull-right">
+            <span class="label label-default">Năm @Model.Filters.Year</span>
         </div>
-    }
-    <script type="application/json" class="md-chart-data" data-chart="trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MonthlyTrend))</script>
-</section>
+    </div>
+    <div class="box-body">
+        <p class="text-muted" style="font-size: 12px; margin-bottom: 8px;">
+            <i class="fa fa-info-circle"></i> Đơn vị: Tỷ đồng; chỉ hiển thị các tháng có số liệu chỉ tiêu 0101
+        </p>
+        @if (Model.MonthlyTrend.Count(x => x.GtsXcnIndex.HasValue) < 2)
+        {
+            <div class="text-center text-muted" style="padding: 50px 0;">
+                <i class="fa fa-line-chart fa-2x" style="opacity: 0.3;"></i>
+                <p style="margin-top: 8px;">Chưa đủ tháng báo cáo để thể hiện xu hướng.</p>
+            </div>
+        }
+        else
+        {
+            <div id="management-trend-chart" class="morris-chart" style="height: 250px;" role="img" aria-label="Xu hướng doanh thu công nghiệp theo tháng"></div>
+            <div class="chart-series-legend text-center" style="margin-top: 10px; font-size: 12px;">
+                <span><i class="fa fa-square" style="color: #1686c9;" aria-hidden="true"></i> Doanh thu công nghiệp (Tỷ đồng)</span>
+            </div>
+        }
+        <script type="application/json" class="md-chart-data" data-chart="trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MonthlyTrend))</script>
+    </div>
+</div>

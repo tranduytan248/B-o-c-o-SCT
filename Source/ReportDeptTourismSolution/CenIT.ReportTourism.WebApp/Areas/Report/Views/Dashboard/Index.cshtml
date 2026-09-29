@@ -13,42 +13,47 @@
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
 
-<div class="management-dashboard" id="managementDashboard">
+<div class="management-dashboard dashboard-overview-page" id="managementDashboard">
     @Html.Partial("_DashboardNavigation", new CenIT.ReportTourism.Models.Report.DashboardNavigationModel { Active = "Overview", Filters = Model.Filters })
 
-    <div class="dashboard-heading">
-        <div>
-            <h1 id="dashboard-content" tabindex="-1">Tình hình trong nhóm doanh nghiệp theo dõi</h1>
-            <p>@Model.FilterSummary <span class="scope-badge">Không phải tổng doanh nghiệp toàn tỉnh</span></p>
+    <div class="dashboard-heading" style="margin-bottom: 12px;">
+        <div class="pull-left">
+            <h1 id="dashboard-content" style="font-size: 22px; font-weight: bold; margin: 0 0 4px; color: #333;">
+                <i class="fa fa-dashboard text-primary"></i> Tổng quan ngành Công Thương
+            </h1>
+            <p class="text-muted" style="margin: 0; font-size: 13px;">
+                @Model.FilterSummary · Dữ liệu snapshot tổng hợp trong phạm vi theo dõi.
+            </p>
         </div>
-        <span class="dashboard-updated"><i class="fa fa-clock-o" aria-hidden="true"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year</span>
+        <div class="pull-right hidden-xs text-right" style="padding-top: 5px;">
+            <span class="label label-default" style="font-size: 12px; padding: 5px 8px;">
+                <i class="fa fa-clock-o"></i> Kỳ báo cáo: @Model.Filters.Month.ToString("00")/@Model.Filters.Year
+            </span>
+        </div>
+        <div class="clearfix"></div>
     </div>
 
     @Html.Partial("_DashboardFilters", Model.FilterOptions)
 
-    <div class="row dashboard-row dashboard-kpi-row">
-        <div class="col-xs-12">
-            @Html.Partial("_StatisticEnterprise", Model)
-        </div>
-    </div>
+    <!-- ROW 1: 4 KPI CARDS -->
+    @Html.Partial("_StatisticEnterprise", Model)
 
-    <div class="row dashboard-row dashboard-primary-row">
-        <div class="col-md-8">
+    <!-- ROW 2: 8 COLS TREND + 4 COLS SECTOR -->
+    <div class="row">
+        <div class="col-md-8 col-sm-12">
             @Html.Partial("_StatisticVisitor", Model)
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 col-sm-12">
             @Html.Partial("_StatisticTypeBusiness", Model)
         </div>
     </div>
 
-    <div class="row dashboard-row dashboard-secondary-row">
-        <div class="col-md-5">
+    <!-- ROW 3: 6 COLS ENTERPRISE MOVEMENT + 6 COLS ALERTS -->
+    <div class="row">
+        <div class="col-md-6 col-sm-12">
             @Html.Partial("_EnterpriseMovement", Model)
         </div>
-        <div class="col-md-4">
-            @Html.Partial("_DashboardSubmissionDetails", new CenIT.ReportTourism.Models.Report.DashboardSubmissionDetailsModel { Submission = Model.Submission, Filters = Model.Filters, ShowDetailsLink = true })
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-6 col-sm-12">
             @Html.Partial("_DashboardAlerts", Model)
         </div>
     </div>

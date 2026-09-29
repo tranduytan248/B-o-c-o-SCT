@@ -71,6 +71,7 @@ namespace CenIT.ReportTourism.Models.Report
         public decimal? Yoy { get; set; }
         public string Note { get; set; }
         public string Tone { get; set; }
+        public bool ShowComparisons { get; set; }
     }
 
     public class DashboardTrendPoint
@@ -79,7 +80,6 @@ namespace CenIT.ReportTourism.Models.Report
         public decimal? GtsXcnIndex { get; set; }
         public decimal? ExportIndex { get; set; }
         public decimal? ImportIndex { get; set; }
-        public decimal Completion { get; set; }
         public int Over10 { get; set; }
         public int Over20 { get; set; }
         public int Over30 { get; set; }
@@ -135,14 +135,6 @@ namespace CenIT.ReportTourism.Models.Report
         public int UrgentEnterprises { get; set; }
     }
 
-    public class DashboardProgressBreakdown
-    {
-        public string Name { get; set; }
-        public int Submitted { get; set; }
-        public int NotSubmitted { get; set; }
-        public decimal CompletionPercent { get; set; }
-    }
-
     public class DashboardAnalysisModel
     {
         public DashboardFilters Filters { get; set; }
@@ -175,10 +167,38 @@ namespace CenIT.ReportTourism.Models.Report
         public DashboardFilters Filters { get; set; }
         public DashboardFilterOptions FilterOptions { get; set; }
         public DashboardSubmissionStatus Submission { get; set; }
-        public IList<DashboardTrendPoint> Trend { get; set; }
-        public IList<DashboardProgressBreakdown> Areas { get; set; }
-        public IList<DashboardProgressBreakdown> Industries { get; set; }
-        public IList<DashboardProgressBreakdown> OutstandingAreas { get; set; }
+        public int ObservedIndicatorEnterprises { get; set; }
+        public IList<DashboardObservationPoint> ObservationTrend { get; set; }
+        public IList<DashboardObservationBreakdown> AreaObservations { get; set; }
+        public IList<DashboardObservationBreakdown> SectorObservations { get; set; }
+        public IList<DashboardProgressEnterprise> EnterpriseRows { get; set; }
+    }
+
+    public class DashboardObservationPoint
+    {
+        public string Month { get; set; }
+        public int Files { get; set; }
+        public int Indicators { get; set; }
+    }
+
+    public class DashboardObservationBreakdown
+    {
+        public string Name { get; set; }
+        public int Enterprises { get; set; }
+        public int Files { get; set; }
+        public int Indicators { get; set; }
+    }
+
+    public class DashboardProgressEnterprise
+    {
+        public int EnterpriseId { get; set; }
+        public string Name { get; set; }
+        public string WardName { get; set; }
+        public string EconomicSectorName { get; set; }
+        public bool HasFile { get; set; }
+        public bool HasIndustrialRevenue { get; set; }
+        public bool HasExportValue { get; set; }
+        public bool HasImportValue { get; set; }
     }
 
     public class DashboardSubmissionDetailsModel
