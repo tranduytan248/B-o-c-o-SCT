@@ -8,20 +8,24 @@
     var activeSecondary = new[] { filters.AreaId, filters.EconomicSectorId, filters.IndustryId, filters.EnterpriseId }.Count(x => x != "all");
     var hasSecondary = activeSecondary > 0;
 }
-<form class="dashboard-filter-toolbar" method="get" action="@Url.Action(Model.Action, "Dashboard")">
-    <div class="row">
-        <div class="col-xs-12 col-sm-6 col-md-3">
-            <div class="form-group">
+<form class="dashboard-filter-toolbar" autocomplete="off" method="get" action="@Url.Action(Model.Action, "Dashboard")">
+    @if (isOverview)
+    {
+        <input type="hidden" name="reportType" value="@filters.ReportType" />
+    }
+    <div class="dashboard-filter-primary">
+        <div class="dashboard-filter-field dashboard-filter-period">
+            <div class="form-group no-margin">
                 <label for="filterMonth">@DashboardText.Get("Filter_Period")</label>
-                <div class="row">
-                    <div class="col-xs-7">
-                        <select name="month" id="filterMonth" class="form-control">
+                <div class="dashboard-period-controls">
+                    <div>
+                        <select name="month" id="filterMonth" class="form-control none-select2">
                             @foreach (var item in Model.Months)
                             { <option value="@item.Value" @(item.Value == filters.Month.ToString() ? "selected" : "")>@item.Text</option> }
                         </select>
                     </div>
-                    <div class="col-xs-5">
-                        <select name="year" id="filterYear" class="form-control" aria-label="@DashboardText.Get("Filter_Year")">
+                    <div>
+                        <select name="year" id="filterYear" class="form-control none-select2" aria-label="@DashboardText.Get("Filter_Year")">
                             @foreach (var item in Model.Years)
                             { <option value="@item.Value" @(item.Value == filters.Year.ToString() ? "selected" : "")>@item.Text</option> }
                         </select>
@@ -31,10 +35,10 @@
         </div>
         @if (!isOverview)
         {
-            <div class="col-xs-12 col-sm-6 col-md-3">
-                <div class="form-group">
+            <div class="dashboard-filter-field">
+                <div class="form-group no-margin">
                     <label for="filterReportType">@DashboardText.Get("Filter_ReportType")</label>
-                    <select name="reportType" id="filterReportType" class="form-control">
+                    <select name="reportType" id="filterReportType" class="form-control none-select2">
                         <option value="1" @(filters.ReportType == 1 ? "selected" : "")>@DashboardText.Get("Type_Manufacturing")</option>
                         <option value="2" @(filters.ReportType == 2 ? "selected" : "")>@DashboardText.Get("Type_Trading")</option>
                         <option value="3" @(filters.ReportType == 3 ? "selected" : "")>@DashboardText.Get("Type_ExportImport")</option>
@@ -44,36 +48,33 @@
         }
         @if (Model.Metrics.Count > 0)
         {
-            <div class="col-xs-12 col-sm-6 col-md-3">
-                <div class="form-group">
+            <div class="dashboard-filter-field dashboard-filter-metric">
+                <div class="form-group no-margin">
                     <label for="metricSelect">@DashboardText.Get("Filter_Metric")</label>
-                    <select name="metric" id="metricSelect" class="form-control">
+                    <select name="metric" id="metricSelect" class="form-control none-select2">
                         @foreach (var item in Model.Metrics)
                         { <option value="@item.Value" @(item.Value == filters.Metric ? "selected" : "")>@item.Text</option> }
                     </select>
                 </div>
             </div>
         }
-        <div class="col-xs-12 col-sm-6 col-md-3 pull-right">
-            <div class="form-group text-right">
-                <label class="hidden-xs">&nbsp;</label>
-                <div>
-                    <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#advancedFiltersPanel" aria-expanded="@(hasSecondary ? "true" : "false")" aria-controls="advancedFiltersPanel">
-                        <i class="fa fa-sliders" aria-hidden="true"></i> @DashboardText.Get("Filter_Advanced")
-                        @if (hasSecondary) { <span class="badge bg-light-blue" title="@DashboardText.Get("Filter_ActiveCount")">@activeSecondary</span> }
-                    </button>
-                    <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i> @DashboardText.Get("Filter_Apply")</button>
-                </div>
+        <div class="dashboard-filter-actions">
+            <div class="dashboard-filter-buttons">
+                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#advancedFiltersPanel" aria-expanded="@(hasSecondary ? "true" : "false")" aria-controls="advancedFiltersPanel">
+                    <i class="fa fa-sliders" aria-hidden="true"></i> @DashboardText.Get("Filter_Advanced")
+                    @if (hasSecondary) { <span class="badge bg-light-blue" title="@DashboardText.Get("Filter_ActiveCount")">@activeSecondary</span> }
+                </button>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i> @DashboardText.Get("Filter_Apply")</button>
             </div>
         </div>
     </div>
     <div id="advancedFiltersPanel" class="collapse @(hasSecondary ? "in" : "")">
-        <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-3"><div class="form-group"><label for="areaId">@DashboardText.Get("Filter_Ward")</label>@Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", filters.AreaId), new { @class = "form-control select2", id = "areaId" })</div></div>
-            <div class="col-xs-12 col-sm-6 col-md-3"><div class="form-group"><label for="economicSectorId">@DashboardText.Get("Filter_EconomicSector")</label>@Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", filters.EconomicSectorId), new { @class = "form-control select2", id = "economicSectorId" })</div></div>
-            <div class="col-xs-12 col-sm-6 col-md-3"><div class="form-group"><label for="industryId">@DashboardText.Get("Filter_Industry")</label>@Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", filters.IndustryId), new { @class = "form-control select2", id = "industryId" })</div></div>
-            <div class="col-xs-12 col-sm-6 col-md-3"><div class="form-group"><label for="enterpriseId">@DashboardText.Get("Enterprise")</label>@Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", filters.EnterpriseId), new { @class = "form-control select2", id = "enterpriseId" })</div></div>
+        <div class="dashboard-filter-secondary">
+            <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="areaId">@DashboardText.Get("Filter_Ward")</label>@Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", filters.AreaId), new { @class = "form-control none-select2", id = "areaId" })</div></div>
+            <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="economicSectorId">@DashboardText.Get("Filter_EconomicSector")</label>@Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", filters.EconomicSectorId), new { @class = "form-control none-select2", id = "economicSectorId" })</div></div>
+            <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="industryId">@DashboardText.Get("Filter_Industry")</label>@Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", filters.IndustryId), new { @class = "form-control none-select2", id = "industryId" })</div></div>
+            <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="enterpriseId">@DashboardText.Get("Enterprise")</label>@Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", filters.EnterpriseId), new { @class = "form-control none-select2", id = "enterpriseId" })</div></div>
         </div>
-        <p class="help-block no-margin"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Filter_IndustryNote")</p>
+        <p class="help-block dashboard-filter-note"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Filter_IndustryNote")</p>
     </div>
 </form>

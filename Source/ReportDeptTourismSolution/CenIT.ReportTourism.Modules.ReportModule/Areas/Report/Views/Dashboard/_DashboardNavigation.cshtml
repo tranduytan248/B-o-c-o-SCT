@@ -9,15 +9,15 @@
 @* Rendered inside .nav-tabs-custom by each page; the filter form is the tab content. *@
 <ul class="nav nav-tabs">
     <li class="@(Model.Active == "Overview" ? "active" : "")">
-        <a href="@Url.Action("Index", "Dashboard", route)"><i class="fa fa-bar-chart text-light-blue"></i> <span>@DashboardText.Get("Nav_Overview")</span></a>
+        <a href="@Url.Action("Index", "Dashboard", route)" aria-current="@(Model.Active == "Overview" ? "page" : null)"><i class="fa fa-bar-chart text-light-blue" aria-hidden="true"></i> <span>@DashboardText.Get("Nav_Overview")</span></a>
     </li>
     <li class="@(Model.Active == "Analysis" ? "active" : "")">
-        <a href="@Url.Action("Analysis", "Dashboard", route)"><i class="fa fa-sitemap text-aqua"></i> <span>@DashboardText.Get("Analysis_Title")</span></a>
+        <a href="@Url.Action("Analysis", "Dashboard", route)" aria-current="@(Model.Active == "Analysis" ? "page" : null)"><i class="fa fa-sitemap text-aqua" aria-hidden="true"></i> <span>@DashboardText.Get("Analysis_Title")</span></a>
     </li>
     <li class="@(Model.Active == "Warnings" ? "active" : "")">
-        <a href="@Url.Action("Warnings", "Dashboard", route)"><i class="fa fa-exclamation-triangle text-yellow"></i> <span>@DashboardText.Get("Nav_Warnings")</span></a>
+        <a href="@Url.Action("Warnings", "Dashboard", route)" aria-current="@(Model.Active == "Warnings" ? "page" : null)"><i class="fa fa-exclamation-triangle text-yellow" aria-hidden="true"></i> <span>@DashboardText.Get("Nav_Warnings")</span></a>
     </li>
     <li class="@(Model.Active == "Progress" ? "active" : "")">
-        <a href="@Url.Action("Progress", "Dashboard", route)"><i class="fa fa-list-alt text-green"></i> <span>@DashboardText.Get("Progress_Title")</span></a>
+        <a href="@Url.Action("Progress", "Dashboard", route)" aria-current="@(Model.Active == "Progress" ? "page" : null)"><i class="fa fa-list-alt text-green" aria-hidden="true"></i> <span>@DashboardText.Get("Progress_Title")</span></a>
     </li>
 </ul>
