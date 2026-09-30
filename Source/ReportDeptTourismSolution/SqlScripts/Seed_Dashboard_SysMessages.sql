@@ -1,5 +1,3 @@
--- Run against the SysProvider database before deploying the dashboard application.
--- Existing translations are preserved. Restart the app or refresh its MessageProvider after seeding.
 SET NOCOUNT ON;
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
@@ -11,159 +9,186 @@ DECLARE @Messages TABLE
 );
 
 INSERT INTO @Messages (LabelKey, [Message]) VALUES
-    (N'Dashboard_Overview_Title', N'Tổng quan báo cáo Công Thương'),
-    (N'Dashboard_Analysis_Title', N'Phân tích chỉ tiêu'),
-    (N'Dashboard_Warnings_Title', N'Tín hiệu biến động'),
-    (N'Dashboard_Progress_Title', N'Theo dõi dữ liệu'),
+    -- Header / Navigation
+    (N'Dashboard_Overview_Title', N'Tổng quan'),
+    (N'Dashboard_Analysis_Title', N'Phân tích'),
+    (N'Dashboard_Warnings_Title', N'Cảnh báo'),
+    (N'Dashboard_Progress_Title', N'Tiến độ dữ liệu'),
+
     (N'Dashboard_Nav_Overview', N'Tổng quan'),
     (N'Dashboard_Nav_Warnings', N'Cảnh báo'),
-    (N'Dashboard_Type_Manufacturing', N'Sản xuất, kinh doanh'),
-    (N'Dashboard_Type_Trading', N'Thương mại, dịch vụ'),
+
+    -- Report types
+    (N'Dashboard_Type_Manufacturing', N'Sản xuất'),
+    (N'Dashboard_Type_Trading', N'Thương mại'),
     (N'Dashboard_Type_ExportImport', N'Xuất nhập khẩu'),
+
+    -- Metrics
     (N'Dashboard_Metric_IndustrialRevenue', N'Doanh thu công nghiệp'),
     (N'Dashboard_Metric_ExportValue', N'Kim ngạch xuất khẩu'),
     (N'Dashboard_Metric_ImportValue', N'Kim ngạch nhập khẩu'),
-    (N'Dashboard_Metric_WholesaleRetailRevenue', N'Doanh thu bán buôn, bán lẻ'),
-    (N'Dashboard_Metric_VehicleRepairRevenue', N'Doanh thu sửa chữa xe'),
-    (N'Dashboard_Metric_RetailSubset', N'Trong đó: bán lẻ'),
-    (N'Dashboard_Metric_FobValue', N'Tổng trị giá xuất khẩu FOB'),
+    (N'Dashboard_Metric_WholesaleRetailRevenue', N'Bán buôn, bán lẻ'),
+    (N'Dashboard_Metric_VehicleRepairRevenue', N'Sửa chữa xe'),
+    (N'Dashboard_Metric_RetailSubset', N'Bán lẻ'),
+    (N'Dashboard_Metric_FobValue', N'Xuất khẩu FOB'),
     (N'Dashboard_Metric_DirectExport', N'Xuất khẩu trực tiếp'),
     (N'Dashboard_Metric_EntrustedExport', N'Xuất khẩu ủy thác'),
+
+    -- Units
     (N'Dashboard_Unit_BillionVnd', N'Tỷ đồng'),
-    (N'Dashboard_Unit_ThousandUsd', N'1.000 USD'),
+    (N'Dashboard_Unit_ThousandUsd', N'Nghìn USD'),
     (N'Dashboard_Unit_MillionVnd', N'Triệu đồng'),
     (N'Dashboard_Unit_Usd', N'USD'),
-    (N'Dashboard_Filter_Period', N'Kỳ báo cáo'),
-    (N'Dashboard_Filter_Year', N'Năm báo cáo'),
+
+    -- Filters
+    (N'Dashboard_Filter_Period', N'Kỳ'),
+    (N'Dashboard_Filter_Year', N'Năm'),
     (N'Dashboard_Filter_ReportType', N'Loại báo cáo'),
     (N'Dashboard_Filter_Metric', N'Chỉ tiêu'),
     (N'Dashboard_Filter_Advanced', N'Bộ lọc'),
-    (N'Dashboard_Filter_ActiveCount', N'Số bộ lọc nâng cao đang áp dụng'),
+    (N'Dashboard_Filter_ActiveCount', N'Bộ lọc đang áp dụng'),
     (N'Dashboard_Filter_Apply', N'Áp dụng'),
     (N'Dashboard_Filter_Ward', N'Phường / xã'),
     (N'Dashboard_Filter_EconomicSector', N'Khu vực kinh tế'),
-    (N'Dashboard_Filter_Industry', N'Ngành trong danh mục'),
-    (N'Dashboard_Filter_IndustryNote', N'Bộ lọc ngành chọn doanh nghiệp có mã ngành trong danh mục; chưa xác định ngành chính.'),
-    (N'Dashboard_Filter_AllIndustries', N'Tất cả ngành trong danh mục'),
+    (N'Dashboard_Filter_Industry', N'Ngành'),
+    (N'Dashboard_Filter_IndustryNote', N'Lọc theo mã ngành doanh nghiệp.'),
+    (N'Dashboard_Filter_AllIndustries', N'Tất cả ngành'),
     (N'Dashboard_Filter_IndustryCode', N'Mã ngành'),
     (N'Dashboard_Filter_AllAreas', N'Tất cả địa bàn'),
     (N'Dashboard_Filter_AllSectors', N'Tất cả khu vực'),
     (N'Dashboard_Filter_AllEnterprises', N'Tất cả doanh nghiệp'),
-    (N'Dashboard_UnknownArea', N'Chưa có địa bàn'),
-    (N'Dashboard_UnknownSector', N'Chưa phân khu vực'),
+
+    -- Common
+    (N'Dashboard_UnknownArea', N'Chưa xác định'),
+    (N'Dashboard_UnknownSector', N'Chưa xác định'),
     (N'Dashboard_Month', N'Tháng'),
     (N'Dashboard_Months12', N'12 tháng'),
     (N'Dashboard_Enterprise', N'Doanh nghiệp'),
     (N'Dashboard_Enterprises', N'doanh nghiệp'),
     (N'Dashboard_Area', N'Địa bàn'),
     (N'Dashboard_Value', N'Giá trị'),
-    (N'Dashboard_Change', N'Thay đổi'),
+    (N'Dashboard_Change', N'Biến động'),
     (N'Dashboard_Rate', N'Tỷ lệ'),
     (N'Dashboard_PreviousPeriod', N'Kỳ trước'),
     (N'Dashboard_CurrentPeriod', N'Kỳ này'),
-    (N'Dashboard_ChartValues', N'Số liệu biểu đồ theo tháng'),
-    (N'Dashboard_ChartEmpty', N'Chưa có dữ liệu cho biểu đồ.'),
+
+    -- Chart
+    (N'Dashboard_ChartValues', N'Số liệu theo tháng'),
+    (N'Dashboard_ChartEmpty', N'Chưa có dữ liệu.'),
     (N'Dashboard_ChartType1', N'Loại 1'),
     (N'Dashboard_ChartType2', N'Loại 2'),
     (N'Dashboard_ChartType3', N'Loại 3'),
     (N'Dashboard_ChartDecliningEnterprises', N'Doanh nghiệp giảm'),
-    (N'Dashboard_ChartReceived', N'Có dữ liệu nhập'),
-    (N'Dashboard_Overview_Subtitle', N'Mỗi loại báo cáo dùng chỉ tiêu và đơn vị riêng'),
+    (N'Dashboard_ChartReceived', N'Có dữ liệu'),
+
+    -- Overview
+    (N'Dashboard_Overview_Subtitle', N'Tổng hợp theo loại báo cáo'),
     (N'Dashboard_Overview_Type', N'Loại'),
-    (N'Dashboard_Overview_AnalyzeReport', N'Phân tích báo cáo'),
-    (N'Dashboard_Overview_ReceivedAnalyze', N'doanh nghiệp có dữ liệu nhập · Phân tích'),
-    (N'Dashboard_Overview_ReceivedTitle', N'Doanh nghiệp có dữ liệu nhập'),
-    (N'Dashboard_Overview_TrendSubtitle', N'12 tháng · theo loại báo cáo'),
-    (N'Dashboard_Overview_TrendAria', N'Xu hướng số doanh nghiệp có dữ liệu nhập theo ba loại báo cáo'),
+    (N'Dashboard_Overview_AnalyzeReport', N'Phân tích'),
+    (N'Dashboard_Overview_ReceivedAnalyze', N'doanh nghiệp có dữ liệu'),
+    (N'Dashboard_Overview_ReceivedTitle', N'Có dữ liệu'),
+    (N'Dashboard_Overview_TrendSubtitle', N'Xu hướng 12 tháng'),
+    (N'Dashboard_Overview_TrendAria', N'Xu hướng dữ liệu 12 tháng'),
     (N'Dashboard_Overview_Classification', N'Phân loại doanh nghiệp'),
     (N'Dashboard_Overview_ProvinceWide', N'Toàn tỉnh'),
-    (N'Dashboard_Overview_NeedsClassification', N'doanh nghiệp cần bổ sung phân loại'),
-    (N'Dashboard_Overview_MissingBusiness', N'Thiếu hồ sơ Công Thương'),
+    (N'Dashboard_Overview_NeedsClassification', N'cần phân loại'),
+    (N'Dashboard_Overview_MissingBusiness', N'Thiếu hồ sơ'),
     (N'Dashboard_Overview_MissingIndustry', N'Thiếu ngành'),
     (N'Dashboard_Overview_MissingReportType', N'Thiếu loại báo cáo'),
-    (N'Dashboard_Overview_ClassificationNote', N'Các nhóm thiếu thông tin có thể trùng nhau và không nằm trong mẫu số của từng loại báo cáo.'),
+    (N'Dashboard_Overview_ClassificationNote', N'Các nhóm có thể trùng nhau.'),
     (N'Dashboard_Overview_LargestChanges', N'Biến động lớn'),
-    (N'Dashboard_Overview_ViewAnalysis', N'Xem phân tích'),
-    (N'Dashboard_Overview_NoComparison', N'Chưa có cặp tháng để so sánh.'),
+    (N'Dashboard_Overview_ViewAnalysis', N'Xem chi tiết'),
+    (N'Dashboard_Overview_NoComparison', N'Chưa đủ dữ liệu so sánh.'),
     (N'Dashboard_Overview_ChangeSize', N'Mức biến động'),
-    (N'Dashboard_Overview_ReceiptNote', N'Dữ liệu nhập theo từng loại không chứng minh đã nộp tệp cho loại đó. Mã loại 0 trong kỳ:'),
-    (N'Dashboard_Overview_FutureRows', N'dòng có kỳ tương lai:'),
-    (N'Dashboard_Analysis_CurrentPeriodCode', N'Kỳ hiện tại · Mã'),
-    (N'Dashboard_Analysis_Mom', N'So với tháng trước'),
+    (N'Dashboard_Overview_ReceiptNote', N'Dữ liệu nhập không đồng nghĩa đã nộp báo cáo.'),
+    (N'Dashboard_Overview_FutureRows', N'Kỳ tương lai:'),
+
+    -- Analysis
+    (N'Dashboard_Analysis_CurrentPeriodCode', N'Kỳ hiện tại'),
+    (N'Dashboard_Analysis_Mom', N'So tháng trước'),
     (N'Dashboard_Analysis_Yoy', N'So cùng kỳ'),
-    (N'Dashboard_Analysis_ComparedCoverage', N'doanh nghiệp được phân loại có số liệu hai kỳ'),
-    (N'Dashboard_Analysis_YtdTitle', N'Tổng các tháng đã có dữ liệu'),
-    (N'Dashboard_Analysis_YtdNote', N'tháng từ đầu năm · không phải lũy kế chính thức'),
+    (N'Dashboard_Analysis_ComparedCoverage', N'doanh nghiệp đủ dữ liệu so sánh'),
+    (N'Dashboard_Analysis_YtdTitle', N'Từ đầu năm'),
+    (N'Dashboard_Analysis_YtdNote', N'tháng có dữ liệu'),
     (N'Dashboard_Analysis_Trend', N'Xu hướng'),
-    (N'Dashboard_Analysis_TrendAria', N'Xu hướng 12 tháng của'),
-    (N'Dashboard_Analysis_TrendNote', N'Tháng không có giá trị để trống; số 0 đã báo cáo vẫn là 0.'),
+    (N'Dashboard_Analysis_TrendAria', N'Xu hướng 12 tháng'),
+    (N'Dashboard_Analysis_TrendNote', N'Tháng chưa có dữ liệu để trống.'),
     (N'Dashboard_Analysis_NoData', N'Chưa có dữ liệu'),
-    (N'Dashboard_Analysis_SectorTitle', N'Theo khu vực kinh tế'),
+    (N'Dashboard_Analysis_SectorTitle', N'Theo khu vực'),
     (N'Dashboard_Analysis_Share', N'Tỷ trọng'),
-    (N'Dashboard_Analysis_NoSectorValue', N'Chưa có giá trị để phân bổ.'),
+    (N'Dashboard_Analysis_NoSectorValue', N'Chưa có dữ liệu phân bổ.'),
     (N'Dashboard_Analysis_LargestEnterpriseChanges', N'Doanh nghiệp biến động lớn'),
-    (N'Dashboard_Analysis_ComparableGroup', N'Trong nhóm có hai kỳ dữ liệu'),
-    (N'Dashboard_Analysis_NoComparison', N'Chưa có đủ dữ liệu đối chiếu.'),
-    (N'Dashboard_Analysis_ComparisonNote', N'Các tỷ lệ MoM/YoY chỉ tính trên cùng doanh nghiệp có giá trị ở cả hai kỳ. Bộ lọc ngành thể hiện thành viên ngành, không phải tỷ trọng ngành chính.'),
-    (N'Dashboard_Warnings_Decline10', N'Tín hiệu giảm trên 10%'),
-    (N'Dashboard_Warnings_Decline20', N'Tín hiệu giảm trên 20%'),
-    (N'Dashboard_Warnings_Decline30', N'Tín hiệu giảm trên 30%'),
+    (N'Dashboard_Analysis_ComparableGroup', N'Có đủ hai kỳ'),
+    (N'Dashboard_Analysis_NoComparison', N'Chưa đủ dữ liệu.'),
+    (N'Dashboard_Analysis_ComparisonNote', N'MoM/YoY chỉ tính doanh nghiệp có đủ hai kỳ.'),
+
+    -- Warnings
+    (N'Dashboard_Warnings_Decline10', N'Giảm >10%'),
+    (N'Dashboard_Warnings_Decline20', N'Giảm >20%'),
+    (N'Dashboard_Warnings_Decline30', N'Giảm >30%'),
     (N'Dashboard_Warnings_LargestChange', N'Biến động lớn nhất'),
     (N'Dashboard_Warnings_DecliningEnterprises', N'Doanh nghiệp giảm'),
-    (N'Dashboard_Warnings_InLargestList', N'trong danh sách biến động lớn'),
-    (N'Dashboard_Warnings_Trend', N'Xu hướng số doanh nghiệp giảm'),
-    (N'Dashboard_Warnings_DeclineOver10', N'Giảm trên 10%'),
-    (N'Dashboard_Warnings_DeclineMom', N'Giảm so với tháng trước'),
-    (N'Dashboard_Warnings_TrendAria', N'Xu hướng số doanh nghiệp có mức giảm'),
-    (N'Dashboard_Warnings_NoPairs', N'Chưa đủ cặp so sánh'),
-    (N'Dashboard_Warnings_Comparable', N'Có thể đối chiếu'),
-    (N'Dashboard_Warnings_Conflict', N'Dữ liệu cần đối chiếu'),
-    (N'Dashboard_Warnings_ConflictDescription', N'doanh nghiệp có mã chỉ tiêu trùng trong kỳ'),
-    (N'Dashboard_Warnings_DeclineList', N'Doanh nghiệp giảm trên 10%'),
-    (N'Dashboard_Warnings_ChangeList', N'Biến động lớn theo doanh nghiệp'),
-    (N'Dashboard_Warnings_NoChanges', N'Chưa có cặp giá trị phù hợp để hiển thị.'),
-    (N'Dashboard_Warnings_Note', N'Các biến động là tín hiệu từ dữ liệu nhập, không phải kết luận vi phạm hay danh sách cần xử lý. Tỷ lệ thay đổi không tính khi kỳ trước bằng 0.'),
+    (N'Dashboard_Warnings_InLargestList', N'trong nhóm biến động lớn'),
+    (N'Dashboard_Warnings_Trend', N'Xu hướng giảm'),
+    (N'Dashboard_Warnings_DeclineOver10', N'Giảm >10%'),
+    (N'Dashboard_Warnings_DeclineMom', N'Giảm so tháng trước'),
+    (N'Dashboard_Warnings_TrendAria', N'Xu hướng doanh nghiệp giảm'),
+    (N'Dashboard_Warnings_NoPairs', N'Chưa đủ dữ liệu'),
+    (N'Dashboard_Warnings_Comparable', N'Có thể so sánh'),
+    (N'Dashboard_Warnings_Conflict', N'Cần đối chiếu'),
+    (N'Dashboard_Warnings_ConflictDescription', N'doanh nghiệp có mã trùng'),
+    (N'Dashboard_Warnings_DeclineList', N'Doanh nghiệp giảm >10%'),
+    (N'Dashboard_Warnings_ChangeList', N'Biến động theo doanh nghiệp'),
+    (N'Dashboard_Warnings_NoChanges', N'Chưa có dữ liệu phù hợp.'),
+    (N'Dashboard_Warnings_Note', N'Biến động chỉ mang tính cảnh báo dữ liệu.'),
+
+    -- Progress
     (N'Dashboard_Progress_CurrentClassification', N'theo phân loại hiện tại'),
-    (N'Dashboard_Progress_ReceivedAssigned', N'Dữ liệu đã nhập / doanh nghiệp được phân loại'),
-    (N'Dashboard_Progress_ObservedRatio', N'tỷ lệ quan sát trong nhóm hiện tại'),
-    (N'Dashboard_Progress_PrimaryValues', N'Có giá trị chỉ tiêu chính'),
-    (N'Dashboard_Progress_IncludingZero', N'doanh nghiệp · gồm giá trị 0'),
-    (N'Dashboard_Progress_Duplicates', N'Mã chỉ tiêu trùng'),
-    (N'Dashboard_Progress_NeedsReview', N'doanh nghiệp cần đối chiếu dữ liệu'),
-    (N'Dashboard_Progress_FileAnyType', N'Có tệp bất kỳ loại'),
-    (N'Dashboard_Progress_FileNote', N'không chứng minh đã nộp loại'),
-    (N'Dashboard_Progress_ReceiptTrend', N'Doanh nghiệp có dữ liệu nhập theo tháng'),
-    (N'Dashboard_Progress_TrendAria', N'Xu hướng số doanh nghiệp có dữ liệu nhập loại'),
+    (N'Dashboard_Progress_ReceivedAssigned', N'Có dữ liệu / được phân loại'),
+    (N'Dashboard_Progress_ObservedRatio', N'Tỷ lệ có dữ liệu'),
+    (N'Dashboard_Progress_PrimaryValues', N'Có chỉ tiêu chính'),
+    (N'Dashboard_Progress_IncludingZero', N'Gồm giá trị 0'),
+    (N'Dashboard_Progress_Duplicates', N'Mã trùng'),
+    (N'Dashboard_Progress_NeedsReview', N'doanh nghiệp cần đối chiếu'),
+    (N'Dashboard_Progress_FileAnyType', N'Có tệp'),
+    (N'Dashboard_Progress_FileNote', N'Không đồng nghĩa đã nộp báo cáo'),
+    (N'Dashboard_Progress_ReceiptTrend', N'Dữ liệu theo tháng'),
+    (N'Dashboard_Progress_TrendAria', N'Xu hướng dữ liệu theo tháng'),
     (N'Dashboard_Progress_ReceivedEnterprise', N'Doanh nghiệp có dữ liệu'),
-    (N'Dashboard_Progress_MetricPresence', N'Mức hiện diện chỉ tiêu'),
-    (N'Dashboard_Progress_MetricNote', N'Giá trị 0 được tính là có dữ liệu; mã trùng được để trống để đối chiếu.'),
-    (N'Dashboard_Progress_ReceivedAssignedShort', N'Có dữ liệu / được phân loại'),
-    (N'Dashboard_Progress_NoAssigned', N'Không có doanh nghiệp được phân loại trong phạm vi lọc.'),
+    (N'Dashboard_Progress_MetricPresence', N'Độ phủ chỉ tiêu'),
+    (N'Dashboard_Progress_MetricNote', N'Giá trị 0 vẫn được tính là có dữ liệu.'),
+    (N'Dashboard_Progress_ReceivedAssignedShort', N'Có dữ liệu / phân loại'),
+    (N'Dashboard_Progress_NoAssigned', N'Không có doanh nghiệp phù hợp.'),
     (N'Dashboard_Progress_ByArea', N'Theo địa bàn'),
     (N'Dashboard_Progress_Worklist', N'Danh sách theo dõi'),
     (N'Dashboard_Progress_TypeData', N'Dữ liệu loại'),
-    (N'Dashboard_Progress_MissingCodes', N'Chỉ tiêu còn thiếu'),
+    (N'Dashboard_Progress_MissingCodes', N'Thiếu chỉ tiêu'),
     (N'Dashboard_Progress_DuplicateData', N'Dữ liệu trùng'),
     (N'Dashboard_Progress_HasData', N'Có dữ liệu'),
     (N'Dashboard_Progress_NoData', N'Chưa có dữ liệu'),
-    (N'Dashboard_Progress_ThreeValues', N'Đủ 3 mã có giá trị'),
+    (N'Dashboard_Progress_ThreeValues', N'Đủ 3 chỉ tiêu'),
     (N'Dashboard_Progress_Review', N'Cần đối chiếu'),
-    (N'Dashboard_Progress_First50', N'Hiển thị 50 doanh nghiệp đầu theo trạng thái cần theo dõi.'),
-    (N'Dashboard_Progress_Note', N'Tỷ lệ này đo dữ liệu nhập trong nhóm doanh nghiệp được phân loại hiện tại. Không phải tỷ lệ nộp hoặc hoàn thành báo cáo chính thức; lịch sử phân loại theo tháng chưa có.');
+    (N'Dashboard_Progress_First50', N'Hiển thị 50 doanh nghiệp đầu.'),
+    (N'Dashboard_Progress_Note', N'Tỷ lệ phản ánh dữ liệu đã nhập, không phải tỷ lệ nộp báo cáo.');
 
+-- UPDATE existing labels as well
+UPDATE target
+SET target.[Message] = seed.[Message]
+FROM dbo.Sys_Messages target
+INNER JOIN @Messages seed
+    ON seed.LabelKey = target.LabelKey
+WHERE target.LangCode = N'vi-VN';
+
+-- INSERT missing labels
 INSERT INTO dbo.Sys_Messages (LangCode, LabelKey, [Message])
 SELECT N'vi-VN', seed.LabelKey, seed.[Message]
-FROM @Messages AS seed
+FROM @Messages seed
 WHERE NOT EXISTS
 (
     SELECT 1
-    FROM dbo.Sys_Messages AS existing WITH (UPDLOCK, HOLDLOCK)
-    WHERE existing.LangCode = N'vi-VN' AND existing.LabelKey = seed.LabelKey
+    FROM dbo.Sys_Messages existing
+    WHERE existing.LangCode = N'vi-VN'
+      AND existing.LabelKey = seed.LabelKey
 );
 
 COMMIT TRANSACTION;
-
-SELECT COUNT(*) AS DashboardMessagesPresent
-FROM dbo.Sys_Messages AS messages
-INNER JOIN @Messages AS seed ON seed.LabelKey = messages.LabelKey
-WHERE messages.LangCode = N'vi-VN';
