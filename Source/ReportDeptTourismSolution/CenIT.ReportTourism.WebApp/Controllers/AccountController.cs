@@ -138,6 +138,16 @@ namespace CenIT.ReportTourism.WebApp.Controllers
             if (IsDefaultLandingUrl(returnUrl))
                 returnUrl = GetDefaultLandingUrl(model.Email);
 
+            // Đăng nhập lần đầu / được cấp lại mật khẩu => bắt buộc đổi mật khẩu trước khi sử dụng
+            if (IsRequireChangePassword(model.Email, true))
+                return Json(new
+                {
+                    status = true,
+                    returnUrl = Url.Action("RequireChangePassword", "Account", new { area = "", returnUrl }),
+                    message = CreateMessage("Đăng nhập thành công. Vui lòng đổi mật khẩu trước khi sử dụng hệ thống.",
+                        EnumProcessType.NonFormat, EnumMsgIcon.Warning)
+                }, JsonRequestBehavior.AllowGet);
+
             return Json(new
             {
                 status = true,
@@ -253,6 +263,8 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                             EnumProcessType.NonFormat, EnumMsgIcon.Error)
                     }, JsonRequestBehavior.AllowGet);
                 default:
+                    if (string.Equals(model.UserName, User?.UserName, StringComparison.OrdinalIgnoreCase))
+                        SetRequireChangePassword(model.UserName, false, "Người dùng tự đổi mật khẩu");
                     AppProcessor.Notifider.ForceLogout(model.UserName);
                     return Json(new
                     {
@@ -261,6 +273,123 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                             EnumProcessType.Edit, EnumMsgIcon.Success)
                     }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        #endregion
+
+        #region Require Change Password
+
+        /// <summary>
+        ///     Trang bắt buộc đổi mật khẩu (đăng nhập lần đầu / được quản trị cấp lại mật khẩu)
+        /// </summary>
+        [HttpGet]
+        public ActionResult RequireChangePassword(string returnUrl = "")
+        {
+            if (string.IsNullOrEmpty(User?.UserName))
+                return RedirectToAction("Login", "Account", new { area = "", returnUrl });
+
+            if (!IsRequireChangePassword(User.UserName, true))
+                return Redirect(IsDefaultLandingUrl(returnUrl) ? GetDefaultLandingUrl(User.UserName) : returnUrl);
+
+            ViewBag.ReturnUrl = returnUrl;
+            return View(new ResetPasswordModel { UserName = User.UserName });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult RequireChangePassword(ResetPasswordModel model, string returnUrl = "")
+        {
+            if (string.IsNullOrEmpty(User?.UserName))
+                return Json(new
+                {
+                    status = false,
+                    returnUrl = Url.Action("Login", "Account", new { area = "", returnUrl }),
+                    message = CreateMessage("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                }, JsonRequestBehavior.AllowGet);
+
+            // Phiên cũ của tài khoản đã đổi mật khẩu (ở phiên khác) thì không cho đổi tiếp
+            if (!IsRequireChangePassword(User.UserName, true))
+                return Json(new
+                {
+                    status = false,
+                    returnUrl = IsDefaultLandingUrl(returnUrl) ? GetDefaultLandingUrl(User.UserName) : returnUrl,
+                    message = CreateMessage("Tài khoản đã được đổi mật khẩu.",
+                        EnumProcessType.NonFormat, EnumMsgIcon.Info)
+                }, JsonRequestBehavior.AllowGet);
+
+            // Chỉ đổi mật khẩu cho tài khoản đang đăng nhập
+            model.UserName = User.UserName;
+            if (!ModelState.IsValid) return PartialView("_RequireChangePassword", model);
+
+            // p_Sys_User_Login băm mật khẩu dạng VARCHAR(250) => chỉ nhận ký tự ASCII in được, tối đa 128 ký tự
+            if (!Regex.IsMatch(model.NewPassword, @"^[\x20-\x7E]{8,128}$"))
+            {
+                ModelState.AddModelError("NewPassword",
+                    "Mật khẩu chỉ gồm chữ cái không dấu, ký tự số, ký tự đặc biệt trên bàn phím và dài 8 - 128 ký tự");
+                return PartialView("_RequireChangePassword", model);
+            }
+
+            if (!Regex.IsMatch(model.NewPassword, @"^(?=(.*\d){2})(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,}$"))
+            {
+                ModelState.AddModelError("NewPassword",
+                    "Mật khẩu phải dài ít nhất 8 ký tự và bao gồm ký tự thường, ký tự hoa, chữ số và ký tự đặc biệt");
+                return PartialView("_RequireChangePassword", model);
+            }
+
+            if (_userCache.IsCurrentPassword(model.UserName, model.NewPassword))
+            {
+                ModelState.AddModelError("NewPassword", "Mật khẩu mới phải khác mật khẩu đang sử dụng");
+                return PartialView("_RequireChangePassword", model);
+            }
+
+            var salt = UPasswordHash.GenerateSalt(model.NewPassword);
+            var passwordHash = UPasswordHash.GenerateCryptoPassword(model.NewPassword, salt);
+
+            int? idUser;
+            try
+            {
+                idUser = _userCache.ChangeRequiredPassword(
+                    model.UserName,
+                    passwordHash,
+                    salt,
+                    "Đổi mật khẩu bắt buộc khi đăng nhập",
+                    model.UserName
+                );
+            }
+            catch (Exception ex)
+            {
+                AppProcessor.Logger.Error(ex);
+                return Json(new
+                {
+                    status = false,
+                    message = CreateMessage("Đổi mật khẩu không thành công. Vui lòng thử lại sau.",
+                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (idUser.GetValueOrDefault(-1) <= 0)
+                return Json(new
+                {
+                    status = false,
+                    message = CreateMessage("Tài khoản không tồn tại hoặc đã ngưng hoạt động.",
+                        EnumProcessType.NonFormat, EnumMsgIcon.Error)
+                }, JsonRequestBehavior.AllowGet);
+
+            AppProcessor.Notifider.ForceLogout(model.UserName);
+
+            // Đăng nhập lại bằng mật khẩu mới
+            Session.Clear();
+            Session.Abandon();
+            FormsAuthentication.SignOut();
+
+            return Json(new
+            {
+                status = true,
+                returnUrl = Url.Action("Login", "Account", new { area = "", returnUrl }),
+                message = CreateMessage("Đổi mật khẩu thành công. Vui lòng đăng nhập lại bằng mật khẩu mới.",
+                    EnumProcessType.NonFormat, EnumMsgIcon.Success)
+            }, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -327,6 +456,9 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                 return PartialView("_ResetPassword", model);
             }
 
+            // Đặt lại đúng mật khẩu đang dùng thì vẫn giữ trạng thái phải đổi mật khẩu
+            var isSamePassword = _userCache.IsCurrentPassword(model.UserName, model.NewPassword);
+
             var salt = UPasswordHash.GenerateSalt(model.NewPassword);
             var passwordHash = UPasswordHash.GenerateCryptoPassword(model.NewPassword, salt);
 
@@ -347,6 +479,8 @@ namespace CenIT.ReportTourism.WebApp.Controllers
                             EnumProcessType.NonFormat, EnumMsgIcon.Error)
                     }, JsonRequestBehavior.AllowGet);
                 default:
+                    if (!isSamePassword)
+                        SetRequireChangePassword(model.UserName, false, "Người dùng đặt lại mật khẩu qua email");
                     AppProcessor.Notifider.ForceLogout(model.UserName);
                     return Json(new
                     {

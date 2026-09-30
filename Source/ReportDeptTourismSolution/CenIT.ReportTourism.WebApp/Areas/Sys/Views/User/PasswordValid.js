@@ -87,7 +87,7 @@
                         "regex": "(?=" +
                             ("[" + CHARSETS.digitSet + "][^" + CHARSETS.digitSet + "]*").repeat(_options.minDigits) +
                             ")",
-                        "message": "Mật khẩu phải chứa ít nhất " + _options.minDigits + " Digits."
+                        "message": "Mật khẩu phải chứa ít nhất " + _options.minDigits + " ký tự số."
                     });
                 if (_options.noSpecial)
                     cases.push({

@@ -428,6 +428,9 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                             EnumProcessType.NonFormat, EnumMsgIcon.Error)
                     }, JsonRequestBehavior.AllowGet);
                 default:
+                    // Quản trị cấp lại mật khẩu => người dùng phải đổi mật khẩu ở lần đăng nhập kế tiếp
+                    if (!string.Equals(model.UserName, User.UserName, StringComparison.OrdinalIgnoreCase))
+                        SetRequireChangePassword(model.UserName, true, "Quản trị cấp lại mật khẩu");
                     AppProcessor.Notifider.ForceLogout(model.UserName);
                     return Json(new
                     {

@@ -16,6 +16,9 @@
     <Procedure Name="Sys_User_DeActive" Value="p_Sys_User_DeActive" />
     <Procedure Name="Sys_User_SaveLogin" Value="p_Sys_User_SaveLogin" />
     <Procedure Name="Sys_User_GetById" Value="p_Sys_User_GetById" />
+    <Procedure Name="Sys_User_GetRequireChangePassword" Value="p_Sys_User_GetRequireChangePassword" />
+    <Procedure Name="Sys_User_SetRequireChangePassword" Value="p_Sys_User_SetRequireChangePassword" />
+    <Procedure Name="Sys_User_ChangeRequiredPassword" Value="p_Sys_User_ChangeRequiredPassword" />
     <Procedure Name="Sys_Function_Register" Value="p_Sys_Function_Register" />
     <Procedure Name="Sys_Function_Save" Value="p_Sys_Function_Save" />
     <Procedure Name="Sys_Function_Get" Value="p_Sys_Function_Get" />

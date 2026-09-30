@@ -242,6 +242,8 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
             var encTicket = FormsAuthentication.Encrypt(authTicket);
             var faCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encTicket);
             HttpContext.Response.Cookies.Add(faCookie);
+            // Giả lập tài khoản: không bắt quản trị đổi mật khẩu thay cho tài khoản được giả lập
+            //SetRequireChangePasswordSession(loginUser.UserName, false);
 
             var msgRes = CreateMessage($"Giả lập tài khoản [{UserName}]", EnumProcessType.Edit, EnumMsgIcon.Success);
 
