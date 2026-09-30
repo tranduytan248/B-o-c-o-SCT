@@ -4,7 +4,10 @@
 @{
     ViewBag.Title = DashboardText.Get("Overview_Title");
 }
-@section Title { @ViewBag.Title <small class="dashboard-subtitle">@DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year · @DashboardText.Get("Overview_Subtitle")</small> }
+@section Title {
+    @{ var pageNote = DashboardText.Get("Overview_ReceiptNote") + " " + Model.Classification.TypeZeroRows + "; " + DashboardText.Get("Overview_FutureRows") + " " + Model.Classification.FutureDatedRows + ". " + DashboardText.Get("Overview_ClassificationNote"); }
+    @ViewBag.Title <span class="dashboard-page-note" tabindex="0" title="@pageNote"><i class="fa fa-info-circle" aria-hidden="true"></i><span class="sr-only">@pageNote</span></span>
+}
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
@@ -87,7 +90,6 @@
                         <li class="list-group-item">@DashboardText.Get("Overview_MissingIndustry") <span class="badge bg-yellow">@Model.Classification.MissingIndustry.ToString("N0")</span></li>
                         <li class="list-group-item">@DashboardText.Get("Overview_MissingReportType") <span class="badge bg-yellow">@Model.Classification.MissingReportType.ToString("N0")</span></li>
                     </ul>
-                    <p class="text-muted small no-margin">@DashboardText.Get("Overview_ClassificationNote")</p>
                 </div>
             </div>
         </div>
@@ -135,7 +137,6 @@
         </div>
     </div>
 
-    <p class="text-muted small"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Overview_ReceiptNote") @Model.Classification.TypeZeroRows; @DashboardText.Get("Overview_FutureRows") @Model.Classification.FutureDatedRows.</p>
 </div>
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>

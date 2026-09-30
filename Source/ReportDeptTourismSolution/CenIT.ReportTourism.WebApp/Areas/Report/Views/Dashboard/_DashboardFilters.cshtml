@@ -72,9 +72,8 @@
         <div class="dashboard-filter-secondary">
             <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="areaId">@DashboardText.Get("Filter_Ward")</label>@Html.DropDownList("areaId", new SelectList(Model.Areas, "Value", "Text", filters.AreaId), new { @class = "form-control none-select2", id = "areaId" })</div></div>
             <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="economicSectorId">@DashboardText.Get("Filter_EconomicSector")</label>@Html.DropDownList("economicSectorId", new SelectList(Model.EconomicSectors, "Value", "Text", filters.EconomicSectorId), new { @class = "form-control none-select2", id = "economicSectorId" })</div></div>
-            <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="industryId">@DashboardText.Get("Filter_Industry")</label>@Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", filters.IndustryId), new { @class = "form-control none-select2", id = "industryId" })</div></div>
+            <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="industryId">@DashboardText.Get("Filter_Industry") <span class="dashboard-page-note" title="@DashboardText.Get("Filter_IndustryNote")"><i class="fa fa-info-circle" aria-hidden="true"></i><span class="sr-only">@DashboardText.Get("Filter_IndustryNote")</span></span></label>@Html.DropDownList("industryId", new SelectList(Model.Industries, "Value", "Text", filters.IndustryId), new { @class = "form-control none-select2", id = "industryId" })</div></div>
             <div class="dashboard-filter-field"><div class="form-group no-margin"><label for="enterpriseId">@DashboardText.Get("Enterprise")</label>@Html.DropDownList("enterpriseId", new SelectList(Model.Enterprises, "Value", "Text", filters.EnterpriseId), new { @class = "form-control none-select2", id = "enterpriseId" })</div></div>
         </div>
-        <p class="help-block dashboard-filter-note"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Filter_IndustryNote")</p>
     </div>
 </form>

@@ -1,10 +1,10 @@
 /* AdminLTE 2.3.11 / Bootstrap 3.3.7 supply all colors, typography and components.
    Only dashboard layout, long-label handling and accessibility adjustments live here. */
-.content-header .dashboard-subtitle {
-  color: #777;
-  display: block;
-  font-size: 13px;
-  margin-top: 2px;
+.dashboard-page-note {
+  color: #999;
+  cursor: help;
+  font-size: 16px;
+  vertical-align: middle;
 }
 .management-dashboard {
   font-variant-numeric: tabular-nums;
@@ -31,6 +31,9 @@
   display: block;
   margin-bottom: 5px;
 }
+.management-dashboard .dashboard-filter-field .dashboard-page-note {
+  font-size: 13px;
+}
 .management-dashboard .dashboard-period-controls {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(90px, 1fr);
@@ -54,11 +57,6 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   padding-top: 16px;
-}
-.management-dashboard .dashboard-filter-note {
-  float: none;
-  line-height: 1.5;
-  padding-top: 8px;
 }
 .management-dashboard .dashboard-filter-toolbar .select2-container {
   width: 100% !important;
@@ -116,38 +114,41 @@
 .management-dashboard .dashboard-equal-row .small-box > .inner {
   flex: 1;
 }
+/* Compact KPI cards so every card row fits above the fold. */
+.management-dashboard .small-box {
+  margin-bottom: 15px;
+}
 .management-dashboard .small-box > .inner {
-  padding: 12px 15px;
+  padding: 10px 15px;
 }
 .management-dashboard .small-box h3 {
-  font-size: 30px;
+  font-size: 28px;
+  margin: 0 0 6px;
   white-space: normal;
   overflow-wrap: break-word;
 }
 .management-dashboard .small-box h3 sup {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: normal;
   position: static;
 }
 .management-dashboard .small-box p {
+  font-size: 14px;
+  margin: 0;
   overflow-wrap: break-word;
 }
 .management-dashboard .small-box .icon {
-  font-size: 70px;
-  top: 0;
+  font-size: 60px;
+  top: 5px;
 }
 .management-dashboard .small-box:hover .icon {
-  font-size: 75px;
+  font-size: 64px;
 }
-.management-dashboard .small-box .progress {
-  background: rgba(0, 0, 0, 0.2);
-  margin: 0 0 10px;
+.management-dashboard .small-box > .small-box-footer {
+  padding: 4px 10px;
 }
-.management-dashboard .small-box .progress .progress-bar {
-  background: #fff;
-}
-.management-dashboard .small-box.bg-gray .progress .progress-bar {
-  background: #555;
+.management-dashboard .small-box.bg-gray > .small-box-footer {
+  color: rgba(0, 0, 0, 0.7);
 }
 
 /* Short breakdowns sit below full-width trends, so sparse data leaves no empty sidebar. */
@@ -155,9 +156,6 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px 24px;
-}
-.management-dashboard .dashboard-grid-note {
-  grid-column: 1 / -1;
 }
 .management-dashboard .progress-group {
   display: grid;

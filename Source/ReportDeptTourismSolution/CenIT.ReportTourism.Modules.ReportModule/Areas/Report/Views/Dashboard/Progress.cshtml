@@ -4,7 +4,10 @@
 @{
     ViewBag.Title = DashboardText.Get("Progress_Title");
 }
-@section Title { @ViewBag.Title <small class="dashboard-subtitle">@Model.TypeName · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year · @DashboardText.Get("Progress_CurrentClassification")</small> }
+@section Title {
+    @{ var pageNote = DashboardText.Get("Progress_Note") + " " + DashboardText.Get("Progress_MetricNote"); }
+    @ViewBag.Title <span class="dashboard-page-note" tabindex="0" title="@pageNote"><i class="fa fa-info-circle" aria-hidden="true"></i><span class="sr-only">@pageNote</span></span>
+}
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
@@ -27,37 +30,40 @@
             <div class="small-box bg-green">
                 <div class="inner">
                     <h3>@Model.Received <sup>/ @Model.Assigned</sup></h3>
-                    <p><b>@DashboardText.Get("Progress_ReceivedAssigned")</b><br />@String.Format("{0:0.#}%", Model.CoveragePercent) · @DashboardText.Get("Progress_ObservedRatio")</p>
-                    <div class="progress xs"><div class="progress-bar" style="width: @Model.CoveragePercent.ToString("0.#", invariant)%"></div></div>
+                    <p><b>@DashboardText.Get("Progress_HasData")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-database" aria-hidden="true"></i></div>
+                <div class="small-box-footer">@DashboardText.Get("Progress_ObservedRatio") <b>@String.Format("{0:0.#}%", Model.CoveragePercent)</b></div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
             <div class="small-box bg-aqua">
                 <div class="inner">
-                    <h3>@Model.MetricValues</h3>
-                    <p><b>@DashboardText.Get("Progress_PrimaryValues")</b><br />@DashboardText.Get("Progress_IncludingZero")</p>
+                    <h3>@Model.MetricValues <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                    <p><b>@DashboardText.Get("Progress_PrimaryValues")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-check-square-o" aria-hidden="true"></i></div>
+                <div class="small-box-footer">@DashboardText.Get("Progress_IncludingZero")</div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
-            <div class="small-box bg-yellow">
+            <div class="small-box bg-purple">
                 <div class="inner">
-                    <h3>@Model.Conflicts</h3>
-                    <p><b>@DashboardText.Get("Progress_Duplicates")</b><br />@DashboardText.Get("Progress_NeedsReview")</p>
+                    <h3>@Model.Conflicts <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                    <p><b>@DashboardText.Get("Progress_Duplicates")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-files-o" aria-hidden="true"></i></div>
+                <div class="small-box-footer">@DashboardText.Get("Progress_Review")</div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
-            <div class="small-box bg-gray">
+            <div class="small-box bg-teal">
                 <div class="inner">
-                    <h3>@Model.FileAnyType</h3>
-                    <p><b>@DashboardText.Get("Progress_FileAnyType")</b><br />@DashboardText.Get("Progress_FileNote") @Model.Filters.ReportType</p>
+                    <h3>@Model.FileAnyType <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                    <p><b>@DashboardText.Get("Progress_FileAnyType")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-file-text-o" aria-hidden="true"></i></div>
+                <div class="small-box-footer">@DashboardText.Get("Progress_FileNote")</div>
             </div>
         </div>
     </div>
@@ -101,7 +107,6 @@
                             <div class="progress sm"><div class="progress-bar progress-bar-aqua" style="width: @ratioWidth(item.Received, item.Assigned)%"></div></div>
                         </div>
                     }
-                    <p class="text-muted small no-margin dashboard-grid-note">@DashboardText.Get("Progress_MetricNote")</p>
                 </div>
             </div>
         </div>
@@ -183,7 +188,6 @@
         </div>
     </div>
 
-    <p class="text-muted small"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Progress_Note")</p>
 </div>
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>

@@ -4,7 +4,10 @@
 @{
     ViewBag.Title = DashboardText.Get("Analysis_Title");
 }
-@section Title { @ViewBag.Title <small class="dashboard-subtitle">@Model.TypeName · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</small> }
+@section Title {
+    @{ var pageNote = DashboardText.Get("Analysis_ComparisonNote") + " " + DashboardText.Get("Analysis_TrendNote"); }
+    @ViewBag.Title <span class="dashboard-page-note" tabindex="0" title="@pageNote"><i class="fa fa-info-circle" aria-hidden="true"></i><span class="sr-only">@pageNote</span></span>
+}
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
@@ -27,44 +30,44 @@
     </div>
 
     <div class="row dashboard-equal-row">
-        <div class="col-xs-12 col-sm-6 col-lg-3">
+        <div class="col-xs-12 col-sm-6">
             <div class="small-box bg-light-blue">
                 <div class="inner">
                     <h3>@Model.CurrentValue <sup>@unit</sup></h3>
-                    <p><b>@DashboardText.Get("Analysis_CurrentPeriodCode") @Model.SelectedMetric.Code</b><br />@Model.SelectedMetric.Label</p>
+                    <p><b>@DashboardText.Get("Analysis_CurrentPeriodCode") · @Model.SelectedMetric.Code</b><br />@Model.SelectedMetric.Label</p>
                 </div>
                 <div class="icon"><i class="fa fa-line-chart" aria-hidden="true"></i></div>
-                <div class="small-box-footer">@Model.TypeName · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</div>
+                <div class="small-box-footer">@DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-6 col-lg-3">
-            <div class="info-box">
-                <span class="info-box-icon @momTone"><i class="fa @momIcon" aria-hidden="true"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">@DashboardText.Get("Analysis_Mom")</span>
-                    <span class="info-box-number @(Model.Mom < 0 ? "text-red" : "")">@(Model.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value) : "—")</span>
-                    <span class="text-muted small">@Model.MomCompared/@Model.Assigned @DashboardText.Get("Analysis_ComparedCoverage")</span>
+        <div class="col-xs-12 col-sm-6">
+            <div class="small-box bg-aqua">
+                <div class="inner">
+                    <h3>@Model.YtdValue <sup>@unit</sup></h3>
+                    <p><b>@DashboardText.Get("Analysis_YtdTitle")</b></p>
                 </div>
+                <div class="icon"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                <div class="small-box-footer"><b>@Model.YtdMonths/@Model.Filters.Month</b> @DashboardText.Get("Analysis_YtdNote")</div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-6 col-lg-3">
-            <div class="info-box">
-                <span class="info-box-icon @yoyTone"><i class="fa @yoyIcon" aria-hidden="true"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">@DashboardText.Get("Analysis_Yoy")</span>
-                    <span class="info-box-number @(Model.Yoy < 0 ? "text-red" : "")">@(Model.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value) : "—")</span>
-                    <span class="text-muted small">@Model.YoyCompared/@Model.Assigned @DashboardText.Get("Analysis_ComparedCoverage")</span>
+        <div class="col-xs-12 col-sm-6">
+            <div class="small-box @momTone">
+                <div class="inner">
+                    <h3>@(Model.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value) : "—")</h3>
+                    <p><b>@DashboardText.Get("Analysis_Mom")</b></p>
                 </div>
+                <div class="icon"><i class="fa @momIcon" aria-hidden="true"></i></div>
+                <div class="small-box-footer"><b>@Model.MomCompared/@Model.Assigned</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-6 col-lg-3">
-            <div class="info-box">
-                <span class="info-box-icon bg-aqua"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">@DashboardText.Get("Analysis_YtdTitle")</span>
-                    <span class="info-box-number">@Model.YtdValue <small>@unit</small></span>
-                    <span class="text-muted small">@Model.YtdMonths/@Model.Filters.Month @DashboardText.Get("Analysis_YtdNote")</span>
+        <div class="col-xs-12 col-sm-6">
+            <div class="small-box @yoyTone">
+                <div class="inner">
+                    <h3>@(Model.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value) : "—")</h3>
+                    <p><b>@DashboardText.Get("Analysis_Yoy")</b></p>
                 </div>
+                <div class="icon"><i class="fa @yoyIcon" aria-hidden="true"></i></div>
+                <div class="small-box-footer"><b>@Model.YoyCompared/@Model.Assigned</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
             </div>
         </div>
     </div>
@@ -79,7 +82,6 @@
                 <div class="box-body">
                     <div id="analysis-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("Value") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart dashboard-chart" role="img" aria-label="@DashboardText.Get("Analysis_TrendAria") @Model.SelectedMetric.Label"></div>
                     <script type="application/json" class="md-chart-data" data-chart="analysis-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
-                    <p class="text-muted small no-margin">@DashboardText.Get("Analysis_TrendNote")</p>
                 </div>
                 <div class="box-footer">
                     <button type="button" class="btn btn-link dashboard-values-toggle" data-toggle="collapse" data-target="#analysis-trend-values" aria-expanded="false" aria-controls="analysis-trend-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</button>
@@ -149,7 +151,6 @@
         </div>
     </div>
 
-    <p class="text-muted small"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Analysis_ComparisonNote")</p>
 </div>
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>

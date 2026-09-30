@@ -4,14 +4,19 @@
 @{
     ViewBag.Title = DashboardText.Get("Warnings_Title");
 }
-@section Title { @ViewBag.Title <small class="dashboard-subtitle">@Model.TypeName · @Model.Metric.Label · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</small> }
+@section Title {
+    @{ var pageNote = DashboardText.Get("Warnings_Note"); }
+    @ViewBag.Title <span class="dashboard-page-note" tabindex="0" title="@pageNote"><i class="fa fa-info-circle" aria-hidden="true"></i><span class="sr-only">@pageNote</span></span>
+}
 @section HeadCss {
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/morris/morris.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Contents/plugins/management-dashboard/management-dashboard.css")" />
 }
 @{
-    var invariant = System.Globalization.CultureInfo.InvariantCulture;
-    var comparablePercent = Model.Assigned > 0 ? Math.Min(100m, 100m * Model.ComparableCount / Model.Assigned) : 0m;
+    Func<int, string> ofComparable = count => Model.ComparableCount > 0 ? String.Format("{0:0.#}%", 100m * count / Model.ComparableCount) : "—";
+    var pageRoute = new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = Model.Filters.ReportType,
+        areaId = Model.Filters.AreaId, economicSectorId = Model.Filters.EconomicSectorId,
+        industryId = Model.Filters.IndustryId, enterpriseId = Model.Filters.EnterpriseId, metric = Model.Filters.Metric };
 }
 <div class="management-dashboard dashboard-warnings-page">
     <div class="nav-tabs-custom">
@@ -26,20 +31,32 @@
         {
             <div class="col-xs-12 col-md-4">
                 <div class="small-box bg-yellow">
-                    <div class="inner"><h3>@(Model.ComparableCount > 0 ? Model.DeclineOver10.ToString() : "—")</h3><p><b>@DashboardText.Get("Warnings_Decline10")</b><br />@DashboardText.Get("Enterprises")</p></div>
+                    <div class="inner">
+                        <h3>@(Model.ComparableCount > 0 ? Model.DeclineOver10.ToString() : "—") <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                        <p><b>@DashboardText.Get("Warnings_Decline10")</b></p>
+                    </div>
                     <div class="icon"><i class="fa fa-arrow-down" aria-hidden="true"></i></div>
+                    <div class="small-box-footer"><b>@ofComparable(Model.DeclineOver10)</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
                 </div>
             </div>
             <div class="col-xs-12 col-md-4">
                 <div class="small-box bg-orange">
-                    <div class="inner"><h3>@(Model.ComparableCount > 0 ? Model.DeclineOver20.ToString() : "—")</h3><p><b>@DashboardText.Get("Warnings_Decline20")</b><br />@DashboardText.Get("Enterprises")</p></div>
+                    <div class="inner">
+                        <h3>@(Model.ComparableCount > 0 ? Model.DeclineOver20.ToString() : "—") <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                        <p><b>@DashboardText.Get("Warnings_Decline20")</b></p>
+                    </div>
                     <div class="icon"><i class="fa fa-level-down" aria-hidden="true"></i></div>
+                    <div class="small-box-footer"><b>@ofComparable(Model.DeclineOver20)</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
                 </div>
             </div>
             <div class="col-xs-12 col-md-4">
                 <div class="small-box bg-red">
-                    <div class="inner"><h3>@(Model.ComparableCount > 0 ? Model.DeclineOver30.ToString() : "—")</h3><p><b>@DashboardText.Get("Warnings_Decline30")</b><br />@DashboardText.Get("Enterprises")</p></div>
+                    <div class="inner">
+                        <h3>@(Model.ComparableCount > 0 ? Model.DeclineOver30.ToString() : "—") <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                        <p><b>@DashboardText.Get("Warnings_Decline30")</b></p>
+                    </div>
                     <div class="icon"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></div>
+                    <div class="small-box-footer"><b>@ofComparable(Model.DeclineOver30)</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
                 </div>
             </div>
         }
@@ -47,37 +64,43 @@
         {
             <div class="col-xs-12 col-sm-6">
                 <div class="small-box bg-light-blue">
-                    <div class="inner"><h3>@(Model.Movements.Any() ? String.Format("{0:+#,##0.##;-#,##0.##;0}", Model.Movements.First().Change) : "—") <sup>@Model.Metric.Unit</sup></h3><p><b>@DashboardText.Get("Warnings_LargestChange")</b><br />@Model.Metric.Label</p></div>
+                    <div class="inner">
+                        <h3>@(Model.Movements.Any() ? String.Format("{0:+#,##0.##;-#,##0.##;0}", Model.Movements.First().Change) : "—") <sup>@Model.Metric.Unit</sup></h3>
+                        <p><b>@DashboardText.Get("Warnings_LargestChange")</b></p>
+                    </div>
                     <div class="icon"><i class="fa fa-exchange" aria-hidden="true"></i></div>
+                    <div class="small-box-footer">@(Model.Movements.Any() ? Model.Movements.First().Name : "—")</div>
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6">
                 <div class="small-box bg-red">
-                    <div class="inner"><h3>@Model.Movements.Count(x => x.Change < 0)</h3><p><b>@DashboardText.Get("Warnings_DecliningEnterprises")</b><br />@DashboardText.Get("Warnings_InLargestList")</p></div>
+                    <div class="inner">
+                        <h3>@Model.Movements.Count(x => x.Change < 0) <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                        <p><b>@DashboardText.Get("Warnings_DecliningEnterprises")</b></p>
+                    </div>
                     <div class="icon"><i class="fa fa-arrow-down" aria-hidden="true"></i></div>
+                    <div class="small-box-footer">@DashboardText.Get("Warnings_InLargestList")</div>
                 </div>
             </div>
         }
-    </div>
-
-    <div class="row dashboard-equal-row">
         <div class="col-xs-12 col-sm-6">
             <div class="small-box bg-aqua">
                 <div class="inner">
                     <h3>@Model.ComparableCount <sup>/ @Model.Assigned</sup></h3>
-                    <p><b>@DashboardText.Get("Warnings_Comparable")</b><br />@DashboardText.Get("Analysis_ComparedCoverage")</p>
-                    <div class="progress xs"><div class="progress-bar" style="width: @comparablePercent.ToString("0.#", invariant)%"></div></div>
+                    <p><b>@DashboardText.Get("Warnings_Comparable")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-balance-scale" aria-hidden="true"></i></div>
+                <a class="small-box-footer" href="@Url.Action("Analysis", "Dashboard", pageRoute)">@DashboardText.Get("Overview_ViewAnalysis") <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
-            <div class="small-box bg-yellow">
+            <div class="small-box bg-purple">
                 <div class="inner">
-                    <h3>@Model.ConflictCount</h3>
-                    <p><b>@DashboardText.Get("Warnings_Conflict")</b><br />@DashboardText.Get("Warnings_ConflictDescription")</p>
+                    <h3>@Model.ConflictCount <sup>@DashboardText.Get("Enterprises")</sup></h3>
+                    <p><b>@DashboardText.Get("Progress_Duplicates")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-files-o" aria-hidden="true"></i></div>
+                <a class="small-box-footer" href="@Url.Action("Progress", "Dashboard", pageRoute)">@DashboardText.Get("Progress_Title") <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
             </div>
         </div>
     </div>
@@ -141,7 +164,6 @@
         </div>
     </div>
 
-    <p class="text-muted small"><i class="fa fa-info-circle" aria-hidden="true"></i> @DashboardText.Get("Warnings_Note")</p>
 </div>
 @section CustomJS {
     <script src="@Url.Content("~/Contents/plugins/morris/raphael-min.js")"></script>
