@@ -22,8 +22,8 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xs-12 col-md-6">
+    <div class="row dashboard-equal-row">
+        <div class="col-xs-12 col-sm-6 col-lg-3">
             <div class="small-box bg-green">
                 <div class="inner">
                     <h3>@Model.Received <sup>/ @Model.Assigned</sup></h3>
@@ -34,55 +34,51 @@
                 <div class="small-box-footer">@Model.TypeName · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</div>
             </div>
         </div>
-        <div class="col-xs-12 col-md-6">
-            <div class="row">
-                <div class="col-xs-12 col-sm-6">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-aqua"><i class="fa fa-check-square-o" aria-hidden="true"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">@DashboardText.Get("Progress_PrimaryValues")</span>
-                            <span class="info-box-number">@Model.MetricValues</span>
-                            <span class="text-muted small">@DashboardText.Get("Progress_IncludingZero")</span>
-                        </div>
-                    </div>
+        <div class="col-xs-12 col-sm-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="fa fa-check-square-o" aria-hidden="true"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">@DashboardText.Get("Progress_PrimaryValues")</span>
+                    <span class="info-box-number">@Model.MetricValues</span>
+                    <span class="text-muted small">@DashboardText.Get("Progress_IncludingZero")</span>
                 </div>
-                <div class="col-xs-12 col-sm-6">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-yellow"><i class="fa fa-files-o" aria-hidden="true"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">@DashboardText.Get("Progress_Duplicates")</span>
-                            <span class="info-box-number">@Model.Conflicts</span>
-                            <span class="text-muted small">@DashboardText.Get("Progress_NeedsReview")</span>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-files-o" aria-hidden="true"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">@DashboardText.Get("Progress_Duplicates")</span>
+                    <span class="info-box-number">@Model.Conflicts</span>
+                    <span class="text-muted small">@DashboardText.Get("Progress_NeedsReview")</span>
                 </div>
-                <div class="col-xs-12">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-gray"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">@DashboardText.Get("Progress_FileAnyType")</span>
-                            <span class="info-box-number">@Model.FileAnyType</span>
-                            <span class="text-muted small">@DashboardText.Get("Progress_FileNote") @Model.Filters.ReportType</span>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-gray"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">@DashboardText.Get("Progress_FileAnyType")</span>
+                    <span class="info-box-number">@Model.FileAnyType</span>
+                    <span class="text-muted small">@DashboardText.Get("Progress_FileNote") @Model.Filters.ReportType</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-xs-12 col-md-8">
+        <div class="col-xs-12">
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title"><i class="fa fa-line-chart text-green" aria-hidden="true"></i> @DashboardText.Get("Progress_ReceiptTrend")</h3>
                     <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Months12")</span></div>
                 </div>
                 <div class="box-body">
-                    <div id="observation-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartReceived") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart" style="height: 240px;" role="img" aria-label="@DashboardText.Get("Progress_TrendAria") @Model.Filters.ReportType"></div>
+                    <div id="observation-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartReceived") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart dashboard-chart" role="img" aria-label="@DashboardText.Get("Progress_TrendAria") @Model.Filters.ReportType"></div>
                     <script type="application/json" class="md-chart-data" data-chart="observation-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReceiptTrend))</script>
                 </div>
                 <div class="box-footer">
-                    <a data-toggle="collapse" href="#observation-trend-values" aria-expanded="false" aria-controls="observation-trend-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</a>
+                    <button type="button" class="btn btn-link dashboard-values-toggle" data-toggle="collapse" data-target="#observation-trend-values" aria-expanded="false" aria-controls="observation-trend-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</button>
                     <div id="observation-trend-values" class="collapse">
                         <div class="table-responsive">
                             <table class="table table-condensed table-striped">
@@ -95,12 +91,12 @@
             </div>
         </div>
 
-        <div class="col-xs-12 col-md-4">
+        <div class="col-xs-12">
             <div class="box box-info">
                 <div class="box-header with-border">
                     <h3 class="box-title"><i class="fa fa-tasks text-aqua" aria-hidden="true"></i> @DashboardText.Get("Progress_MetricPresence")</h3>
                 </div>
-                <div class="box-body">
+                <div class="box-body dashboard-breakdown-grid">
                     @foreach (var item in Model.MetricPresence)
                     {
                         <div class="progress-group">
@@ -109,13 +105,13 @@
                             <div class="progress sm"><div class="progress-bar progress-bar-aqua" style="width: @ratioWidth(item.Received, item.Assigned)%"></div></div>
                         </div>
                     }
-                    <p class="text-muted small no-margin">@DashboardText.Get("Progress_MetricNote")</p>
+                    <p class="text-muted small no-margin dashboard-grid-note">@DashboardText.Get("Progress_MetricNote")</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row dashboard-equal-row">
         <div class="col-xs-12 col-md-6">
             <div class="box box-default">
                 <div class="box-header with-border">
@@ -142,6 +138,7 @@
                     <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Progress_ReceivedAssignedShort")</span></div>
                 </div>
                 <div class="box-body">
+                    @if (!Model.Areas.Any()) { <p class="text-muted no-margin">@DashboardText.Get("Progress_NoAssigned")</p> }
                     @foreach (var item in Model.Areas.Take(10))
                     {
                         <div class="progress-group">
@@ -167,6 +164,7 @@
                         <table class="table table-bordered table-striped table-hover table-condensed no-margin">
                             <thead><tr><th>@DashboardText.Get("Enterprise")</th><th>@DashboardText.Get("Area")</th><th>@DashboardText.Get("Progress_TypeData") @Model.Filters.ReportType</th><th>@DashboardText.Get("Progress_MissingCodes")</th><th>@DashboardText.Get("Progress_DuplicateData")</th></tr></thead>
                             <tbody>
+                                @if (!Model.Enterprises.Any()) { <tr><td colspan="5" class="text-muted">@DashboardText.Get("Progress_NoAssigned")</td></tr> }
                                 @foreach (var item in Model.Enterprises.Take(50))
                                 {
                                     <tr>

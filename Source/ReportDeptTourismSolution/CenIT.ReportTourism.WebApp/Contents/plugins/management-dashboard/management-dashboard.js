@@ -13,7 +13,7 @@
     }
   }
 
-  function drawChart(id, dataName, keys, colors, bar) {
+  function drawChart(id, dataName, keys, colors, bar, integerCounts) {
     var element = document.getElementById(id);
     var data = chartData(dataName);
     if (!element || !window.Morris) return;
@@ -32,8 +32,7 @@
       })
     ) {
       element.textContent = element.getAttribute("data-empty") || "";
-      element.className += " text-muted text-center";
-      element.style.lineHeight = element.offsetHeight + "px";
+      element.className += " dashboard-chart-empty";
       return;
     }
     var options = {
@@ -47,20 +46,36 @@
       resize: true,
       hideHover: "auto",
       parseTime: false,
+      smooth: false,
       gridTextColor: "#777",
       gridLineColor: "#f4f4f4",
       yLabelFormat: function (value) {
         return Number(value).toLocaleString("vi-VN");
       },
     };
+    if (integerCounts) {
+      var maxCount = data.reduce(function (max, point) {
+        return keys.reduce(function (value, key) {
+          return Math.max(value, Number(point[key]) || 0);
+        }, max);
+      }, 0);
+      options.ymin = 0;
+      options.ymax = Math.max(4, Math.ceil(maxCount / 4) * 4);
+      options.numLines = 5;
+    }
     if (bar) new Morris.Bar(options);
     else new Morris.Line(options);
   }
 
   $(function () {
     if ($.fn.select2) {
-      $(".management-dashboard select.select2").each(function () {
-        $(this).select2({ width: "100%", language: "vi" });
+      $(".management-dashboard .dashboard-filter-toolbar select").each(function () {
+        $(this).select2({
+          width: "100%",
+          language: "vi",
+          allowClear: false,
+          minimumResultsForSearch: $(this).closest(".dashboard-filter-primary").length ? Infinity : 0,
+        });
       });
     }
     $(".management-dashboard .dashboard-filter-toolbar").each(function () {
@@ -77,6 +92,7 @@
       ["Type1", "Type2", "Type3"],
       ["#3c8dbc", "#00a65a", "#f39c12"],
       true,
+      true,
     );
     drawChart(
       "analysis-trend-chart",
@@ -91,6 +107,7 @@
       ["Value"],
       ["#dd4b39"],
       true,
+      true,
     );
     drawChart(
       "observation-trend-chart",
@@ -98,6 +115,7 @@
       ["Value"],
       ["#00a65a"],
       false,
+      true,
     );
   });
 })(jQuery);

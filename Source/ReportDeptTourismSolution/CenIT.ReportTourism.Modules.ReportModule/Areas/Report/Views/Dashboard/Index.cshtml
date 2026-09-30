@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row dashboard-equal-row">
         @foreach (var card in Model.TypeCards)
         {
             var route = new { year = Model.Filters.Year, month = Model.Filters.Month, reportType = card.ReportType,
@@ -44,7 +44,7 @@
         }
     </div>
 
-    <div class="row">
+    <div class="row dashboard-equal-row">
         <div class="col-xs-12 col-md-8">
             <div class="box box-primary">
                 <div class="box-header with-border">
@@ -52,7 +52,7 @@
                     <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Overview_TrendSubtitle")</span></div>
                 </div>
                 <div class="box-body">
-                    <div id="receipt-overview-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartType1"), DashboardText.Get("ChartType2"), DashboardText.Get("ChartType3") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart" style="height: 260px;" role="img" aria-label="@DashboardText.Get("Overview_TrendAria")"></div>
+                    <div id="receipt-overview-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartType1"), DashboardText.Get("ChartType2"), DashboardText.Get("ChartType3") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart dashboard-chart" role="img" aria-label="@DashboardText.Get("Overview_TrendAria")"></div>
                     <ul class="list-inline text-center no-margin">
                         <li><i class="fa fa-square text-light-blue" aria-hidden="true"></i> @DashboardText.Get("ChartType1")</li>
                         <li><i class="fa fa-square text-green" aria-hidden="true"></i> @DashboardText.Get("ChartType2")</li>
@@ -61,7 +61,7 @@
                     <script type="application/json" class="md-chart-data" data-chart="receipt-overview">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReceiptTrend))</script>
                 </div>
                 <div class="box-footer">
-                    <a data-toggle="collapse" href="#receipt-overview-values" aria-expanded="false" aria-controls="receipt-overview-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</a>
+                    <button type="button" class="btn btn-link dashboard-values-toggle" data-toggle="collapse" data-target="#receipt-overview-values" aria-expanded="false" aria-controls="receipt-overview-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</button>
                     <div id="receipt-overview-values" class="collapse">
                         <div class="table-responsive">
                             <table class="table table-condensed table-striped">

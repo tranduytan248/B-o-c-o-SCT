@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row dashboard-equal-row">
         @if (Model.IsIndustrial)
         {
             <div class="col-xs-12 col-sm-4">
@@ -60,32 +60,8 @@
         }
     </div>
 
-    <div class="row">
-        <div class="col-xs-12 col-md-8">
-            <div class="box box-danger">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-bar-chart text-red" aria-hidden="true"></i> @DashboardText.Get("Warnings_Trend")</h3>
-                    <div class="box-tools pull-right"><span class="label label-default">@(Model.IsIndustrial ? DashboardText.Get("Warnings_DeclineOver10") : DashboardText.Get("Warnings_DeclineMom"))</span></div>
-                </div>
-                <div class="box-body">
-                    <div id="warning-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartDecliningEnterprises") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart" style="height: 240px;" role="img" aria-label="@DashboardText.Get("Warnings_TrendAria")"></div>
-                    <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
-                </div>
-                <div class="box-footer">
-                    <a data-toggle="collapse" href="#warning-trend-values" aria-expanded="false" aria-controls="warning-trend-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</a>
-                    <div id="warning-trend-values" class="collapse">
-                        <div class="table-responsive">
-                            <table class="table table-condensed table-striped">
-                                <thead><tr><th>@DashboardText.Get("Month")</th><th class="text-right">@DashboardText.Get("Warnings_DecliningEnterprises")</th></tr></thead>
-                                <tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td class="text-right">@(point.Value.HasValue ? point.Value.Value.ToString("#,##0") : DashboardText.Get("Warnings_NoPairs"))</td></tr> }</tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xs-12 col-md-4">
+    <div class="row dashboard-equal-row">
+        <div class="col-xs-12 col-sm-6">
             <div class="info-box bg-aqua">
                 <span class="info-box-icon"><i class="fa fa-balance-scale" aria-hidden="true"></i></span>
                 <div class="info-box-content">
@@ -95,12 +71,40 @@
                     <span class="progress-description" title="@DashboardText.Get("Analysis_ComparedCoverage")">@DashboardText.Get("Analysis_ComparedCoverage")</span>
                 </div>
             </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
             <div class="info-box">
                 <span class="info-box-icon bg-yellow"><i class="fa fa-files-o" aria-hidden="true"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">@DashboardText.Get("Warnings_Conflict")</span>
                     <span class="info-box-number">@Model.ConflictCount</span>
                     <span class="text-muted small">@DashboardText.Get("Warnings_ConflictDescription")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-danger">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-bar-chart text-red" aria-hidden="true"></i> @DashboardText.Get("Warnings_Trend")</h3>
+                    <div class="box-tools pull-right"><span class="label label-default">@(Model.IsIndustrial ? DashboardText.Get("Warnings_DeclineOver10") : DashboardText.Get("Warnings_DeclineMom"))</span></div>
+                </div>
+                <div class="box-body">
+                    <div id="warning-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("ChartDecliningEnterprises") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart dashboard-chart" role="img" aria-label="@DashboardText.Get("Warnings_TrendAria")"></div>
+                    <script type="application/json" class="md-chart-data" data-chart="warning-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
+                </div>
+                <div class="box-footer">
+                    <button type="button" class="btn btn-link dashboard-values-toggle" data-toggle="collapse" data-target="#warning-trend-values" aria-expanded="false" aria-controls="warning-trend-values"><i class="fa fa-table" aria-hidden="true"></i> @DashboardText.Get("ChartValues")</button>
+                    <div id="warning-trend-values" class="collapse">
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-striped">
+                                <thead><tr><th>@DashboardText.Get("Month")</th><th class="text-right">@DashboardText.Get("Warnings_DecliningEnterprises")</th></tr></thead>
+                                <tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td class="text-right">@(point.Value.HasValue ? point.Value.Value.ToString("#,##0") : DashboardText.Get("Warnings_NoPairs"))</td></tr> }</tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

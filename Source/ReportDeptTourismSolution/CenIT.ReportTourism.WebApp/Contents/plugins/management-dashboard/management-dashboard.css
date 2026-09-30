@@ -1,47 +1,265 @@
-/*
- * Report dashboard (Areas/Report/Views/Dashboard).
- * Layout and components come from AdminLTE 2.3.11 / Bootstrap 3.3.7; only page-scoped adjustments live here.
- */
-
-/* Subtitle inside the shared .content-header title (the layout forces the title color with !important). */
+/* AdminLTE 2.3.11 / Bootstrap 3.3.7 supply all colors, typography and components.
+   Only dashboard layout, long-label handling and accessibility adjustments live here. */
 .content-header .dashboard-subtitle {
   color: #777;
   display: block;
   font-size: 13px;
   margin-top: 2px;
 }
+.management-dashboard {
+  font-variant-numeric: tabular-nums;
+}
 
-/* Formatted totals with units are longer than AdminLTE's short counters, so allow wrapping. */
+/* Share the complete toolbar width instead of reserving empty Bootstrap columns. */
+.management-dashboard .dashboard-filter-primary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+.management-dashboard .dashboard-filter-field {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.management-dashboard .dashboard-filter-period {
+  flex: 1.2 1 240px;
+}
+.management-dashboard .dashboard-filter-metric {
+  flex: 1.4 1 220px;
+}
+.management-dashboard .dashboard-filter-field label {
+  display: block;
+  margin-bottom: 5px;
+}
+.management-dashboard .dashboard-period-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(90px, 1fr);
+  gap: 8px;
+}
+/* When the toolbar wraps, keep the buttons right-aligned instead of stranded on the left. */
+.management-dashboard .dashboard-filter-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+.management-dashboard .dashboard-filter-buttons {
+  display: flex;
+  gap: 8px;
+}
+.management-dashboard .dashboard-filter-buttons .btn {
+  height: 34px;
+  white-space: nowrap;
+}
+.management-dashboard .dashboard-filter-secondary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 16px;
+}
+.management-dashboard .dashboard-filter-note {
+  float: none;
+  line-height: 1.5;
+  padding-top: 8px;
+}
+.management-dashboard .dashboard-filter-toolbar .select2-container {
+  width: 100% !important;
+}
+/* AdminLTE already pads the selection box; the rendered text must not add a second inset. */
+.management-dashboard
+  .dashboard-filter-toolbar
+  .select2-container
+  .select2-selection--single {
+  height: auto;
+  min-height: 34px;
+  padding: 6px 28px 6px 12px;
+}
+.management-dashboard
+  .dashboard-filter-toolbar
+  .select2-container
+  .select2-selection--single
+  .select2-selection__rendered {
+  margin-top: 0;
+  padding: 0;
+  line-height: 20px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+.management-dashboard
+  .dashboard-filter-toolbar
+  .select2-container
+  .select2-selection--single
+  .select2-selection__arrow {
+  top: 50%;
+  height: 26px;
+  margin-top: -13px;
+}
+
+/* Bootstrap still controls widths and breakpoints; flex only aligns card heights. */
+.management-dashboard .dashboard-equal-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+.management-dashboard .dashboard-equal-row::before,
+.management-dashboard .dashboard-equal-row::after {
+  display: none;
+}
+.management-dashboard .dashboard-equal-row > [class*="col-"] {
+  display: flex;
+  min-width: 0;
+}
+.management-dashboard .dashboard-equal-row > [class*="col-"] > .box,
+.management-dashboard .dashboard-equal-row > [class*="col-"] > .small-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.management-dashboard .dashboard-equal-row .box-body,
+.management-dashboard .dashboard-equal-row .small-box > .inner {
+  flex: 1;
+}
+.management-dashboard .small-box > .inner {
+  padding: 12px 15px;
+}
 .management-dashboard .small-box h3 {
   font-size: 30px;
   white-space: normal;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
-
 .management-dashboard .small-box h3 sup {
   font-size: 15px;
   font-weight: normal;
+  position: static;
 }
-
-/* Same treatment AdminLTE gives .info-box.bg-* progress bars, applied to the coverage bar in a small-box. */
+.management-dashboard .small-box p {
+  overflow-wrap: break-word;
+}
+.management-dashboard .small-box .icon {
+  font-size: 70px;
+  top: 0;
+}
+.management-dashboard .small-box:hover .icon {
+  font-size: 75px;
+}
 .management-dashboard .small-box .progress {
   background: rgba(0, 0, 0, 0.2);
   margin: 0 0 10px;
 }
-
 .management-dashboard .small-box .progress .progress-bar {
   background: #fff;
 }
-
-/* Vietnamese descriptions are long; wrap rather than truncate with an ellipsis. */
-.management-dashboard .info-box .progress-description {
-  white-space: normal;
+.management-dashboard .small-box.bg-gray .progress .progress-bar {
+  background: #555;
 }
 
+/* Short breakdowns sit below full-width trends, so sparse data leaves no empty sidebar. */
+.management-dashboard .dashboard-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+.management-dashboard .dashboard-grid-note {
+  grid-column: 1 / -1;
+}
+.management-dashboard .progress-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+}
+.management-dashboard .progress-number {
+  float: none;
+  white-space: nowrap;
+}
+.management-dashboard .progress-group .progress {
+  grid-column: 1 / -1;
+}
+
+/* Keep header tools in flow so long Vietnamese titles cannot overlap them. */
+.management-dashboard .box-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.management-dashboard .box-header::before,
+.management-dashboard .box-header::after,
+.management-dashboard .dashboard-breakdown-grid::before,
+.management-dashboard .dashboard-breakdown-grid::after {
+  display: none;
+}
+.management-dashboard .box-header .box-title {
+  flex: 1 1 220px;
+  line-height: 1.4;
+}
+.management-dashboard .box-header > .box-tools {
+  position: static;
+  max-width: 100%;
+}
+.management-dashboard .box-tools .label {
+  display: inline-block;
+  white-space: normal;
+  line-height: 1.4;
+}
+.management-dashboard .dashboard-chart {
+  height: 240px;
+}
+.management-dashboard .dashboard-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.management-dashboard .dashboard-values-toggle {
+  padding: 0;
+  white-space: normal;
+  text-align: left;
+}
+.management-dashboard .table .text-right {
+  white-space: nowrap;
+}
+.management-dashboard .progress-text,
+.management-dashboard .table td:not(.text-right) {
+  overflow-wrap: break-word;
+}
+.management-dashboard a:focus-visible,
+.management-dashboard button:focus-visible,
+.management-dashboard .select2-container--focus .select2-selection {
+  outline: 2px solid #23527c;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1199px) {
+  .management-dashboard .dashboard-filter-secondary,
+  .management-dashboard .dashboard-breakdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 767px) {
-  /* Let box tools drop below long titles instead of overlapping them. */
-  .management-dashboard .box-header > .box-tools {
-    position: static;
-    margin-top: 5px;
+  .management-dashboard .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .management-dashboard .nav-tabs > li {
+    flex: 1 1 50%;
+    margin-right: 0;
+  }
+  .management-dashboard .dashboard-filter-field,
+  .management-dashboard .dashboard-filter-actions {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+  .management-dashboard .dashboard-filter-buttons .btn {
+    flex: 1;
+  }
+  .management-dashboard .dashboard-filter-secondary,
+  .management-dashboard .dashboard-breakdown-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .management-dashboard .dashboard-chart {
+    height: 220px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .management-dashboard .small-box .icon,
+  .management-dashboard .collapsing {
+    transition: none;
   }
 }
