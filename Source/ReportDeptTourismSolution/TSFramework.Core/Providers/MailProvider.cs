@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TSFramework.Core.Members.Mail;
@@ -154,10 +155,10 @@ namespace TSFramework.Core.Providers
             var nMail = new MailMessage
             {
                 From = new MailAddress(mail.From ?? _config.UserCredential,
-                    mail.DisplayNameFrom ?? _config.UserCredentialName),
-                //BodyEncoding = Encoding.Unicode,
-                //Body = mailBody.Html,
-                //Body =  mail.Body,
+                    mail.DisplayNameFrom ?? _config.UserCredentialName, Encoding.UTF8),
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8,
+                Body = mailBody.Html,
                 Subject = mail.Subject,
                 DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure,
                 IsBodyHtml = mail.IsBodyHtml

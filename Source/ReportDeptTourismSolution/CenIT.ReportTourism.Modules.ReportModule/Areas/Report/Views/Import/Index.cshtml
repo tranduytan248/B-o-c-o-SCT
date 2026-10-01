@@ -44,7 +44,7 @@
     </div>*@
     @{
         var currentDaysInMonth = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-        var displayLockDay = Math.Min(Model.DayDeadlineSendReportLate, currentDaysInMonth);
+        var displayLockDay = Math.Min(Model.DayDeadlineSendReport, currentDaysInMonth);
         var showInfoBanner = !Model.IsEnterpriseUser || Model.ExistEnterpriseSubmitReportYet;
     }
     @if (showInfoBanner)
@@ -55,11 +55,11 @@
                 <h4><i class="icon fa fa-info"></i> Thông tin!</h4>
                 @if (Model.IsEnterpriseUser)
                 {
-                    <p>Thời hạn gửi báo cáo trước <b class="text-danger fa-2x">23h59 ngày @Model.DayDeadlineSendReport</b>. Báo cáo gửi sau ngày <b class="text-danger fa-2x">@Model.DayDeadlineSendReport</b> sẽ được xem là trễ hạn. Và sau ngày <b class="text-danger fa-2x">@displayLockDay</b> chức năng báo cáo sẽ bị khoá.</p>
+                    <p>Thời hạn gửi báo cáo trước <b class="text-danger fa-2x">23h59 ngày @Model.DayDeadlineSendReport</b>. Sau ngày <b class="text-danger fa-2x">@displayLockDay</b>, chức năng báo cáo sẽ bị khóa.</p>
                 }
                 else
                 {
-                    <p>Thời hạn nhập báo cáo trước <b class="text-danger fa-2x">23h59 ngày @Model.DayDeadlineSendReport</b>. Báo cáo nhập sau ngày <b class="text-danger fa-2x">@Model.DayDeadlineSendReport</b> sẽ được xem là trễ hạn. Và sau ngày <b class="text-danger fa-2x">@displayLockDay</b> chức năng báo cáo sẽ bị khoá.</p>
+                    <p>Thời hạn nhập báo cáo trước <b class="text-danger fa-2x">23h59 ngày @Model.DayDeadlineSendReport</b>. Sau ngày <b class="text-danger fa-2x">@displayLockDay</b>, chức năng báo cáo sẽ bị khóa.</p>
                 }
             </div>
         </div>

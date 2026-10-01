@@ -71,6 +71,10 @@
                                             || product.Targets == "Kim ngạch nhập khẩu";
                             var isTradeHeader = product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu"
                                                 || product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu";
+                            var isBusinessProductHeader = string.IsNullOrEmpty(product.Code)
+                                                          || product.Code == "2"
+                                                          || product.Code == "6.0"
+                                                          || product.Code == "7.0";
                             var tradeHeaderPrefix = product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu" ? "XK"
                                 : product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu" ? "NK"
                                 : string.Empty;
@@ -78,29 +82,29 @@
                             string rowDataSummary = "";
                             string rowDataGroup = "";
 
-                            if (product.Code == "06" || product.Targets == "Kim ngạch xuất khẩu")
+                            if (product.Code == "6" || product.Code == "06" || product.Targets == "Kim ngạch xuất khẩu")
                             {
                                 rowDataSummary = "XK";
                             }
-                            else if (product.Code == "07" || product.Targets == "Kim ngạch nhập khẩu")
+                            else if (product.Code == "7" || product.Code == "07" || product.Targets == "Kim ngạch nhập khẩu")
                             {
                                 rowDataSummary = "NK";
                             }
-                            else if (!string.IsNullOrEmpty(product.Code) && product.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase))
+                            else if (!string.IsNullOrEmpty(product.Code) && (product.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase) || (product.Level ?? "").StartsWith("6.")))
                             {
                                 rowDataGroup = "XK";
                             }
-                            else if (!string.IsNullOrEmpty(product.Code) && product.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase))
+                            else if (!string.IsNullOrEmpty(product.Code) && (product.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase) || (product.Level ?? "").StartsWith("7.")))
                             {
                                 rowDataGroup = "NK";
                             }
 
                             string rowDataRole = "";
-                            if (product.Code == "01" || product.Targets == "Tổng doanh thu")
+                            if (product.Code == "1" || product.Code == "01" || product.Targets == "Tổng doanh thu")
                             {
                                 rowDataRole = "total-revenue";
                             }
-                            else if (product.Code == "0101" || product.Targets == "Trong đó doanh thu công nghiệp")
+                            else if (product.Code == "1.1" || product.Code == "0101" || product.Targets == "Trong đó doanh thu công nghiệp")
                             {
                                 rowDataRole = "industry-revenue";
                             }
@@ -108,7 +112,7 @@
                             var isTradeSummary = !string.IsNullOrEmpty(rowDataSummary);
 
                             <tr class="@(isSummary ? "business-summary" : "")" @(!string.IsNullOrEmpty(rowDataSummary) ? "data-summary=" + rowDataSummary : "") @(!string.IsNullOrEmpty(rowDataGroup) ? "data-group=" + rowDataGroup : "") @(!string.IsNullOrEmpty(rowDataRole) ? "data-role=" + rowDataRole : "")>
-                                @if (string.IsNullOrEmpty(product.Code))
+                                @if (isBusinessProductHeader)
                                 {
                                     <td class="text-center">@product.Level</td>
                                     <td colspan="5" style="text-align: left !important;">
@@ -152,22 +156,22 @@
                             </tr>
                             var addTradePrefix = string.Empty;
                             if (product.Targets == "Nhóm/mặt hàng xuất khẩu chủ yếu" &&
-                                (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase))))
+                                (nextProduct == null || (!((nextProduct.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase)) && !((nextProduct.Level ?? string.Empty).StartsWith("6.")))))
                             {
                                 addTradePrefix = "XK";
                             }
-                            else if ((product.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase) &&
-                                     (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase))))
+                            else if (((product.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase) || (product.Level ?? string.Empty).StartsWith("6.")) &&
+                                     (nextProduct == null || (!((nextProduct.Code ?? string.Empty).StartsWith("XK", StringComparison.OrdinalIgnoreCase)) && !((nextProduct.Level ?? string.Empty).StartsWith("6.")))))
                             {
                                 addTradePrefix = "XK";
                             }
                             else if (product.Targets == "Nhóm/mặt hàng nhập khẩu chủ yếu" &&
-                                     (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase))))
+                                     (nextProduct == null || (!((nextProduct.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase)) && !((nextProduct.Level ?? string.Empty).StartsWith("7.")))))
                             {
                                 addTradePrefix = "NK";
                             }
-                            else if ((product.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase) &&
-                                     (nextProduct == null || !((nextProduct.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase))))
+                            else if (((product.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase) || (product.Level ?? string.Empty).StartsWith("7.")) &&
+                                     (nextProduct == null || (!((nextProduct.Code ?? string.Empty).StartsWith("NK", StringComparison.OrdinalIgnoreCase)) && !((nextProduct.Level ?? string.Empty).StartsWith("7.")))))
                             {
                                 addTradePrefix = "NK";
                             }

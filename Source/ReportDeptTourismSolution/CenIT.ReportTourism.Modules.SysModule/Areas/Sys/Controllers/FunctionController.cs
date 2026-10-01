@@ -194,6 +194,11 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
             {
                 new ListItem
                 {
+                    Text = "Mở khóa",
+                    Value = EnumHelper.GetDescription(EnumActionType.Unlock)
+                },
+                new ListItem
+                {
                     Text = AppProcessor.Messagor.GetMessage(
                         $"ActionType{EnumHelper.GetDescription(EnumActionType.Add)}"),
                     Value = EnumHelper.GetDescription(EnumActionType.Add)

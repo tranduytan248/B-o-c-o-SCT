@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -117,6 +117,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
                 ExistEnterpriseSubmitReportYet = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0 ? lstEnterpriseOther.Count > 0 : true),
                 IsEnterpriseUser = isEnterpriseUser,
+                IsReportLocked = IsReportLocked(DateTime.Now),
+                CanUnlockReport = CanUnlockReport(),
                 ListTypeBusiness = Enum.GetValues(typeof(EnumTypeBusiness))
                     .Cast<EnumTypeBusiness>()
                     .Select(x => new ListItem(AppProcessor.Messagor.GetMessage(EnumHelper.GetDescription(x)),
@@ -387,6 +389,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0"),
                 ExistEnterpriseSubmitReportYet = (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0 ? lstEnterpriseOther.Count > 0 : true),
                 IsEnterpriseUser = isEnterpriseUser,
+                IsReportLocked = IsReportLocked(DateTime.Now),
+                CanUnlockReport = CanUnlockReport(),
                 EnableSignDigitalDoc =
                     (_configCache.GetViaKey("Enable_SignDigital_Doc")?.ConfigValue ?? "0") != "0"
             };
@@ -394,6 +398,24 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         }
 
         #region Import
+
+        [HttpPost]
+        [ActionType(Type = EnumActionType.Unlock)]
+        public ActionResult UnlockReport()
+        {
+            var config = _configCache.GetViaKey("Enable_Report_Lock");
+            if (config == null)
+                return Json(new { status = false, message = "Không tìm thấy cấu hình khóa báo cáo." });
+
+            config.ConfigValue = "0";
+            config.SaveBy = User.UserName;
+            var result = _configCache.Save(config);
+            return Json(new
+            {
+                status = result.GetValueOrDefault(0) > 0,
+                message = result.GetValueOrDefault(0) > 0 ? "Đã mở khóa báo cáo." : "Không thể mở khóa báo cáo."
+            });
+        }
 
         [AjaxOnly]
         [ActionType(Type = EnumActionType.Add)]
@@ -1175,6 +1197,10 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 {
                     dataImports = MergeBusinessProductData(catalog, dataImports);
                 }
+                else
+                {
+                    dataImports = RestoreBusinessProductHierarchyCodes(dataImports);
+                }
                 ViewBag.IsBusinessProductReport = true;
             }
 
@@ -1222,6 +1248,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 var catalog = catalogResult?.Model as List<ReportDataImportModel>;
                 if (catalog != null && catalog.Any())
                     data = MergeBusinessProductData(catalog, data);
+                else
+                    data = RestoreBusinessProductHierarchyCodes(data);
             }
             var total = data.Count;
             var result = Json(
@@ -1433,7 +1461,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{model.TypeReportName}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
-            var dataReport = ReadFormData(Request.Form);
+            var dataReport = ReadFormData(Request.Form, model.EnterpriseId ?? 0);
             EnsureTradingDynamicCodes(dataReport, model.EnterpriseId ?? 0);
 
             if (string.Equals(Request.Form["BusinessProductReport"], "true", StringComparison.OrdinalIgnoreCase))
@@ -1866,7 +1894,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             logActions.AppendLine($" - [{User.UserName}] thực hiện gửi báo cáo [{model.TypeReportName}] cho doanh nghiệp [{enterpriseModel.BusinessName}]");
             logActions.AppendLine(" - Đọc nội dung báo cáo");
 
-            var dataReport = ReadFormData(Request.Form);
+            var dataReport = ReadFormData(Request.Form, model.EnterpriseId ?? 0);
             EnsureTradingDynamicCodes(dataReport, model.EnterpriseId ?? 0);
 
             if (string.Equals(Request.Form["BusinessProductReport"], "true", StringComparison.OrdinalIgnoreCase))
@@ -2288,9 +2316,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     {
                         Targets = product.ProductName,
                         Unit = product.Unit,
-                        Code = !string.IsNullOrWhiteSpace(product.ProductCode)
+                        // Mã đường dẫn: sản phẩm thuộc nhóm "2. Sản phẩm công nghiệp chủ yếu".
+                        // Ví dụ mã danh mục 3512200 được lưu là 2.3512200.
+                        Code = "2." + (!string.IsNullOrWhiteSpace(product.ProductCode)
                             ? product.ProductCode.Trim()
-                            : string.Format("02{0:D4}", product.ProductId)
+                            : product.ProductId.ToString())
                     }).ToList();
             }
             catch (Exception exMain)
@@ -2329,15 +2359,15 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             }
 
             // Khung chỉ tiêu theo mẫu báo cáo doanh nghiệp hằng tháng.
-            products.Add(CreateBusinessProductLine("Tổng doanh thu", "Tỷ đồng", "01"));
-            products.Add(CreateBusinessProductLine("Trong đó doanh thu công nghiệp", "Tỷ đồng", "0101"));
-            products.Add(CreateBusinessProductHeader("Sản phẩm công nghiệp chủ yếu"));
+            products.Add(CreateBusinessProductLine("Tổng doanh thu", "Tỷ đồng", "1"));
+            products.Add(CreateBusinessProductLine("Trong đó doanh thu công nghiệp", "Tỷ đồng", "1.1"));
+            products.Add(CreateBusinessProductHeader("Sản phẩm công nghiệp chủ yếu", "2"));
             products.AddRange(mainProducts);
-            products.Add(CreateBusinessProductLine("Kim ngạch xuất khẩu", "1.000 USD", "06"));
-            products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng xuất khẩu chủ yếu"));
+            products.Add(CreateBusinessProductLine("Kim ngạch xuất khẩu", "1.000 USD", "6"));
+            products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng xuất khẩu chủ yếu", "6.0"));
             products.AddRange(exportProducts);
-            products.Add(CreateBusinessProductLine("Kim ngạch nhập khẩu", "1.000 USD", "07"));
-            products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng nhập khẩu chủ yếu"));
+            products.Add(CreateBusinessProductLine("Kim ngạch nhập khẩu", "1.000 USD", "7"));
+            products.Add(CreateBusinessProductHeader("Nhóm/mặt hàng nhập khẩu chủ yếu", "7.0"));
             products.AddRange(importProducts);
             ApplyBusinessProductHierarchy(products);
 
@@ -2366,8 +2396,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
                         foreach (var p in products)
                         {
-                            // Kim ngạch xuất khẩu (06) và nhập khẩu (07) không nạp trực tiếp, chỉ tính từ các mặt hàng bên trong
-                            if (p.Code == "06" || p.Code == "07" || p.Targets == "Kim ngạch xuất khẩu" || p.Targets == "Kim ngạch nhập khẩu")
+                            // Kim ngạch xuất khẩu (6) và nhập khẩu (7) không nạp trực tiếp, chỉ tính từ các mặt hàng bên trong
+                            if (p.Code == "6" || p.Code == "06" || p.Code == "7" || p.Code == "07" || p.Targets == "Kim ngạch xuất khẩu" || p.Targets == "Kim ngạch nhập khẩu")
                             {
                                 continue;
                             }
@@ -2405,6 +2435,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         private PartialViewResult LoadTradingReport(int? enterpriseId, DateTime? onMonth, string forMonth,
             List<ReportDataImportModel> savedData = null)
         {
+            savedData = RestoreTradingHierarchyCodes(savedData);
+            if (savedData != null)
+            {
+                savedData = savedData
+                    .Where(x => !(x.Code == "38" || x.Code == "39" || ((x.Level == "1.13.1" || x.Level == "1.13.2") && (string.Equals(x.Targets, "Trong đó: Bán lẻ", StringComparison.OrdinalIgnoreCase) || string.Equals(x.Targets, "Trong đó: Nền tảng trực tuyến", StringComparison.OrdinalIgnoreCase)))))
+                    .ToList();
+            }
             DateTime reportMonth;
             if (!onMonth.HasValue && !string.IsNullOrWhiteSpace(forMonth) &&
                 DateTime.TryParse(forMonth, out reportMonth))
@@ -2481,9 +2518,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     });
                 }
 
-                var otherRetailIndex = rows.FindIndex(x => x.Code == "38");
-                if (otherRetailIndex < 0) rows.AddRange(dynamicRows);
-                else rows.InsertRange(otherRetailIndex, dynamicRows);
+                var otherGoodsIndex = rows.FindIndex(x => x.Code == "34");
+                if (otherGoodsIndex >= 0) rows.InsertRange(otherGoodsIndex + 1, dynamicRows);
+                else rows.AddRange(dynamicRows);
             }
 
             ApplyTradingHierarchy(rows);
@@ -2530,8 +2567,6 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "32"),
                 CreateBusinessProductLine("Trong đó: Nền tảng trực tuyến", "Triệu đồng", "33"),
                 CreateBusinessProductLine("11. Hàng hóa khác", "Triệu đồng", "34"),
-                CreateBusinessProductLine("Trong đó: Bán lẻ", "Triệu đồng", "38"),
-                CreateBusinessProductLine("Trong đó: Nền tảng trực tuyến", "Triệu đồng", "39"),
                 CreateBusinessProductLine("II. Doanh thu thuần hoạt động sửa chữa ô tô, mô tô, xe máy và xe có động cơ khác", "Triệu đồng", "40")
             };
         }
@@ -2546,19 +2581,19 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 else if (code == "02") row.Level = "1.1";
                 else if (code == "03") row.Level = "1.2";
                 else if (new[] { "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code)) row.Level = "1." + ((Convert.ToInt32(code) - 1) / 3 + 2);
-                else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(code)) row.Level = code == "38" ? "1.13.1" : "1." + ((Convert.ToInt32(code) - 2) / 3 + 2) + ".1";
-                else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" }.Contains(code)) row.Level = code == "39" ? "1.13.2" : "1." + ((Convert.ToInt32(code) - 3) / 3 + 2) + ".2";
+                else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32" }.Contains(code)) row.Level = "1." + ((Convert.ToInt32(code) - 2) / 3 + 2) + ".1";
+                else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33" }.Contains(code)) row.Level = "1." + ((Convert.ToInt32(code) - 3) / 3 + 2) + ".2";
                 else if (code == "40") row.Level = "2";
-                else if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
+                else if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || code.Contains(".TM_"))
                 {
                     if (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase))
-                        row.Level = "1.13." + (otherNumber + 2) + ".1";
+                        row.Level = "1.13." + otherNumber + ".1";
                     else if (code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
-                        row.Level = "1.13." + (otherNumber + 2) + ".2";
+                        row.Level = "1.13." + otherNumber + ".2";
                     else
                     {
                         otherNumber++;
-                        row.Level = "1.13." + (otherNumber + 2);
+                        row.Level = "1.13." + otherNumber;
                     }
                 }
             }
@@ -2571,7 +2606,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             // Dynamic parents = BL + TT
             var dynamicParents = rows.Where(r => {
                 var c = r.Code ?? "";
-                return c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
+                return (c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || c.Contains(".TM_")) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
             }).ToList();
 
             foreach (var parent in dynamicParents)
@@ -2583,33 +2618,16 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 parent.AccumulatedBeginingOfYear = (bl?.AccumulatedBeginingOfYear ?? 0) + (tt?.AccumulatedBeginingOfYear ?? 0);
             }
 
-            // Row 38 = sum of dynamic BL
-            var row38 = rows.FirstOrDefault(x => x.Code == "38");
             var blRows = rows.Where(x => (x.Code ?? "").EndsWith("_BL", StringComparison.OrdinalIgnoreCase)).ToList();
-            if (row38 != null)
-            {
-                row38.PerformInPeriod = blRows.Sum(x => x.PerformInPeriod ?? 0);
-                row38.PerformPreviousPeriod = blRows.Sum(x => x.PerformPreviousPeriod ?? 0);
-                row38.AccumulatedBeginingOfYear = blRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
-            }
-
-            // Row 39 = sum of dynamic TT
-            var row39 = rows.FirstOrDefault(x => x.Code == "39");
             var ttRows = rows.Where(x => (x.Code ?? "").EndsWith("_TT", StringComparison.OrdinalIgnoreCase)).ToList();
-            if (row39 != null)
-            {
-                row39.PerformInPeriod = ttRows.Sum(x => x.PerformInPeriod ?? 0);
-                row39.PerformPreviousPeriod = ttRows.Sum(x => x.PerformPreviousPeriod ?? 0);
-                row39.AccumulatedBeginingOfYear = ttRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
-            }
 
-            // Row 34 = 38 + 39
+            // Row 34 = sum of dynamic BL + TT
             var row34 = rows.FirstOrDefault(x => x.Code == "34");
             if (row34 != null)
             {
-                row34.PerformInPeriod = (row38?.PerformInPeriod ?? 0) + (row39?.PerformInPeriod ?? 0);
-                row34.PerformPreviousPeriod = (row38?.PerformPreviousPeriod ?? 0) + (row39?.PerformPreviousPeriod ?? 0);
-                row34.AccumulatedBeginingOfYear = (row38?.AccumulatedBeginingOfYear ?? 0) + (row39?.AccumulatedBeginingOfYear ?? 0);
+                row34.PerformInPeriod = blRows.Sum(x => x.PerformInPeriod ?? 0) + ttRows.Sum(x => x.PerformInPeriod ?? 0);
+                row34.PerformPreviousPeriod = blRows.Sum(x => x.PerformPreviousPeriod ?? 0) + ttRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                row34.AccumulatedBeginingOfYear = blRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0) + ttRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
             }
 
             var sums = new[] {
@@ -2631,10 +2649,20 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             var totalRetail = rows.FirstOrDefault(x => x.Code == "02");
             var totalOnline = rows.FirstOrDefault(x => x.Code == "03");
-            var retailRows = rows.Where(x => new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(x.Code)).ToList();
-            var onlineRows = rows.Where(x => new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" }.Contains(x.Code)).ToList();
-            if (totalRetail != null) { totalRetail.PerformInPeriod = retailRows.Sum(x => x.PerformInPeriod ?? 0); totalRetail.PerformPreviousPeriod = retailRows.Sum(x => x.PerformPreviousPeriod ?? 0); totalRetail.AccumulatedBeginingOfYear = retailRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0); }
-            if (totalOnline != null) { totalOnline.PerformInPeriod = onlineRows.Sum(x => x.PerformInPeriod ?? 0); totalOnline.PerformPreviousPeriod = onlineRows.Sum(x => x.PerformPreviousPeriod ?? 0); totalOnline.AccumulatedBeginingOfYear = onlineRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0); }
+            var retailRows = rows.Where(x => new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32" }.Contains(x.Code)).ToList();
+            var onlineRows = rows.Where(x => new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33" }.Contains(x.Code)).ToList();
+            if (totalRetail != null)
+            {
+                totalRetail.PerformInPeriod = retailRows.Sum(x => x.PerformInPeriod ?? 0) + blRows.Sum(x => x.PerformInPeriod ?? 0);
+                totalRetail.PerformPreviousPeriod = retailRows.Sum(x => x.PerformPreviousPeriod ?? 0) + blRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                totalRetail.AccumulatedBeginingOfYear = retailRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0) + blRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
+            }
+            if (totalOnline != null)
+            {
+                totalOnline.PerformInPeriod = onlineRows.Sum(x => x.PerformInPeriod ?? 0) + ttRows.Sum(x => x.PerformInPeriod ?? 0);
+                totalOnline.PerformPreviousPeriod = onlineRows.Sum(x => x.PerformPreviousPeriod ?? 0) + ttRows.Sum(x => x.PerformPreviousPeriod ?? 0);
+                totalOnline.AccumulatedBeginingOfYear = onlineRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0) + ttRows.Sum(x => x.AccumulatedBeginingOfYear ?? 0);
+            }
             var total = rows.FirstOrDefault(x => x.Code == "01");
             var mainGroupCodes = new[] { "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" };
             var mainGroupRows = rows.Where(x => mainGroupCodes.Contains(x.Code)).ToList();
@@ -2649,6 +2677,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         private PartialViewResult LoadImportExportReport(int? enterpriseId, DateTime? onMonth, string forMonth = null,
             List<ReportDataImportModel> savedData = null)
         {
+            savedData = RestoreImportExportHierarchyCodes(savedData);
             DateTime reportMonth;
             if (!onMonth.HasValue && !string.IsNullOrWhiteSpace(forMonth) &&
                 DateTime.TryParse(forMonth, out reportMonth))
@@ -2670,8 +2699,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 }
 
                 var dynamicCountries = savedData.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
-                                                            x.Code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) &&
-                                                            !string.Equals(x.Code, "XK_QG_HEADER", StringComparison.OrdinalIgnoreCase))
+                                                            (x.Code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) || (x.Level ?? "").StartsWith("1.1.")) &&
+                                                            !string.Equals(x.Code, "XK_QG_HEADER", StringComparison.OrdinalIgnoreCase) &&
+                                                            !string.Equals(x.Level, "1.1", StringComparison.OrdinalIgnoreCase))
                     .Select(x => new ReportDataImportModel
                     {
                         Targets = x.Targets,
@@ -2696,8 +2726,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 }
 
                 var dynamicProducts = savedData.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
-                                                           x.Code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase) &&
-                                                           !string.Equals(x.Code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase))
+                                                           (x.Code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase) || (x.Level ?? "").StartsWith("1.2.")) &&
+                                                           !string.Equals(x.Code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase) &&
+                                                           !string.Equals(x.Level, "1.2", StringComparison.OrdinalIgnoreCase))
                     .Select(x => new ReportDataImportModel
                     {
                         Targets = x.Targets,
@@ -2823,9 +2854,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         private static void RecalculateImportExportSummary(List<ReportDataImportModel> rows)
         {
             var directExportRows = rows.Where(x => !string.IsNullOrWhiteSpace(x.Code) &&
-                                              (x.Code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) || x.Code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase)) &&
+                                              (x.Code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) || x.Code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase) || (x.Level ?? "").StartsWith("1.1.") || (x.Level ?? "").StartsWith("1.2.")) &&
                                               !string.Equals(x.Code, "XK_QG_HEADER", StringComparison.OrdinalIgnoreCase) &&
-                                              !string.Equals(x.Code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase)).ToList();
+                                              !string.Equals(x.Code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase) &&
+                                              !string.Equals(x.Level, "1.1", StringComparison.OrdinalIgnoreCase) &&
+                                              !string.Equals(x.Level, "1.2", StringComparison.OrdinalIgnoreCase)).ToList();
 
             var utHeaderIdx = rows.FindIndex(x => string.Equals(x.Code, "UT_MH_HEADER", StringComparison.OrdinalIgnoreCase));
             var trustRows = utHeaderIdx >= 0
@@ -2860,9 +2893,261 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             }
         }
 
-        private static ReportDataImportModel CreateBusinessProductHeader(string targets)
+        // Code được lưu theo nhánh Level để báo cáo tổng hợp xác định được quan hệ cha - con: [Level].[Mã sản phẩm]
+        private static void ApplyBusinessProductHierarchyCodes(IEnumerable<DataRow> rows)
         {
-            return new ReportDataImportModel { Targets = targets };
+            foreach (var row in rows)
+            {
+                var code = Convert.ToString(row["Code"]) ?? string.Empty;
+                var level = Convert.ToString(row["Level"]) ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(level) || string.IsNullOrWhiteSpace(code)) continue;
+
+                // Các chỉ tiêu cố định:
+                // 01 -> 1 (Tổng doanh thu)
+                // 0101 -> 1.1 (Trong đó doanh thu công nghiệp)
+                // 06 -> 6 (Kim ngạch xuất khẩu)
+                // 07 -> 7 (Kim ngạch nhập khẩu)
+                if (string.Equals(code, "01", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "1", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "1", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "1";
+                    continue;
+                }
+                if (string.Equals(code, "0101", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "1.1", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "1.1", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "1.1";
+                    continue;
+                }
+                if (string.Equals(code, "06", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "6", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "6", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "6";
+                    continue;
+                }
+                if (string.Equals(code, "07", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "7", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "7", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "7";
+                    continue;
+                }
+                if (string.Equals(code, "2", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "2", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "2";
+                    continue;
+                }
+                if (string.Equals(code, "6.0", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "6.0", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "6.0";
+                    continue;
+                }
+                if (string.Equals(code, "7.0", StringComparison.OrdinalIgnoreCase) || string.Equals(level, "7.0", StringComparison.OrdinalIgnoreCase))
+                {
+                    row["Code"] = "7.0";
+                    continue;
+                }
+
+                // Dòng sản phẩm phân cấp: 2.x (sản phẩm chủ yếu), 6.x (xuất khẩu), 7.x (nhập khẩu)
+                // Lưu theo quy tắc: [Cấp cha].[Mã sản phẩm từ DB]
+                // Ví dụ: Level 2.1 Điện gió -> Cấp cha là 2 + . + 3512200 = 2.3512200
+                // Level 6.1 XKB0010 -> Cấp cha là 6 + . + XKB0010 = 6.XKB0010
+                // Level 7.1 NKB0031 -> Cấp cha là 7 + . + NKB0031 = 7.NKB0031
+                if (level.StartsWith("2.") || (level.StartsWith("6.") && level != "6.0") || (level.StartsWith("7.") && level != "7.0"))
+                {
+                    var rawCode = code;
+                    var lastDot = rawCode.LastIndexOf('.');
+                    if (lastDot >= 0 && lastDot < rawCode.Length - 1)
+                    {
+                        rawCode = rawCode.Substring(lastDot + 1);
+                    }
+
+                    var parentLevel = level.Contains(".") ? level.Substring(0, level.LastIndexOf('.')) : level;
+                    row["Code"] = parentLevel + "." + rawCode;
+                }
+            }
+        }
+
+        // Code được lưu theo nhánh Level để báo cáo tổng hợp xác định được quan hệ cha - con.
+        // Phần hậu tố giữ mã nghiệp vụ cũ cho các dòng phát sinh động (quốc gia, mặt hàng).
+        private static void ApplyTradingHierarchyCodes(IEnumerable<DataRow> rows)
+        {
+            foreach (var row in rows)
+            {
+                var code = Convert.ToString(row["Code"]) ?? string.Empty;
+                var level = Convert.ToString(row["Level"]) ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(level)) continue;
+                if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || code.Contains(".TM_"))
+                {
+                    var rawCode = code;
+                    var tmIdx = rawCode.IndexOf("TM_", StringComparison.OrdinalIgnoreCase);
+                    if (tmIdx >= 0) rawCode = rawCode.Substring(tmIdx);
+                    var parentLevel = level.Contains(".") ? level.Substring(0, level.LastIndexOf('.')) : level;
+                    row["Code"] = parentLevel + "." + rawCode;
+                }
+                else
+                {
+                    row["Code"] = level;
+                }
+            }
+        }
+
+        private static void ApplyImportExportHierarchyCodes(IEnumerable<DataRow> rows)
+        {
+            foreach (var row in rows)
+            {
+                var code = Convert.ToString(row["Code"]) ?? string.Empty;
+                var level = Convert.ToString(row["Level"]) ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(level)) continue;
+                var isFixedRow = string.Equals(code, "FOB", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(code, "XK_TT", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(code, "XK_QG_HEADER", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(code, "UT_XK", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(code, "UT_MH_HEADER", StringComparison.OrdinalIgnoreCase);
+                if (isFixedRow)
+                {
+                    row["Code"] = level;
+                }
+                else
+                {
+                    var rawCode = code;
+                    var lastDot = rawCode.LastIndexOf('.');
+                    if (lastDot >= 0 && lastDot < rawCode.Length - 1)
+                    {
+                        rawCode = rawCode.Substring(lastDot + 1);
+                    }
+                    var parentLevel = level.Contains(".") ? level.Substring(0, level.LastIndexOf('.')) : level;
+                    row["Code"] = parentLevel + "." + rawCode;
+                }
+            }
+        }
+
+        private static List<ReportDataImportModel> RestoreTradingHierarchyCodes(List<ReportDataImportModel> rows)
+        {
+            if (rows == null) return null;
+            foreach (var row in rows)
+            {
+                var code = row.Code ?? string.Empty;
+                var level = row.Level ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(level) || string.IsNullOrWhiteSpace(code)) continue;
+                var tmIdx = code.IndexOf("TM_", StringComparison.OrdinalIgnoreCase);
+                if (tmIdx >= 0)
+                {
+                    row.Code = code.Substring(tmIdx);
+                    continue;
+                }
+                if (string.Equals(code, level, StringComparison.OrdinalIgnoreCase))
+                    row.Code = GetTradingLegacyCode(level);
+            }
+            return rows;
+        }
+
+        private static string GetTradingLegacyCode(string level)
+        {
+            var codes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "1", "01" }, { "1.1", "02" }, { "1.2", "03" },
+                { "1.13", "34" }, { "2", "40" }
+            };
+            string code;
+            if (codes.TryGetValue(level, out code)) return code;
+
+            // Nhóm hàng 1.3 đến 1.12: cha, bán lẻ, nền tảng trực tuyến.
+            var parts = level.Split('.');
+            int group;
+            int child;
+            if (parts.Length >= 2 && parts[0] == "1" && int.TryParse(parts[1], out group) && group >= 3 && group <= 12)
+            {
+                var baseCode = 4 + (group - 3) * 3;
+                if (parts.Length == 2) return baseCode.ToString("D2");
+                if (parts.Length == 3 && int.TryParse(parts[2], out child) && (child == 1 || child == 2))
+                    return (baseCode + child).ToString("D2");
+            }
+            return level;
+        }
+
+        private static List<ReportDataImportModel> RestoreImportExportHierarchyCodes(List<ReportDataImportModel> rows)
+        {
+            if (rows == null) return null;
+            foreach (var row in rows)
+            {
+                var code = row.Code ?? string.Empty;
+                var level = row.Level ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(level) || string.IsNullOrWhiteSpace(code)) continue;
+                if (string.Equals(code, level, StringComparison.OrdinalIgnoreCase))
+                {
+                    row.Code = GetImportExportLegacyCode(level);
+                    continue;
+                }
+                var lastDot = code.LastIndexOf('.');
+                if (lastDot >= 0 && lastDot < code.Length - 1)
+                {
+                    row.Code = code.Substring(lastDot + 1);
+                }
+            }
+            return rows;
+        }
+
+        private static string GetImportExportLegacyCode(string level)
+        {
+            if (level == "0") return "FOB";
+            if (level == "1") return "XK_TT";
+            if (level == "1.1") return "XK_QG_HEADER";
+            if (level == "1.2") return "XK_MH_HEADER";
+            if (level == "2") return "UT_XK";
+            if (level == "2.1") return "UT_MH_HEADER";
+            return level;
+        }
+
+        private static List<ReportDataImportModel> RestoreBusinessProductHierarchyCodes(List<ReportDataImportModel> rows)
+        {
+            if (rows == null) return null;
+            foreach (var row in rows)
+            {
+                var code = row.Code ?? string.Empty;
+                var level = row.Level ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(code)) continue;
+
+                if (string.Equals(code, "01", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "1", StringComparison.OrdinalIgnoreCase))
+                {
+                    row.Code = "1";
+                    continue;
+                }
+                if (string.Equals(code, "0101", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "1.1", StringComparison.OrdinalIgnoreCase))
+                {
+                    row.Code = "1.1";
+                    continue;
+                }
+                if (string.Equals(code, "06", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "6", StringComparison.OrdinalIgnoreCase))
+                {
+                    row.Code = "6";
+                    continue;
+                }
+                if (string.Equals(code, "07", StringComparison.OrdinalIgnoreCase) || string.Equals(code, "7", StringComparison.OrdinalIgnoreCase))
+                {
+                    row.Code = "7";
+                    continue;
+                }
+                if (string.Equals(code, "2", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(code, "6.0", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(code, "7.0", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if ((code.StartsWith("2.", StringComparison.OrdinalIgnoreCase) && code.Length > 2) ||
+                    (code.StartsWith("6.", StringComparison.OrdinalIgnoreCase) && code != "6.0") ||
+                    (code.StartsWith("7.", StringComparison.OrdinalIgnoreCase) && code != "7.0"))
+                {
+                    var lastDot = code.LastIndexOf('.');
+                    if (lastDot >= 0 && lastDot < code.Length - 1)
+                    {
+                        row.Code = code.Substring(lastDot + 1);
+                    }
+                }
+            }
+            return rows;
+        }
+
+        private static ReportDataImportModel CreateBusinessProductHeader(string targets, string code)
+        {
+            return new ReportDataImportModel { Targets = targets, Code = code };
         }
 
         private static ReportDataImportModel CreateBusinessProductLine(string targets, string unit, string code)
@@ -2894,7 +3179,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     case "Sản phẩm công nghiệp chủ yếu":
                         section = "MainProduct";
                         product.Level = "2";
-                        continue;
+                        break;
                     case "Lao động - Thu nhập":
                         section = "Labor";
                         product.Level = "3";
@@ -2915,14 +3200,16 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                         break;
                     case "Nhóm/mặt hàng xuất khẩu chủ yếu":
                         section = "Export";
-                        continue;
+                        product.Level = "6.0";
+                        break;
                     case "Kim ngạch nhập khẩu":
                         section = "Import";
                         product.Level = "7";
                         break;
                     case "Nhóm/mặt hàng nhập khẩu chủ yếu":
                         section = "Import";
-                        continue;
+                        product.Level = "7.0";
+                        break;
                 }
 
                 if (string.IsNullOrWhiteSpace(product.Code))
@@ -2942,11 +3229,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         private static List<ReportDataImportModel> MergeBusinessProductData(
             List<ReportDataImportModel> catalog, List<ReportDataImportModel> savedData)
         {
-            savedData = savedData ?? new List<ReportDataImportModel>();
+            savedData = RestoreBusinessProductHierarchyCodes(savedData) ?? new List<ReportDataImportModel>();
             foreach (var item in catalog.Where(x => !string.IsNullOrWhiteSpace(x.Code)))
             {
                 // Kim ngạch XK và NK không nạp trực tiếp, chỉ tính từ tổng các mặt hàng bên trong
-                if (item.Code == "06" || item.Code == "07" || item.Targets == "Kim ngạch xuất khẩu" || item.Targets == "Kim ngạch nhập khẩu")
+                if (item.Code == "6" || item.Code == "06" || item.Code == "7" || item.Code == "07" || item.Targets == "Kim ngạch xuất khẩu" || item.Targets == "Kim ngạch nhập khẩu")
                     continue;
 
                 // Mã sản phẩm có thể trùng giữa ba nhóm danh mục, nên ưu tiên tên và đơn vị.
@@ -2955,7 +3242,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                                 string.Equals(x.Unit, item.Unit, StringComparison.OrdinalIgnoreCase))
                             ?? savedData.FirstOrDefault(x =>
                                 !string.IsNullOrWhiteSpace(x.Code) &&
-                                string.Equals(x.Code.Trim(), item.Code.Trim(), StringComparison.OrdinalIgnoreCase));
+                                (string.Equals(x.Code.Trim(), item.Code.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                                 (item.Code == "1" && x.Code == "01") || (item.Code == "01" && x.Code == "1") ||
+                                 (item.Code == "1.1" && x.Code == "0101") || (item.Code == "0101" && x.Code == "1.1") ||
+                                 (item.Code == "6" && x.Code == "06") || (item.Code == "06" && x.Code == "6") ||
+                                 (item.Code == "7" && x.Code == "07") || (item.Code == "07" && x.Code == "7")));
 
                 if (saved == null)
                     continue;
@@ -2977,7 +3268,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         private static void RecalculateTradeSummaryInModel(List<ReportDataImportModel> products)
         {
             if (products == null) return;
-            var exportSummary = products.FirstOrDefault(p => string.Equals(p.Code, "06", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Targets, "Kim ngạch xuất khẩu", StringComparison.OrdinalIgnoreCase));
+            var exportSummary = products.FirstOrDefault(p => string.Equals(p.Code, "6", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Code, "06", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Targets, "Kim ngạch xuất khẩu", StringComparison.OrdinalIgnoreCase));
             if (exportSummary != null)
             {
                 var xkItems = products.Where(p => !string.IsNullOrWhiteSpace(p.Code) && p.Code.StartsWith("XK", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -2986,7 +3277,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 exportSummary.PerformInPeriod = xkItems.Any() ? xkItems.Sum(x => x.PerformInPeriod ?? 0) : (double?)0;
             }
 
-            var importSummary = products.FirstOrDefault(p => string.Equals(p.Code, "07", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Targets, "Kim ngạch nhập khẩu", StringComparison.OrdinalIgnoreCase));
+            var importSummary = products.FirstOrDefault(p => string.Equals(p.Code, "7", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Code, "07", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Targets, "Kim ngạch nhập khẩu", StringComparison.OrdinalIgnoreCase));
             if (importSummary != null)
             {
                 var nkItems = products.Where(p => !string.IsNullOrWhiteSpace(p.Code) && p.Code.StartsWith("NK", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -3172,7 +3463,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             return dataImportChecked;
         }
 
-        private DataTable ReadFormData(NameValueCollection formData)
+        private DataTable ReadFormData(NameValueCollection formData, int enterpriseId = 0)
         {
             #region Init Datatable
 
@@ -3209,7 +3500,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             {
                 var code = formData[$"Code_{idx}"];
                 var target = formData[$"Target_{idx}"];
-                if ((isBusinessProductReport || isTradingReport || isImportExportReport) && string.IsNullOrWhiteSpace(code)) continue;
+                // Mẫu sản xuất, kinh doanh phải lưu cả các dòng chỉ mục/tiêu đề nhóm (Code rỗng)
+                // để khi xem lại hoặc chỉnh sửa giữ nguyên cấu trúc báo cáo.
+                if ((isTradingReport || isImportExportReport) && string.IsNullOrWhiteSpace(code)) continue;
                 if (isImportExportReport && string.IsNullOrWhiteSpace(target)) continue;
 
                 dartaFormReport.Rows.Add(
@@ -3235,9 +3528,26 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     .ToList();
                 for (var rowIndex = 0; rowIndex < orderedRows.Count; rowIndex++)
                     orderedRows[rowIndex]["Index"] = rowIndex;
+
+                ApplyBusinessProductHierarchyCodes(orderedRows);
+
+                var sortedTable = dartaFormReport.Clone();
+                foreach (var r in orderedRows)
+                {
+                    sortedTable.ImportRow(r);
+                }
+                return sortedTable;
             }
             else if (isTradingReport)
             {
+                var rowsToRemove = dartaFormReport.AsEnumerable()
+                    .Where(r => {
+                        var c = Convert.ToString(r["Code"]);
+                        return c == "38" || c == "39";
+                    }).ToList();
+                foreach (var r in rowsToRemove) dartaFormReport.Rows.Remove(r);
+
+                EnsureTradingDynamicCodes(dartaFormReport, enterpriseId);
                 RecalculateTradingSummaryInDataTable(dartaFormReport);
                 var rows = dartaFormReport.AsEnumerable().ToList();
                 var child = 0;
@@ -3248,19 +3558,19 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     else if (code == "02") row["Level"] = "1.1";
                     else if (code == "03") row["Level"] = "1.2";
                     else if (new[] { "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code)) row["Level"] = "1." + ((Convert.ToInt32(code) - 1) / 3 + 2);
-                    else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" }.Contains(code)) row["Level"] = code == "38" ? "1.13.1" : "1." + ((Convert.ToInt32(code) - 2) / 3 + 2) + ".1";
-                    else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" }.Contains(code)) row["Level"] = code == "39" ? "1.13.2" : "1." + ((Convert.ToInt32(code) - 3) / 3 + 2) + ".2";
+                    else if (new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32" }.Contains(code)) row["Level"] = "1." + ((Convert.ToInt32(code) - 2) / 3 + 2) + ".1";
+                    else if (new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33" }.Contains(code)) row["Level"] = "1." + ((Convert.ToInt32(code) - 3) / 3 + 2) + ".2";
                     else if (code == "40") row["Level"] = "2";
-                    else if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase))
+                    else if (code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || code.Contains(".TM_"))
                     {
                         if (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase))
-                            row["Level"] = "1.13." + (child + 2) + ".1";
+                            row["Level"] = "1.13." + child + ".1";
                         else if (code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
-                            row["Level"] = "1.13." + (child + 2) + ".2";
+                            row["Level"] = "1.13." + child + ".2";
                         else
                         {
                             child++;
-                            row["Level"] = "1.13." + (child + 2);
+                            row["Level"] = "1.13." + child;
                         }
                     }
                 }
@@ -3270,6 +3580,14 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     .ToList();
                 for (var rowIndex = 0; rowIndex < orderedRows.Count; rowIndex++)
                     orderedRows[rowIndex]["Index"] = rowIndex;
+                ApplyTradingHierarchyCodes(orderedRows);
+
+                var sortedTable = dartaFormReport.Clone();
+                foreach (var r in orderedRows)
+                {
+                    sortedTable.ImportRow(r);
+                }
+                return sortedTable;
             }
             else if (isImportExportReport)
             {
@@ -3299,7 +3617,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     {
                         row["Level"] = "1.1";
                     }
-                    else if (!string.IsNullOrWhiteSpace(code) && code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase))
+                    else if (!string.IsNullOrWhiteSpace(code) && (code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) || (Convert.ToString(row["Level"]) ?? "").StartsWith("1.1.")))
                     {
                         row["Level"] = "1.1." + (++countryNumber);
                     }
@@ -3307,7 +3625,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     {
                         row["Level"] = "1.2";
                     }
-                    else if (!string.IsNullOrWhiteSpace(code) && code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase))
+                    else if (!string.IsNullOrWhiteSpace(code) && !inTrustSection && (code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase) || (Convert.ToString(row["Level"]) ?? "").StartsWith("1.2.")))
                     {
                         row["Level"] = "1.2." + (++productNumber);
                     }
@@ -3333,6 +3651,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 {
                     sortedTable.ImportRow(r);
                 }
+                ApplyImportExportHierarchyCodes(sortedTable.AsEnumerable());
                 return sortedTable;
             }
 
@@ -3394,12 +3713,24 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             return null;
         }
 
+        private bool CanUnlockReport()
+        {
+            return AppProcessor.Author.IsAllow(User.UserName, "Report", "Import",
+                EnumHelper.GetDescription(EnumActionType.Unlock));
+        }
+
         private bool IsReportLocked(DateTime? forMonth)
         {
             if (!forMonth.HasValue) return false;
 
+            // Admin mở khóa bằng cấu hình Enable_Report_Lock = 0.
+            // Không có cấu hình thì vẫn giữ hành vi an toàn: báo cáo bị khóa theo hạn.
+            var lockEnabled = _configCache.GetViaKey("Enable_Report_Lock");
+            if (lockEnabled != null && string.Equals(lockEnabled.ConfigValue, "0", StringComparison.OrdinalIgnoreCase))
+                return false;
+
             int lockDay;
-            if (!int.TryParse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue,
+            if (!int.TryParse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue,
                     out lockDay) || lockDay <= 0)
                 return false;
 
@@ -3418,7 +3749,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             if (table == null) return;
             var rows = table.AsEnumerable().ToList();
-            var exportRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "06", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Kim ngạch xuất khẩu", StringComparison.OrdinalIgnoreCase));
+            var exportRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "6", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Code"]), "06", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Kim ngạch xuất khẩu", StringComparison.OrdinalIgnoreCase));
             if (exportRow != null)
             {
                 var xkRows = rows.Where(r => (Convert.ToString(r["Code"]) ?? "").StartsWith("XK", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -3427,7 +3758,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 exportRow["PerformInPeriod"] = xkRows.Any() ? xkRows.Sum(r => r["PerformInPeriod"] != DBNull.Value ? Convert.ToDouble(r["PerformInPeriod"]) : 0.0) : 0.0;
             }
 
-            var importRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "07", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Kim ngạch nhập khẩu", StringComparison.OrdinalIgnoreCase));
+            var importRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "7", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Code"]), "07", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Kim ngạch nhập khẩu", StringComparison.OrdinalIgnoreCase));
             if (importRow != null)
             {
                 var nkRows = rows.Where(r => (Convert.ToString(r["Code"]) ?? "").StartsWith("NK", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -3447,7 +3778,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             // Dynamic products: parent = BL + TT
             var dynamicParents = rows.Where(r => {
                 var c = Convert.ToString(r["Code"]) ?? "";
-                return c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
+                return (c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || c.Contains(".TM_")) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
             }).ToList();
 
             foreach (var parent in dynamicParents)
@@ -3461,27 +3792,14 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 }
             }
 
-            // Row 38 = sum of dynamic BL sub-rows
-            var row38 = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "38");
             var blRows = rows.Where(x => (Convert.ToString(x["Code"]) ?? "").EndsWith("_BL", StringComparison.OrdinalIgnoreCase)).ToList();
-            if (row38 != null)
-            {
-                foreach (var f in fields) row38[f] = blRows.Sum(x => value(x, f));
-            }
-
-            // Row 39 = sum of dynamic TT sub-rows
-            var row39 = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "39");
             var ttRows = rows.Where(x => (Convert.ToString(x["Code"]) ?? "").EndsWith("_TT", StringComparison.OrdinalIgnoreCase)).ToList();
-            if (row39 != null)
-            {
-                foreach (var f in fields) row39[f] = ttRows.Sum(x => value(x, f));
-            }
 
-            // Row 34 = 38 + 39
+            // Row 34 = sum of dynamic BL + TT
             var row34 = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "34");
             if (row34 != null)
             {
-                foreach (var f in fields) row34[f] = value(row38, f) + value(row39, f);
+                foreach (var f in fields) row34[f] = blRows.Sum(x => value(x, f)) + ttRows.Sum(x => value(x, f));
             }
 
             // Groups 1 to 10
@@ -3501,14 +3819,14 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                        rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == codes[2]));
             }
 
-            var retailCodes = new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32", "38" };
-            var onlineCodes = new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33", "39" };
+            var retailCodes = new[] { "05", "08", "11", "14", "17", "20", "23", "26", "29", "32" };
+            var onlineCodes = new[] { "06", "09", "12", "15", "18", "21", "24", "27", "30", "33" };
             var retailTotal = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "02");
             var onlineTotal = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "03");
             foreach (var f in fields)
             {
-                if (retailTotal != null) retailTotal[f] = rows.Where(x => retailCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, f));
-                if (onlineTotal != null) onlineTotal[f] = rows.Where(x => onlineCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, f));
+                if (retailTotal != null) retailTotal[f] = rows.Where(x => retailCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, f)) + blRows.Sum(x => value(x, f));
+                if (onlineTotal != null) onlineTotal[f] = rows.Where(x => onlineCodes.Contains(Convert.ToString(x["Code"]))).Sum(x => value(x, f)) + ttRows.Sum(x => value(x, f));
             }
 
             var total = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "01");
@@ -3531,10 +3849,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             var directExportRows = rows.Where(x => {
                 var code = Convert.ToString(x["Code"]);
+                var level = Convert.ToString(x["Level"]);
                 return !string.IsNullOrWhiteSpace(code) &&
-                       (code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) || code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase)) &&
+                       (code.StartsWith("XK_QG_", StringComparison.OrdinalIgnoreCase) || code.StartsWith("XK_MH_", StringComparison.OrdinalIgnoreCase) || (level ?? "").StartsWith("1.1.") || (level ?? "").StartsWith("1.2.")) &&
                        !string.Equals(code, "XK_QG_HEADER", StringComparison.OrdinalIgnoreCase) &&
-                       !string.Equals(code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase);
+                       !string.Equals(code, "XK_MH_HEADER", StringComparison.OrdinalIgnoreCase) &&
+                       !string.Equals(level, "1.1", StringComparison.OrdinalIgnoreCase) &&
+                       !string.Equals(level, "1.2", StringComparison.OrdinalIgnoreCase);
             }).ToList();
 
             var utHeaderIdx = rows.FindIndex(x => string.Equals(Convert.ToString(x["Code"]), "UT_MH_HEADER", StringComparison.OrdinalIgnoreCase));
@@ -3605,8 +3926,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             if (table == null) return true;
 
             var rows = table.AsEnumerable().ToList();
-            var totalRevRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "01", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Tổng doanh thu", StringComparison.OrdinalIgnoreCase));
-            var industryRevRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "0101", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Trong đó doanh thu công nghiệp", StringComparison.OrdinalIgnoreCase));
+            var totalRevRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "1", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Code"]), "01", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Tổng doanh thu", StringComparison.OrdinalIgnoreCase));
+            var industryRevRow = rows.FirstOrDefault(r => string.Equals(Convert.ToString(r["Code"]), "1.1", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Code"]), "0101", StringComparison.OrdinalIgnoreCase) || string.Equals(Convert.ToString(r["Targets"]), "Trong đó doanh thu công nghiệp", StringComparison.OrdinalIgnoreCase));
 
             if (totalRevRow == null || industryRevRow == null) return true;
 
@@ -3640,34 +3961,13 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
             var rows = table.AsEnumerable().ToList();
             var dynamicParents = rows.Where(x => {
                 var c = Convert.ToString(x["Code"]) ?? string.Empty;
-                return c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
+                return (c.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || c.Contains(".TM_")) && !c.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !c.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
             }).ToList();
             if (!dynamicParents.Any()) return true;
 
             if (dynamicParents.Any(x => string.IsNullOrWhiteSpace(Convert.ToString(x["Targets"]))))
             {
                 errorMessage = "Vui lòng nhập tên cho tất cả các mặt hàng đã thêm ở mục '11. Hàng hóa khác'.";
-                return false;
-            }
-
-            Func<DataRow, string, double> value = (row, field) => (row == null || row[field] == DBNull.Value) ? 0 : Convert.ToDouble(row[field]);
-            var otherGoodsRow = rows.FirstOrDefault(x => Convert.ToString(x["Code"]) == "34");
-            if (otherGoodsRow == null) return true;
-
-            double total34Prev = value(otherGoodsRow, "PerformPreviousPeriod");
-            double total34Curr = value(otherGoodsRow, "PerformInPeriod");
-            double sumDynPrev = dynamicParents.Sum(x => value(x, "PerformPreviousPeriod"));
-            double sumDynCurr = dynamicParents.Sum(x => value(x, "PerformInPeriod"));
-
-            if (Math.Abs(sumDynPrev - total34Prev) > 0.01)
-            {
-                errorMessage = string.Format("Ràng buộc: Tổng Thực hiện tháng trước của các mặt hàng thêm ({0:#,##0.##}) phải bằng tổng Bán lẻ + Nền tảng trực tuyến của Hàng hóa khác ({1:#,##0.##}).", sumDynPrev, total34Prev);
-                return false;
-            }
-
-            if (Math.Abs(sumDynCurr - total34Curr) > 0.01)
-            {
-                errorMessage = string.Format("Ràng buộc: Tổng Ước thực hiện tháng báo cáo của các mặt hàng thêm ({0:#,##0.##}) phải bằng tổng Bán lẻ + Nền tảng trực tuyến của Hàng hóa khác ({1:#,##0.##}).", sumDynCurr, total34Curr);
                 return false;
             }
 
@@ -3680,20 +3980,30 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             if (table == null || enterpriseId <= 0) return;
             var dynamicRows = table.AsEnumerable()
-                .Where(x => (Convert.ToString(x["Code"]) ?? string.Empty).StartsWith("TM_NEW_", StringComparison.OrdinalIgnoreCase))
+                .Where(x =>
+                {
+                    var c = Convert.ToString(x["Code"]) ?? string.Empty;
+                    return c.StartsWith("TM_NEW_", StringComparison.OrdinalIgnoreCase) || c.Contains(".TM_NEW_");
+                })
                 .ToList();
             if (!dynamicRows.Any()) return;
 
             var knownCodes = (_importCache.GetViaEnterpriseOnMonth(enterpriseId, null) ?? new List<ReportDataImportModel>())
-                .Where(x => !string.IsNullOrWhiteSpace(x.Targets) && !string.IsNullOrWhiteSpace(x.Code) && x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) && !x.Code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !x.Code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
+                .Where(x => !string.IsNullOrWhiteSpace(x.Targets) && !string.IsNullOrWhiteSpace(x.Code) && (x.Code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || x.Code.Contains(".TM_")) && !x.Code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) && !x.Code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase))
                 .GroupBy(x => x.Targets.Trim(), StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x.Key, x => x.First().Code, StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(x => x.Key, x =>
+                {
+                    var c = x.First().Code;
+                    var tmIdx = c.IndexOf("TM_", StringComparison.OrdinalIgnoreCase);
+                    return tmIdx >= 0 ? c.Substring(tmIdx) : c;
+                }, StringComparer.OrdinalIgnoreCase);
 
             var groups = dynamicRows
                 .Select(r => Convert.ToString(r["Code"]))
                 .Select(c =>
                 {
-                    var raw = c.Substring("TM_NEW_".Length);
+                    var tmIdx = c.IndexOf("TM_NEW_", StringComparison.OrdinalIgnoreCase);
+                    var raw = tmIdx >= 0 ? c.Substring(tmIdx + "TM_NEW_".Length) : c;
                     var idx = raw.IndexOf('_');
                     return idx > 0 ? raw.Substring(0, idx) : raw;
                 })
@@ -3702,7 +4012,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             foreach (var grp in groups)
             {
-                var parentRow = dynamicRows.FirstOrDefault(r => Convert.ToString(r["Code"]).Equals("TM_NEW_" + grp, StringComparison.OrdinalIgnoreCase));
+                var parentRow = dynamicRows.FirstOrDefault(r =>
+                {
+                    var c = Convert.ToString(r["Code"]);
+                    return c.EndsWith("TM_NEW_" + grp, StringComparison.OrdinalIgnoreCase);
+                });
                 var target = parentRow != null ? (Convert.ToString(parentRow["Targets"]) ?? string.Empty).Trim() : string.Empty;
                 if (string.IsNullOrWhiteSpace(target)) continue;
 
@@ -3713,11 +4027,34 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     knownCodes[target] = baseCode;
                 }
 
-                if (parentRow != null) parentRow["Code"] = baseCode;
-                var blRow = dynamicRows.FirstOrDefault(r => Convert.ToString(r["Code"]).Equals("TM_NEW_" + grp + "_BL", StringComparison.OrdinalIgnoreCase));
-                if (blRow != null) blRow["Code"] = baseCode + "_BL";
-                var ttRow = dynamicRows.FirstOrDefault(r => Convert.ToString(r["Code"]).Equals("TM_NEW_" + grp + "_TT", StringComparison.OrdinalIgnoreCase));
-                if (ttRow != null) ttRow["Code"] = baseCode + "_TT";
+                if (parentRow != null)
+                {
+                    var curCode = Convert.ToString(parentRow["Code"]);
+                    var tmIdx = curCode.IndexOf("TM_NEW_", StringComparison.OrdinalIgnoreCase);
+                    parentRow["Code"] = (tmIdx > 0 ? curCode.Substring(0, tmIdx) : "") + baseCode;
+                }
+                var blRow = dynamicRows.FirstOrDefault(r =>
+                {
+                    var c = Convert.ToString(r["Code"]);
+                    return c.EndsWith("TM_NEW_" + grp + "_BL", StringComparison.OrdinalIgnoreCase);
+                });
+                if (blRow != null)
+                {
+                    var curCode = Convert.ToString(blRow["Code"]);
+                    var tmIdx = curCode.IndexOf("TM_NEW_", StringComparison.OrdinalIgnoreCase);
+                    blRow["Code"] = (tmIdx > 0 ? curCode.Substring(0, tmIdx) : "") + baseCode + "_BL";
+                }
+                var ttRow = dynamicRows.FirstOrDefault(r =>
+                {
+                    var c = Convert.ToString(r["Code"]);
+                    return c.EndsWith("TM_NEW_" + grp + "_TT", StringComparison.OrdinalIgnoreCase);
+                });
+                if (ttRow != null)
+                {
+                    var curCode = Convert.ToString(ttRow["Code"]);
+                    var tmIdx = curCode.IndexOf("TM_NEW_", StringComparison.OrdinalIgnoreCase);
+                    ttRow["Code"] = (tmIdx > 0 ? curCode.Substring(0, tmIdx) : "") + baseCode + "_TT";
+                }
             }
         }
 

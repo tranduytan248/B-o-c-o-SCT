@@ -37,18 +37,21 @@
         {
             var currentIndex = rowNumber++;
             var code = item.Code ?? "";
-            var isDynamic = code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase);
+            if (code == "38" || code == "39")
+            {
+                continue;
+            }
+            var isDynamic = code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || code.Contains(".TM_");
             var isDynamicSub = isDynamic && (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) || code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase));
             var isDynamicParent = isDynamic && !isDynamicSub;
             var isBL = isDynamic && code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase);
             var isTT = isDynamic && code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase);
             var baseGroup = isDynamic ? (code.EndsWith("_BL") || code.EndsWith("_TT") ? code.Substring(0, code.Length - 3) : code) : "";
-            var isHiddenRow = code == "38" || code == "39";
             var isCalculated = isDynamicParent || new[] { "01", "02", "03", "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code);
             var isSummary = isCalculated || code == "40";
-            var isDetail = isDynamicSub || new[] { "02", "03", "05", "06", "08", "09", "11", "12", "14", "15", "17", "18", "20", "21", "23", "24", "26", "27", "29", "30", "32", "33", "38", "39" }.Contains(code);
-            <tr class="trading-row @(isSummary ? "trading-summary" : "") @(isDetail ? "trading-detail" : "") @(isDynamic ? "trading-dynamic" : "") @(isDynamicParent ? "trading-dynamic-parent" : "") @(isDynamicSub ? "trading-dynamic-sub" : "") @(isBL ? "trading-sub-row-bl" : "") @(isTT ? "trading-sub-row-tt" : "") @(isHiddenRow ? "hidden" : "")" style="@(isHiddenRow ? "display:none;" : "")" data-code="@code" data-group="@baseGroup" data-base="@(item.ComparedSamePeriodLastYear ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)">
-                <td class="text-left" style="@(isDynamicSub ? "padding-left: 28px; font-style: italic;" : "")">
+            var isDetail = isDynamicSub || new[] { "02", "03", "05", "06", "08", "09", "11", "12", "14", "15", "17", "18", "20", "21", "23", "24", "26", "27", "29", "30", "32", "33" }.Contains(code);
+            <tr class="trading-row @(isSummary ? "trading-summary" : "") @(isDetail ? "trading-detail" : "") @(isDynamic ? "trading-dynamic" : "") @(isDynamicParent ? "trading-dynamic-parent" : "") @(isDynamicSub ? "trading-dynamic-sub" : "") @(isBL ? "trading-sub-row-bl" : "") @(isTT ? "trading-sub-row-tt" : "")" data-code="@code" data-group="@baseGroup" data-base="@(item.ComparedSamePeriodLastYear ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                <td class="text-left" style="@(isDynamicSub ? "padding-left: 28px; font-style: italic;" : (isDynamicParent ? "padding-left: 14px;" : ""))">
                     @Html.Hidden("Target_" + currentIndex, item.Targets)
                     @Html.Hidden("Unit_" + currentIndex, "Triệu đồng")
                     @Html.Hidden("Index_" + currentIndex, item.Index)
@@ -106,8 +109,9 @@
 
     (function () {
         var calculated = ["01","02","03","04","07","10","13","16","19","22","25","28","31","34"];
-        var retailCodes = ["05","08","11","14","17","20","23","26","29","32","38"], onlineCodes = ["06","09","12","15","18","21","24","27","30","33","39"];
-        var groups = [["04","05","06"],[ "07","08","09"],[ "10","11","12"],[ "13","14","15"],[ "16","17","18"],[ "19","20","21"],[ "22","23","24"],[ "25","26","27"],[ "28","29","30"],[ "31","32","33"],[ "34","38","39"]];
+        var retailCodes = ["05","08","11","14","17","20","23","26","29","32"];
+        var onlineCodes = ["06","09","12","15","18","21","24","27","30","33"];
+        var groups = [["04","05","06"],[ "07","08","09"],[ "10","11","12"],[ "13","14","15"],[ "16","17","18"],[ "19","20","21"],[ "22","23","24"],[ "25","26","27"],[ "28","29","30"],[ "31","32","33"]];
         var mainGroupCodes = ["04","07","10","13","16","19","22","25","28","31","34"];
         function parseNumber(v) { return parseNumberTrading(v); }
         function formatNumber(v) { return formatNumberTrading(v); }
@@ -129,7 +133,9 @@
                 });
             });
 
-            // 2. Row 38 = sum of dynamic BL, Row 39 = sum of dynamic TT, Row 34 = 38 + 39
+            // 2. Sum of dynamic BL and TT -> Row 34 ("11. Hàng hóa khác")
+            var totalDynBL = { ".trading-previous": 0, ".trading-current": 0 };
+            var totalDynTT = { ".trading-previous": 0, ".trading-current": 0 };
             $.each([".trading-previous", ".trading-current"], function (_, cls) {
                 var totalBL = 0;
                 $("#TradingDataReport tr.trading-sub-row-bl").each(function() {
@@ -140,13 +146,13 @@
                     totalTT += parseNumber($(this).find(cls).val());
                 });
 
-                set("38", cls, totalBL);
-                set("39", cls, totalTT);
                 set("34", cls, totalBL + totalTT);
+                totalDynBL[cls] = totalBL;
+                totalDynTT[cls] = totalTT;
             });
 
             // 3. Groups 1 to 10
-            $.each(groups.slice(0, 10), function (_, g) {
+            $.each(groups, function (_, g) {
                 $.each([".trading-previous", ".trading-current"], function (_, cls) {
                     set(g[0], cls, val(g[1], cls) + val(g[2], cls));
                 });
@@ -154,8 +160,8 @@
 
             // 4. Totals (02, 03, 01)
             $.each([".trading-previous", ".trading-current"], function (_, cls) {
-                set("02", cls, sum(retailCodes, cls));
-                set("03", cls, sum(onlineCodes, cls));
+                set("02", cls, sum(retailCodes, cls) + totalDynBL[cls]);
+                set("03", cls, sum(onlineCodes, cls) + totalDynTT[cls]);
                 set("01", cls, sum(mainGroupCodes, cls));
             });
         }

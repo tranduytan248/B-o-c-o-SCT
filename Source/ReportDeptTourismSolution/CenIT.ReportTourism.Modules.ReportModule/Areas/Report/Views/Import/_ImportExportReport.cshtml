@@ -626,11 +626,12 @@
 
         function syncProductCountryTarget() {
             var pName = $.trim($prodInput.find("option:selected").text() || "");
+            var pCode = $prodInput.val() || "";
             var cName = $select.find("option:selected").text() || "";
             var cCode = $select.val() || "ITEM";
             var combined = (pName ? pName : "") + (pName && cName ? " / " : "") + cName;
             $target.val(combined ? "- " + combined : "");
-            $codeInput.val(combined ? "XK_MH_" + cCode + "_" + index : "");
+            $codeInput.val(combined ? (pCode ? pCode : ("XK_MH_" + cCode + "_" + index)) : "");
         }
 
         $prodInput.on("change select2:select", syncProductCountryTarget);
@@ -647,18 +648,26 @@
         .on("change.syncPcTarget", "#ImportExportDataReport .ie-country-product-row .ie-product-select", function () {
             var $r = $(this).closest("tr");
             var pName = $.trim($(this).find("option:selected").text() || "");
+            var pCode = $(this).val() || "";
             var cName = $r.find(".ie-country-select option:selected").text() || "";
             var combined = (pName ? pName : "") + (pName && cName ? " / " : "") + cName;
             $r.find("input[name^='Target_']").val(combined ? "- " + combined : "");
+            if (pCode) {
+                $r.find("input[name^='Code_']").val(pCode);
+            }
         });
 
     $(document).off("change.syncPcTarget", "#ImportExportDataReport .ie-country-product-row .ie-country-select")
         .on("change.syncPcTarget", "#ImportExportDataReport .ie-country-product-row .ie-country-select", function () {
             var $r = $(this).closest("tr");
             var pName = $.trim($r.find(".ie-product-select option:selected").text() || "");
+            var pCode = $r.find(".ie-product-select").val() || "";
             var cName = $(this).find("option:selected").text() || "";
             var combined = (pName ? pName : "") + (pName && cName ? " / " : "") + cName;
             $r.find("input[name^='Target_']").val(combined ? "- " + combined : "");
+            if (pCode) {
+                $r.find("input[name^='Code_']").val(pCode);
+            }
         });
 
     $(document).off("change.syncQgTarget", "#ImportExportDataReport .ie-country-row .ie-country-select")

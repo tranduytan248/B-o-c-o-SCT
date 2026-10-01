@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -19,17 +19,17 @@ namespace CenIT.ReportTourism.Biz.Report
         private static readonly Dictionary<int, DashboardMetric[]> MetricSets = new Dictionary<int, DashboardMetric[]>
         {
             { 1, new[] {
-                new DashboardMetric { Key = "primary", Code = "0101", Label = "Doanh thu công nghiệp", Unit = "Tỷ đồng" },
-                new DashboardMetric { Key = "secondary", Code = "06", Label = "Kim ngạch xuất khẩu", Unit = "1.000 USD" },
-                new DashboardMetric { Key = "tertiary", Code = "07", Label = "Kim ngạch nhập khẩu", Unit = "1.000 USD" } } },
+                new DashboardMetric { Key = "primary", Code = "1.1", Label = "Doanh thu công nghiệp", Unit = "Tỷ đồng" },
+                new DashboardMetric { Key = "secondary", Code = "6", Label = "Kim ngạch xuất khẩu", Unit = "1.000 USD" },
+                new DashboardMetric { Key = "tertiary", Code = "7", Label = "Kim ngạch nhập khẩu", Unit = "1.000 USD" } } },
             { 2, new[] {
-                new DashboardMetric { Key = "primary", Code = "01", Label = "Doanh thu bán buôn, bán lẻ", Unit = "Triệu đồng" },
-                new DashboardMetric { Key = "secondary", Code = "40", Label = "Doanh thu sửa chữa xe", Unit = "Triệu đồng" },
-                new DashboardMetric { Key = "tertiary", Code = "02", Label = "Trong đó: bán lẻ", Unit = "Triệu đồng" } } },
+                new DashboardMetric { Key = "primary", Code = "1", Label = "Doanh thu bán buôn, bán lẻ", Unit = "Triệu đồng" },
+                new DashboardMetric { Key = "secondary", Code = "2", Label = "Doanh thu sửa chữa xe", Unit = "Triệu đồng" },
+                new DashboardMetric { Key = "tertiary", Code = "1.1", Label = "Trong đó: bán lẻ", Unit = "Triệu đồng" } } },
             { 3, new[] {
-                new DashboardMetric { Key = "primary", Code = "FOB", Label = "Tổng trị giá xuất khẩu FOB", Unit = "USD" },
-                new DashboardMetric { Key = "secondary", Code = "XK_TT", Label = "Xuất khẩu trực tiếp", Unit = "USD" },
-                new DashboardMetric { Key = "tertiary", Code = "UT_XK", Label = "Xuất khẩu ủy thác", Unit = "USD" } } }
+                new DashboardMetric { Key = "primary", Code = "0", Label = "Tổng trị giá xuất khẩu FOB", Unit = "USD" },
+                new DashboardMetric { Key = "secondary", Code = "1", Label = "Xuất khẩu trực tiếp", Unit = "USD" },
+                new DashboardMetric { Key = "tertiary", Code = "2", Label = "Xuất khẩu ủy thác", Unit = "USD" } } }
         };
 
         public static string TypeName(int type)

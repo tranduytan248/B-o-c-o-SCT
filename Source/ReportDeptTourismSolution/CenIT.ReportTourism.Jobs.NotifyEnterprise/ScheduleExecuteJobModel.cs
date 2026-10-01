@@ -36,10 +36,20 @@ namespace CenIT.ReportTourism.Jobs.NotifyEnterprise
                 var hostProtocol = ConfigurationManager.AppSettings["Host_Protocol"] ?? "http://";
                 var urlHost = $"{hostProtocol}{HostingEnvironment.SiteName}/";
 
-                var dayDeadlineSendReport =
-                    int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Report")?.ConfigValue ?? "0");
-                var dayDeadlineSendReportLate =
-                    int.Parse(_configCache.GetViaKey("Day_Deadline_Send_Late_Report")?.ConfigValue ?? "0");
+                var dayDeadlineSendReport = GetConfigDay("Day_Deadline_Send_Report", 0);
+                var dayDeadlineSendReportLate = GetConfigDay("Day_Deadline_Send_Late_Report", 0);
+                var firstReminderDay = GetConfigDay("Day_Remind_Report_First", 7);
+                var secondReminderDay = GetConfigDay("Day_Remind_Report_Second", 9);
+
+                if (DateTime.Today.Day != firstReminderDay && DateTime.Today.Day != secondReminderDay)
+                {
+                    AppProcessor.Logger.Message($"Không gửi nhắc báo cáo ngày {DateTime.Today:dd/MM/yyyy}. Lịch nhắc: ngày {firstReminderDay} và {secondReminderDay} hàng tháng.");
+                    return;
+                }
+
+                // Nếu cấu hình trùng ngày thì chỉ gửi một lần trong lần chạy của job.
+                var reminderSequence = DateTime.Today.Day == firstReminderDay ? 1 : 2;
+                AppProcessor.Logger.Message($"Thực hiện nhắc nộp báo cáo lần {reminderSequence} ngày {DateTime.Today:dd/MM/yyyy}.");
 
                 var lstEmails = new List<MailModel>();
                 _enterpriseCache.GetNotSumitReportYet(DateTime.Now).ForEach(e =>
@@ -75,6 +85,14 @@ namespace CenIT.ReportTourism.Jobs.NotifyEnterprise
             {
                 AppProcessor.Logger.Error(ex);
             }
+        }
+
+        private int GetConfigDay(string configKey, int defaultValue)
+        {
+            int value;
+            return int.TryParse(_configCache.GetViaKey(configKey)?.ConfigValue, out value) && value > 0 && value <= 31
+                ? value
+                : defaultValue;
         }
     }
 }

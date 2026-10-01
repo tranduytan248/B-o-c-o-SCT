@@ -68,21 +68,23 @@
                 <tbody>
                 @if (Model.ListDataImports != null && Model.ListDataImports.Any())
                 {
-                    var hasDynamic = Model.ListDataImports.Any(x => (x.Code ?? "").StartsWith("TM_", StringComparison.OrdinalIgnoreCase));
                     foreach (var item in Model.ListDataImports)
                     {
                         var code = item.Code ?? "";
-                        if (hasDynamic && (code == "38" || code == "39"))
+                        if (code == "38" || code == "39" || code == "1.13.38" || code == "1.13.39" ||
+                            ((item.Level == "1.13.1" || item.Level == "1.13.2") && (string.Equals(item.Targets, "Trong đó: Bán lẻ", StringComparison.OrdinalIgnoreCase) || string.Equals(item.Targets, "Trong đó: Nền tảng trực tuyến", StringComparison.OrdinalIgnoreCase)) && !code.Contains("TM_")))
                         {
                             continue;
                         }
-                        var isDynamic = code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase);
+                        var isDynamic = code.StartsWith("TM_", StringComparison.OrdinalIgnoreCase) || code.Contains(".TM_");
                         var isDynamicSub = isDynamic && (code.EndsWith("_BL", StringComparison.OrdinalIgnoreCase) || code.EndsWith("_TT", StringComparison.OrdinalIgnoreCase));
-                        var isCalculated = new[] { "01", "02", "03", "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code);
+                        var isDynamicParent = isDynamic && !isDynamicSub;
+                        var isCalculated = isDynamicParent || new[] { "01", "02", "03", "04", "07", "10", "13", "16", "19", "22", "25", "28", "31", "34" }.Contains(code);
                         var isSummary = isCalculated || code == "40";
-                        var isDetail = isDynamicSub || new[] { "02", "03", "05", "06", "08", "09", "11", "12", "14", "15", "17", "18", "20", "21", "23", "24", "26", "27", "29", "30", "32", "33", "38", "39" }.Contains(code);
+                        var isDetail = isDynamicSub || new[] { "02", "03", "05", "06", "08", "09", "11", "12", "14", "15", "17", "18", "20", "21", "23", "24", "26", "27", "29", "30", "32", "33" }.Contains(code);
+                        var paddingStyle = isDetail ? "padding-left: 28px; font-style: italic;" : (isDynamicParent ? "padding-left: 14px;" : "");
                         <tr class="@(isSummary ? "view-summary" : "") @(isDetail ? "view-detail" : "")">
-                            <td class="text-left" style="@(isDetail ? "padding-left: 28px; font-style: italic;" : "")">
+                            <td class="text-left" style="@paddingStyle">
                                 @if (isSummary)
                                 {
                                     <strong>@item.Targets</strong>
@@ -201,17 +203,17 @@
                                         || item.Targets == "Nộp ngân sách"
                                         || item.Targets == "Kim ngạch xuất khẩu"
                                         || item.Targets == "Kim ngạch nhập khẩu";
-                        var isCategory = string.IsNullOrEmpty(item.Unit) && string.IsNullOrEmpty(item.Code);
+                        var isCategory = string.IsNullOrEmpty(item.Unit) || item.Code == "2" || item.Code == "6.0" || item.Code == "7.0";
                         var isChild = !string.IsNullOrEmpty(item.Unit) && !isSummary && !isCategory;
 
                         string displayIndex = "";
-                        if (item.Index.HasValue && item.Index.Value > 0)
-                        {
-                            displayIndex = item.Index.Value.ToString();
-                        }
-                        else if (!string.IsNullOrEmpty(item.Level))
+                        if (!string.IsNullOrEmpty(item.Level))
                         {
                             displayIndex = item.Level;
+                        }
+                        else if (item.Index.HasValue && item.Index.Value > 0)
+                        {
+                            displayIndex = item.Index.Value.ToString();
                         }
                         else if (!isCategory)
                         {

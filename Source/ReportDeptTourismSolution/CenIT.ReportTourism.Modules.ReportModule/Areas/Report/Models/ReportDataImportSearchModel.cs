@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web.UI.WebControls;
 using TSFramework.App.Attributes;
@@ -41,6 +41,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Models
 
         public bool ExistEnterpriseSubmitReportYet { get; set; }
         public bool IsEnterpriseUser { get; set; } = false;
+        public bool IsReportLocked { get; set; }
+        public bool CanUnlockReport { get; set; }
 
         public bool EnableSignDigitalDoc { get; set; } = false;
     }
