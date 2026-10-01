@@ -9,6 +9,7 @@ namespace TSFramework.Core.Enums
         [Description("View")] View = 1,
         [Description("Add")] Add = 2,
         [Description("Edit")] Edit = 4,
-        [Description("Delete")] Delete = 8
+        [Description("Delete")] Delete = 8,
+        [Description("Unlock")] Unlock = 16
     }
 }
