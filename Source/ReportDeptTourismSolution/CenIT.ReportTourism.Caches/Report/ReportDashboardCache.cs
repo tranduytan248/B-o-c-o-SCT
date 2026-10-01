@@ -12,7 +12,7 @@ namespace CenIT.ReportTourism.Caches.Report
 
         protected override string[] MasterCacheKeyArray => new[]
         {
-            "ReportDashboardCache", "DataImportCache", "ReportExtendInfosCache", "EnterprisesCache", "CENIT.APP.Cache"
+            "ReportDashboardCache", "DataImportCache", "ReportExtendInfosCache", "EnterprisesCache", "SysMessagesCache", "CENIT.APP.Cache"
         };
 
         public DashboardModel GetDashboard(DashboardFilters filters)

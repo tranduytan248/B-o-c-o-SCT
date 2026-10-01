@@ -13,17 +13,20 @@ namespace CenIT.ReportTourism.Biz.Sys
         private readonly string _sysRoleGetByUserId = "Sys_Role_GetByUserId";
         private readonly string _sysUserActive = "Sys_User_Active";
         private readonly string _sysUserChangePassword = "Sys_User_ChangePassword";
+        private readonly string _sysUserChangeRequiredPassword = "Sys_User_ChangeRequiredPassword";
         private readonly string _sysUserDeActive = "Sys_User_DeActive";
         private readonly string _sysUserDelete = "Sys_User_Delete";
         private readonly string _sysUserGet = "Sys_User_Get";
         private readonly string _sysUserGetByEmail = "Sys_User_GetByEmail";
         private readonly string _sysUserGetById = "Sys_User_GetById";
         private readonly string _sysUserGetByUserName = "Sys_User_GetByUserName";
+        private readonly string _sysUserGetRequireChangePassword = "Sys_User_GetRequireChangePassword";
         private readonly string _sysUserLogin = "Sys_User_Login";
         private readonly string _sysUserLoginViaEmail = "Sys_User_LoginViaEmail";
         private readonly string _sysUserResetPassword = "Sys_User_ResetPassword";
         private readonly string _sysUserSave = "Sys_User_Save";
         private readonly string _sysUserSaveLogin = "Sys_User_SaveLogin";
+        private readonly string _sysUserSetRequireChangePassword = "Sys_User_SetRequireChangePassword";
 
         private List<SysUserModel> LoadList(out int total, SysSearchModel search)
         {
@@ -197,6 +200,54 @@ namespace CenIT.ReportTourism.Biz.Sys
             var iReturnInt = AppProcessor.ProcedureProvider.Execute(_sysUserSaveLogin, DATA_PROVIDER_NAME, userName,
                 isValid, senderIp, senderHeader);
             return iReturnInt.GetValueOrDefault(0);
+        }
+
+        /// <summary>
+        ///     Tài khoản chưa tự đặt mật khẩu (mới tạo / được quản trị cấp lại mật khẩu) thì phải đổi mật khẩu khi đăng nhập
+        /// </summary>
+        public bool IsRequireChangePassword(string userName)
+        {
+            var valReturn = AppProcessor.ProcedureProvider.Execute(_sysUserGetRequireChangePassword,
+                DATA_PROVIDER_NAME, userName);
+            return valReturn.GetValueOrDefault(0) == 1;
+        }
+
+        /// <summary>
+        ///     Mật khẩu có trùng mật khẩu hiện tại của tài khoản không (đọc trực tiếp DB, không qua cache)
+        /// </summary>
+        public bool IsCurrentPassword(string userName, string password)
+        {
+            var user = LoadDetail(userName);
+            if (user == null || string.IsNullOrEmpty(user.Salt) ||
+                !string.Equals(user.UserName, userName, System.StringComparison.OrdinalIgnoreCase)) return false;
+            return UPasswordHash.GenerateCryptoPassword(password, user.Salt) == user.Password;
+        }
+
+        public int SetRequireChangePassword(string userName, bool isRequire, string reason, string changeBy)
+        {
+            var valReturn = AppProcessor.ProcedureProvider.Execute(_sysUserSetRequireChangePassword,
+                DATA_PROVIDER_NAME,
+                userName,
+                isRequire,
+                reason,
+                changeBy);
+            return valReturn.GetValueOrDefault(0);
+        }
+
+        /// <summary>
+        ///     Đổi mật khẩu ở trang bắt buộc đổi mật khẩu, đồng thời bỏ đánh dấu phải đổi mật khẩu
+        /// </summary>
+        public int ChangeRequiredPassword(string userName, string newPass, string salt, string reason,
+            string changeBy)
+        {
+            var valReturn = AppProcessor.ProcedureProvider.Execute(_sysUserChangeRequiredPassword,
+                DATA_PROVIDER_NAME,
+                userName,
+                newPass,
+                salt,
+                reason,
+                changeBy);
+            return valReturn.GetValueOrDefault(0);
         }
     }
 }

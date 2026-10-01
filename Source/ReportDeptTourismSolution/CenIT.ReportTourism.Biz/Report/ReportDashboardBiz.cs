@@ -16,25 +16,31 @@ namespace CenIT.ReportTourism.Biz.Report
         private static readonly CultureInfo Vietnamese = CultureInfo.GetCultureInfo("vi-VN");
         private readonly ReportBiz _reports = new ReportBiz();
 
-        private static readonly Dictionary<int, DashboardMetric[]> MetricSets = new Dictionary<int, DashboardMetric[]>
+        private static DashboardMetric[] Metrics(int type)
         {
-            { 1, new[] {
-                new DashboardMetric { Key = "primary", Code = "1.1", Label = "Doanh thu công nghiệp", Unit = "Tỷ đồng" },
-                new DashboardMetric { Key = "secondary", Code = "6", Label = "Kim ngạch xuất khẩu", Unit = "1.000 USD" },
-                new DashboardMetric { Key = "tertiary", Code = "7", Label = "Kim ngạch nhập khẩu", Unit = "1.000 USD" } } },
-            { 2, new[] {
-                new DashboardMetric { Key = "primary", Code = "1", Label = "Doanh thu bán buôn, bán lẻ", Unit = "Triệu đồng" },
-                new DashboardMetric { Key = "secondary", Code = "2", Label = "Doanh thu sửa chữa xe", Unit = "Triệu đồng" },
-                new DashboardMetric { Key = "tertiary", Code = "1.1", Label = "Trong đó: bán lẻ", Unit = "Triệu đồng" } } },
-            { 3, new[] {
-                new DashboardMetric { Key = "primary", Code = "0", Label = "Tổng trị giá xuất khẩu FOB", Unit = "USD" },
-                new DashboardMetric { Key = "secondary", Code = "1", Label = "Xuất khẩu trực tiếp", Unit = "USD" },
-                new DashboardMetric { Key = "tertiary", Code = "2", Label = "Xuất khẩu ủy thác", Unit = "USD" } } }
-        };
+            if (type == 1) return new[]
+            {
+                new DashboardMetric { Key = "primary", Code = "1.1", Label = DashboardText.Get("Metric_IndustrialRevenue"), Unit = DashboardText.Get("Unit_BillionVnd") },
+                new DashboardMetric { Key = "secondary", Code = "6", Label = DashboardText.Get("Metric_ExportValue"), Unit = DashboardText.Get("Unit_ThousandUsd") },
+                new DashboardMetric { Key = "tertiary", Code = "7", Label = DashboardText.Get("Metric_ImportValue"), Unit = DashboardText.Get("Unit_ThousandUsd") }
+            };
+            if (type == 2) return new[]
+            {
+                new DashboardMetric { Key = "primary", Code = "1", Label = DashboardText.Get("Metric_WholesaleRetailRevenue"), Unit = DashboardText.Get("Unit_MillionVnd") },
+                new DashboardMetric { Key = "secondary", Code = "2", Label = DashboardText.Get("Metric_VehicleRepairRevenue"), Unit = DashboardText.Get("Unit_MillionVnd") },
+                new DashboardMetric { Key = "tertiary", Code = "1.1", Label = DashboardText.Get("Metric_RetailSubset"), Unit = DashboardText.Get("Unit_MillionVnd") }
+            };
+            return new[]
+            {
+                new DashboardMetric { Key = "primary", Code = "0", Label = DashboardText.Get("Metric_FobValue"), Unit = DashboardText.Get("Unit_Usd") },
+                new DashboardMetric { Key = "secondary", Code = "1", Label = DashboardText.Get("Metric_DirectExport"), Unit = DashboardText.Get("Unit_Usd") },
+                new DashboardMetric { Key = "tertiary", Code = "2", Label = DashboardText.Get("Metric_EntrustedExport"), Unit = DashboardText.Get("Unit_Usd") }
+            };
+        }
 
         public static string TypeName(int type)
         {
-            return type == 2 ? "Thương mại, dịch vụ" : type == 3 ? "Xuất nhập khẩu" : "Sản xuất, kinh doanh";
+            return DashboardText.Get(type == 2 ? "Type_Trading" : type == 3 ? "Type_ExportImport" : "Type_Manufacturing");
         }
 
         public DashboardModel GetDashboard(DashboardFilters filters)
@@ -44,7 +50,7 @@ namespace CenIT.ReportTourism.Biz.Report
             var cards = byType.Select(pair =>
             {
                 var current = At(pair.Value, filters.Year, filters.Month).ToList();
-                var metric = MetricSets[pair.Key][0];
+                var metric = Metrics(pair.Key)[0];
                 return new DashboardTypeCard
                 {
                     ReportType = pair.Key, Name = TypeName(pair.Key), MetricLabel = metric.Label,
@@ -92,7 +98,7 @@ namespace CenIT.ReportTourism.Biz.Report
                     Month = date.ToString("yyyy-MM"),
                     Value = SumOrNull(At(rows, date.Year, date.Month).Select(r => Value(r, metric.Key)))
                 }).ToList();
-            var sectorValues = current.GroupBy(r => String.IsNullOrWhiteSpace(r.EconomicSectorName) ? "Chưa phân khu vực" : r.EconomicSectorName)
+            var sectorValues = current.GroupBy(r => String.IsNullOrWhiteSpace(r.EconomicSectorName) ? DashboardText.Get("UnknownSector") : r.EconomicSectorName)
                 .Select(g => new DashboardBreakdown { Name = g.Key, Value = SumOrNull(g.Select(r => Value(r, metric.Key))) ?? 0 })
                 .OrderByDescending(g => g.Value).ToList();
             var sectorTotal = sectorValues.Sum(g => g.Value);
@@ -102,7 +108,7 @@ namespace CenIT.ReportTourism.Biz.Report
             return new DashboardAnalysisModel
             {
                 Filters = filters, FilterOptions = BuildOptions(rows, filters, "Analysis", true),
-                TypeName = TypeName(filters.ReportType), SelectedMetric = metric, Metrics = MetricSets[filters.ReportType],
+                TypeName = TypeName(filters.ReportType), SelectedMetric = metric, Metrics = Metrics(filters.ReportType),
                 CurrentValue = FormatOrDash(SumOrNull(values)),
                 YtdValue = ytdValues.Count == 0 ? "—" : Format(ytdValues.Sum(v => v.Value)),
                 YtdMonths = ytdValues.Count,
@@ -136,7 +142,7 @@ namespace CenIT.ReportTourism.Biz.Report
             return new DashboardWarningsModel
             {
                 Filters = filters, FilterOptions = BuildOptions(rows, filters, "Warnings", false),
-                TypeName = TypeName(filters.ReportType), Metric = MetricSets[filters.ReportType][0],
+                TypeName = TypeName(filters.ReportType), Metric = Metrics(filters.ReportType)[0],
                 IsIndustrial = filters.ReportType == 1, ComparableCount = movements.Count,
                 Assigned = current.Count,
                 DeclineOver10 = movements.Count(x => x.Percent < -10),
@@ -154,6 +160,7 @@ namespace CenIT.ReportTourism.Biz.Report
             filters = Normalize(filters);
             var rows = GetRows(filters, filters.ReportType);
             var current = At(rows, filters.Year, filters.Month).ToList();
+            var metrics = Metrics(filters.ReportType);
             var end = new DateTime(filters.Year, filters.Month, 1);
             var trend = Enumerable.Range(0, 12).Select(offset => end.AddMonths(offset - 11))
                 .Where(date => date <= DateTime.Today)
@@ -169,7 +176,7 @@ namespace CenIT.ReportTourism.Biz.Report
                 Received = current.Count(r => r.DataImported),
                 FileAnyType = current.Count(r => r.FileAnyType),
                 MetricValues = current.Count(r => r.PrimaryValue.HasValue),
-                MetricPresence = MetricSets[filters.ReportType].Select(metric => new DashboardBreakdown
+                MetricPresence = metrics.Select(metric => new DashboardBreakdown
                 {
                     Name = metric.Label + " (" + metric.Code + ")",
                     Assigned = current.Count,
@@ -178,8 +185,8 @@ namespace CenIT.ReportTourism.Biz.Report
                 Conflicts = current.Count(r => r.MetricConflict),
                 CoveragePercent = current.Count == 0 ? 0 : 100m * current.Count(r => r.DataImported) / current.Count,
                 ReceiptTrend = trend,
-                Areas = Breakdown(current, r => r.WardName, "Chưa có địa bàn"),
-                Sectors = Breakdown(current, r => r.EconomicSectorName, "Chưa phân khu vực"),
+                Areas = Breakdown(current, r => r.WardName, DashboardText.Get("UnknownArea")),
+                Sectors = Breakdown(current, r => r.EconomicSectorName, DashboardText.Get("UnknownSector")),
                 Enterprises = current.OrderByDescending(r => r.MetricConflict).ThenBy(r => r.DataImported)
                     .ThenBy(r => r.PrimaryValue.HasValue)
                     .ThenBy(r => r.BusinessName).Select(r => new DashboardEnterpriseRow
@@ -187,7 +194,7 @@ namespace CenIT.ReportTourism.Biz.Report
                         EnterpriseId = r.EnterpriseId, Name = r.BusinessName, WardName = r.WardName,
                         DataImported = r.DataImported, FileAnyType = r.FileAnyType,
                         HasMetricValue = r.PrimaryValue.HasValue, MetricConflict = r.MetricConflict,
-                        MissingMetricCodes = String.Join(", ", MetricSets[filters.ReportType]
+                        MissingMetricCodes = String.Join(", ", metrics
                             .Where(metric => !Value(r, metric.Key).HasValue).Select(metric => metric.Code))
                     }).ToList()
             };
@@ -264,7 +271,7 @@ namespace CenIT.ReportTourism.Biz.Report
 
         private static DashboardMetric SelectedMetric(DashboardFilters filters)
         {
-            return MetricSets[filters.ReportType].First(m => m.Key == filters.Metric);
+            return Metrics(filters.ReportType).First(m => m.Key == filters.Metric);
         }
 
         private static IEnumerable<SnapshotRow> At(IEnumerable<SnapshotRow> rows, int year, int month)
@@ -334,10 +341,10 @@ namespace CenIT.ReportTourism.Biz.Report
             var industryNames = (new CateBusinessIndustryBiz().Get(out total, null) ?? new List<CateBusinessIndustryModel>())
                 .Where(i => i.IsActive && !i.IsDeleted)
                 .GroupBy(i => i.IndustryId).ToDictionary(g => g.Key.ToString(), g => g.First().IndustryName);
-            var industries = new List<DashboardOption> { new DashboardOption { Value = "all", Text = "Tất cả ngành trong danh mục" } };
+            var industries = new List<DashboardOption> { new DashboardOption { Value = "all", Text = DashboardText.Get("Filter_AllIndustries") } };
             industries.AddRange(industryIds.Select(id => new DashboardOption
             {
-                Value = id, Text = industryNames.ContainsKey(id) ? industryNames[id] : "Mã ngành " + id
+                Value = id, Text = industryNames.ContainsKey(id) ? industryNames[id] : DashboardText.Get("Filter_IndustryCode") + " " + id
             }).OrderBy(x => x.Text));
             var years = rows.Where(r => r.DataImported || r.PrimaryValue.HasValue || r.SecondaryValue.HasValue || r.TertiaryValue.HasValue)
                 .Select(r => r.ForMonth.Year).Concat(new[] { filters.Year, DateTime.Today.Year })
@@ -347,11 +354,11 @@ namespace CenIT.ReportTourism.Biz.Report
                 Filters = filters, Action = action, Years = years,
                 Months = Enumerable.Range(1, 12).Select(m => new DashboardOption
                 { Value = m.ToString(), Text = Vietnamese.DateTimeFormat.GetMonthName(m) }).ToList(),
-                Areas = Options(rows, r => r.WardId, r => r.WardName, "Tất cả địa bàn"),
-                EconomicSectors = Options(rows, r => r.EconomicSectorId, r => r.EconomicSectorName, "Tất cả khu vực"),
+                Areas = Options(rows, r => r.WardId, r => r.WardName, DashboardText.Get("Filter_AllAreas")),
+                EconomicSectors = Options(rows, r => r.EconomicSectorId, r => r.EconomicSectorName, DashboardText.Get("Filter_AllSectors")),
                 Industries = industries,
-                Enterprises = Options(rows, r => (int?)r.EnterpriseId, r => r.BusinessName, "Tất cả doanh nghiệp"),
-                Metrics = includeMetric ? MetricSets[filters.ReportType].Select(m => new DashboardOption
+                Enterprises = Options(rows, r => (int?)r.EnterpriseId, r => r.BusinessName, DashboardText.Get("Filter_AllEnterprises")),
+                Metrics = includeMetric ? Metrics(filters.ReportType).Select(m => new DashboardOption
                 { Value = m.Key, Text = m.Label }).ToList() : new List<DashboardOption>()
             };
         }

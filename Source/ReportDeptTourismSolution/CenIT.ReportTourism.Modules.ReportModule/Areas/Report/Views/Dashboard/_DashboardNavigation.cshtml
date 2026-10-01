@@ -1,24 +1,23 @@
 @model CenIT.ReportTourism.Models.Report.DashboardNavigationModel
+@using CenIT.ReportTourism.Models.Report
 @{
     var filters = Model.Filters ?? new CenIT.ReportTourism.Models.Report.DashboardFilters();
     var route = new { year = filters.Year, month = filters.Month, reportType = filters.ReportType, areaId = filters.AreaId,
         economicSectorId = filters.EconomicSectorId, industryId = filters.IndustryId,
         enterpriseId = filters.EnterpriseId, metric = filters.Metric };
 }
-
-<div class="nav-tabs-custom dashboard-nav-tabs">
-    <ul class="nav nav-tabs">
-        <li class="@(Model.Active == "Overview" ? "active" : "")">
-            <a href="@Url.Action("Index", "Dashboard", route)"><i class="fa fa-bar-chart text-primary"></i> <span>Tổng quan</span></a>
-        </li>
-        <li class="@(Model.Active == "Analysis" ? "active" : "")">
-            <a href="@Url.Action("Analysis", "Dashboard", route)"><i class="fa fa-sitemap text-info"></i> <span>Phân tích chỉ tiêu</span></a>
-        </li>
-        <li class="@(Model.Active == "Warnings" ? "active" : "")">
-            <a href="@Url.Action("Warnings", "Dashboard", route)"><i class="fa fa-exclamation-triangle text-warning"></i> <span>Cảnh báo</span></a>
-        </li>
-        <li class="@(Model.Active == "Progress" ? "active" : "")">
-            <a href="@Url.Action("Progress", "Dashboard", route)"><i class="fa fa-list-alt text-success"></i> <span>Theo dõi dữ liệu</span></a>
-        </li>
-    </ul>
-</div>
+@* Rendered inside .nav-tabs-custom by each page; the filter form is the tab content. *@
+<ul class="nav nav-tabs">
+    <li class="@(Model.Active == "Overview" ? "active" : "")">
+        <a href="@Url.Action("Index", "Dashboard", route)" aria-current="@(Model.Active == "Overview" ? "page" : null)"><i class="fa fa-bar-chart text-light-blue" aria-hidden="true"></i> <span>@DashboardText.Get("Nav_Overview")</span></a>
+    </li>
+    <li class="@(Model.Active == "Analysis" ? "active" : "")">
+        <a href="@Url.Action("Analysis", "Dashboard", route)" aria-current="@(Model.Active == "Analysis" ? "page" : null)"><i class="fa fa-sitemap text-aqua" aria-hidden="true"></i> <span>@DashboardText.Get("Analysis_Title")</span></a>
+    </li>
+    <li class="@(Model.Active == "Warnings" ? "active" : "")">
+        <a href="@Url.Action("Warnings", "Dashboard", route)" aria-current="@(Model.Active == "Warnings" ? "page" : null)"><i class="fa fa-exclamation-triangle text-yellow" aria-hidden="true"></i> <span>@DashboardText.Get("Nav_Warnings")</span></a>
+    </li>
+    <li class="@(Model.Active == "Progress" ? "active" : "")">
+        <a href="@Url.Action("Progress", "Dashboard", route)" aria-current="@(Model.Active == "Progress" ? "page" : null)"><i class="fa fa-list-alt text-green" aria-hidden="true"></i> <span>@DashboardText.Get("Progress_Title")</span></a>
+    </li>
+</ul>

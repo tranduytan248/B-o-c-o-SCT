@@ -189,5 +189,36 @@ namespace CenIT.ReportTourism.Caches.Sys
             var idUser = Api.SaveLogin(userName, isValid, senderIp, senderHeader);
             return idUser;
         }
+
+        [DataObjectMethod(DataObjectMethodType.Select, false)]
+        public bool IsRequireChangePassword(string userName)
+        {
+            if (string.IsNullOrEmpty(userName)) return false;
+            return Api.IsRequireChangePassword(userName);
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Select, false)]
+        public bool IsCurrentPassword(string userName, string password)
+        {
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password)) return false;
+            return Api.IsCurrentPassword(userName, password);
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Update, false)]
+        public int? SetRequireChangePassword(string userName, bool isRequire, string reason, string changeBy)
+        {
+            if (string.IsNullOrEmpty(userName)) return null;
+            return Api.SetRequireChangePassword(userName, isRequire, reason, changeBy);
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Update, false)]
+        public int? ChangeRequiredPassword(string userName, string newPass, string salt, string reason,
+            string changeBy)
+        {
+            var valReturn = Api.ChangeRequiredPassword(userName, newPass, salt, reason, changeBy);
+            // Mật khẩu thay đổi => bỏ cache thông tin tài khoản (GetByUserName có lưu Password/Salt)
+            InvalidateCache();
+            return valReturn;
+        }
     }
 }

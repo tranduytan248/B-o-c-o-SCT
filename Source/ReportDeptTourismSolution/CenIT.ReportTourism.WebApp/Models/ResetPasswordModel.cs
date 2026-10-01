@@ -7,13 +7,16 @@ namespace CenIT.ReportTourism.WebApp.Models
         [CustomDisplayName("User_Label_UserName")]
         public string UserName { get; set; }
 
+        // Mật khẩu chỉ dùng để băm, không hiển thị lại => cho phép ký tự như '<' mà không bị request validation chặn
         [CustomRequired]
         [CustomDisplayName("Authorize_New_Password")]
+        [System.Web.Mvc.AllowHtml]
         public string NewPassword { get; set; } = null;
 
         [CustomRequired]
         [CustomDisplayName("Authorize_Confirm_Password")]
         [CustomCompare("NewPassword", ErrorMessage = "Common_MessageCompareNotMatch")]
+        [System.Web.Mvc.AllowHtml]
         public string ConfirmPassword { get; set; }
 
         public string Salt { get; set; }
