@@ -118,7 +118,7 @@
                 <tr class="ie-summary" data-code="FOB">
                     <td class="text-left">
                         @Html.Hidden("Target_" + rowNumber, fobRow != null ? fobRow.Targets : "TỔNG GIÁ TRỊ (FOB) = I + II")
-                        @Html.Hidden("Unit_" + rowNumber, "USD")
+                        @Html.Hidden("Unit_" + rowNumber, "Kg")
                         @Html.Hidden("Index_" + rowNumber, fobRow != null && fobRow.Index.HasValue ? fobRow.Index.Value : 0)
                         @Html.Hidden("Level_" + rowNumber, "0")
                         @Html.Hidden("Code_" + rowNumber, "FOB")
@@ -135,7 +135,7 @@
                 <tr class="ie-summary" data-code="XK_TT">
                     <td class="text-left">
                         @Html.Hidden("Target_" + rowNumber, xkTtRow != null ? xkTtRow.Targets : "I.Tổng trị giá xuất khẩu trực tiếp")
-                        @Html.Hidden("Unit_" + rowNumber, "USD")
+                        @Html.Hidden("Unit_" + rowNumber, "Kg")
                         @Html.Hidden("Index_" + rowNumber, xkTtRow != null && xkTtRow.Index.HasValue ? xkTtRow.Index.Value : 1)
                         @Html.Hidden("Level_" + rowNumber, "1")
                         @Html.Hidden("Code_" + rowNumber, "XK_TT")
@@ -170,7 +170,7 @@
                     <tr class="ie-row ie-country-row" data-group="XK_QG">
                         <td class="text-left">
                             @Html.Hidden("Target_" + rowNumber, "- " + natName)
-                            @Html.Hidden("Unit_" + rowNumber, "USD")
+                            @Html.Hidden("Unit_" + rowNumber, cRow.Unit ?? "Kg")
                             @Html.Hidden("Index_" + rowNumber, cRow.Index.HasValue ? cRow.Index.Value : rowNumber - 1)
                             @Html.Hidden("Level_" + rowNumber, cRow.Level ?? "1.1")
                             @Html.Hidden("Code_" + rowNumber, cRow.Code)
@@ -232,7 +232,7 @@
                     <tr class="ie-row ie-country-product-row" data-group="XK_MH">
                         <td class="text-left">
                             @Html.Hidden("Target_" + rowNumber, "- " + displayText)
-                            @Html.Hidden("Unit_" + rowNumber, "USD")
+                            @Html.Hidden("Unit_" + rowNumber, "Kg")
                             @Html.Hidden("Index_" + rowNumber, pcRow.Index.HasValue ? pcRow.Index.Value : rowNumber - 1)
                             @Html.Hidden("Level_" + rowNumber, pcRow.Level ?? "1.2")
                             @Html.Hidden("Code_" + rowNumber, pcRow.Code)
@@ -276,7 +276,7 @@
                 <tr class="ie-summary" data-code="UT_XK">
                     <td class="text-left">
                         @Html.Hidden("Target_" + rowNumber, utXkRow != null ? utXkRow.Targets : "II. Trị giá ủy thác xuất khẩu")
-                        @Html.Hidden("Unit_" + rowNumber, "USD")
+                        @Html.Hidden("Unit_" + rowNumber, "Kg")
                         @Html.Hidden("Index_" + rowNumber, utXkRow != null && utXkRow.Index.HasValue ? utXkRow.Index.Value : rowNumber - 1)
                         @Html.Hidden("Level_" + rowNumber, "2")
                         @Html.Hidden("Code_" + rowNumber, "UT_XK")
@@ -505,6 +505,10 @@
             });
         }
     }
+    function getExportProductUnit($sel) {
+        var selected = $sel.data("select2") ? ($sel.select2("data")[0] || {}) : {};
+        return selected.unit || $sel.find("option:selected").data("unit") || "Kg";
+    }
     // Initialize existing selects
     $("#ImportExportDataReport select.ie-country-select").each(function () {
         initCountrySelect($(this));
@@ -528,7 +532,7 @@
             .addClass("form-control ie-country-select");
 
         var $target = $("<input />", { id: "Target_" + index, name: "Target_" + index, type: "hidden" });
-        var $unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden", value: "USD" });
+        var $unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden", value: "Kg" });
         var $indexInput = $("<input />", { id: "Index_" + index, name: "Index_" + index, type: "hidden", value: index });
         var $levelInput = $("<input />", { id: "Level_" + index, name: "Level_" + index, type: "hidden", value: level });
         var $codeInput = $("<input />", { id: "Code_" + index, name: "Code_" + index, type: "hidden" });
@@ -591,7 +595,7 @@
         var $prodInput = $("<select><option value=''></option></select>").addClass("form-control ie-product-select").css("width", "45%");
 
         var $target = $("<input />", { id: "Target_" + index, name: "Target_" + index, type: "hidden" });
-        var $unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden", value: "USD" });
+        var $unit = $("<input />", { id: "Unit_" + index, name: "Unit_" + index, type: "hidden", value: "Kg" });
         var $indexInput = $("<input />", { id: "Index_" + index, name: "Index_" + index, type: "hidden", value: index });
         var $levelInput = $("<input />", { id: "Level_" + index, name: "Level_" + index, type: "hidden", value: level });
         var $codeInput = $("<input />", { id: "Code_" + index, name: "Code_" + index, type: "hidden" });

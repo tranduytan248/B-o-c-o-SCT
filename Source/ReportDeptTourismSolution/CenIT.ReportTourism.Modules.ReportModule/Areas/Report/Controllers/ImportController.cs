@@ -2705,7 +2705,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     .Select(x => new ReportDataImportModel
                     {
                         Targets = x.Targets,
-                        Unit = x.Unit ?? "USD",
+                        // Dòng chia theo quốc gia dùng đơn vị mặc định Kg.
+                        Unit = x.Unit ?? "Kg",
                         Code = x.Code,
                         Level = x.Level,
                         Index = x.Index,
@@ -2732,7 +2733,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     .Select(x => new ReportDataImportModel
                     {
                         Targets = x.Targets,
-                        Unit = x.Unit ?? "USD",
+                        // Mặt hàng xuất khẩu trực tiếp chia theo quốc gia dùng Kg.
+                        // Đơn vị riêng của danh mục doanh nghiệp chỉ áp dụng cho nhóm ủy thác.
+                        Unit = "Kg",
                         Code = x.Code,
                         Level = x.Level,
                         Index = x.Index,
@@ -2766,11 +2769,11 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             var lines = new List<ReportDataImportModel>
             {
-                CreateBusinessProductLine("TỔNG GIÁ TRỊ (FOB) = I + II", "USD", "FOB"),
-                CreateBusinessProductLine("I.Tổng trị giá xuất khẩu trực tiếp", "USD", "XK_TT"),
+                CreateBusinessProductLine("TỔNG GIÁ TRỊ (FOB) = I + II", "Kg", "FOB"),
+                CreateBusinessProductLine("I.Tổng trị giá xuất khẩu trực tiếp", "Kg", "XK_TT"),
                 new ReportDataImportModel { Targets = "Chia theo nước cuối cùng hàng đến", Code = "XK_QG_HEADER" },
                 new ReportDataImportModel { Targets = "Mặt hàng xuất khẩu trực tiếp chia theo nước cuối cùng hàng đến", Code = "XK_MH_HEADER" },
-                CreateBusinessProductLine("II. Trị giá ủy thác xuất khẩu", "USD", "UT_XK"),
+                CreateBusinessProductLine("II. Trị giá ủy thác xuất khẩu", "Kg", "UT_XK"),
                 new ReportDataImportModel { Targets = "Mặt hàng ủy thác xuất khẩu", Code = "UT_MH_HEADER" }
             };
 
