@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Provider xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
      <StoredProcedures ProviderName="ReportTourismProvider">
@@ -29,6 +29,7 @@
                      Value="p_Report_Reports_04_BaoCaoHoatDongDoanhNghiep" />
           
           <Procedure Name="usp_Report_KTXH_TheoEnterprise" Value="usp_Report_KTXH_TheoEnterprise" />
+          <Procedure Name="usp_Report_HoatDongXuatKhau_TheoEnterprise" Value="usp_Report_HoatDongXuatKhau_TheoEnterprise" />
           <Procedure Name="usp_Report_KTXH_Tong" Value="usp_Report_KTXH_Tong" />
           <Procedure Name="usp_Report_KTXH_Type2_TheoEnterprise" Value="usp_Report_KTXH_Type2_TheoEnterprise" />
           <Procedure Name="usp_Report_KTXH_Type2_Tong" Value="usp_Report_KTXH_Type2_Tong" />

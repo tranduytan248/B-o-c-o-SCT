@@ -1,0 +1,1150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Body>
+    <ReportItems>
+      <!-- Top Left: Form number & reception date -->
+      <Textbox Name="TxtTopLeft1">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Biểu số: 01-CS/XKHH</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Ngày nhận báo cáo:</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Ngày 12 tháng sau tháng báo cáo</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontStyle>Italic</FontStyle>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.1in</Top>
+        <Left>0.1in</Left>
+        <Height>0.6in</Height>
+        <Width>2.6in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+
+      <!-- Top Right: Receiving Agency -->
+      <Textbox Name="TxtTopRight">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Đơn vị nhận báo cáo:</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Right</TextAlign></Style>
+          </Paragraph>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Cục Thống Kê tỉnh Khánh Hòa</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Right</TextAlign></Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.1in</Top>
+        <Left>6.85in</Left>
+        <Height>0.6in</Height>
+        <Width>3.0in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+
+      <!-- Center Title -->
+      <Textbox Name="TxtTitle">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>BÁO CÁO</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>13pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Center</TextAlign></Style>
+          </Paragraph>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>HOẠT ĐỘNG XUẤT KHẨU HÀNG HÓA</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>14pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Center</TextAlign></Style>
+          </Paragraph>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>(Áp dụng đối với doanh nghiệp có hoạt động xuất khẩu hàng hóa)</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontStyle>Italic</FontStyle>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Center</TextAlign></Style>
+          </Paragraph>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>="(Tháng " &amp; Parameters!p_Month.Value &amp; " năm " &amp; Parameters!p_Year.Value &amp; ")"</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>10pt</FontSize>
+                  <FontStyle>Italic</FontStyle>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Center</TextAlign></Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.75in</Top>
+        <Left>0.1in</Left>
+        <Height>0.9in</Height>
+        <Width>9.75in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Enterprise Info: Business Name & Tax Code Label -->
+      <Textbox Name="TxtEnterpriseName">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Tên doanh nghiệp: </Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>10pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Parameters!p_EnterpriseName.Value</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>10pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.72in</Top>
+        <Left>0.1in</Left>
+        <Height>0.24in</Height>
+        <Width>6.6in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <Textbox Name="TxtTaxLabel">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Mã số thuế doanh nghiệp:</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Right</TextAlign></Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.72in</Top>
+        <Left>6.7in</Left>
+        <Height>0.24in</Height>
+        <Width>3.15in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Address & Tax Code Boxes -->
+      <Textbox Name="TxtAddress">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Địa chỉ: </Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Parameters!p_Address.Value</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.98in</Top>
+        <Left>0.1in</Left>
+        <Height>0.24in</Height>
+        <Width>6.6in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Tax Box 10 digits -->
+      <Textbox Name="TxtTaxBox">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!p_TaxCode.Value</Value>
+                <Style>
+                  <FontFamily>Courier New</FontFamily>
+                  <FontSize>10.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Center</TextAlign></Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.98in</Top>
+        <Left>7.4in</Left>
+        <Height>0.24in</Height>
+        <Width>2.45in</Width>
+        <Style>
+          <Border>
+            <Style>Solid</Style>
+            <Color>#555555</Color>
+          </Border>
+          <BackgroundColor>#f9f9f9</BackgroundColor>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Phone and Email -->
+      <Textbox Name="TxtContact">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Điện thoại: </Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Parameters!p_Phone.Value</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>      Email: </Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Parameters!p_Email.Value</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>2.24in</Top>
+        <Left>0.1in</Left>
+        <Height>0.24in</Height>
+        <Width>9.75in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Main Business Industry & Industry Code -->
+      <Textbox Name="TxtIndustry">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Ngành sản xuất kinh doanh chính: </Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Parameters!p_MainIndustryName.Value</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>2.5in</Top>
+        <Left>0.1in</Left>
+        <Height>0.24in</Height>
+        <Width>7.2in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <Textbox Name="TxtIndustryCodeLabel">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Mã ngành:</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Right</TextAlign></Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>2.5in</Top>
+        <Left>7.3in</Left>
+        <Height>0.24in</Height>
+        <Width>1.2in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <Textbox Name="TxtIndustryCodeBox">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!p_MainIndustryCode.Value</Value>
+                <Style>
+                  <FontFamily>Courier New</FontFamily>
+                  <FontSize>10.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style><TextAlign>Center</TextAlign></Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>2.5in</Top>
+        <Left>8.6in</Left>
+        <Height>0.24in</Height>
+        <Width>1.25in</Width>
+        <Style>
+          <Border>
+            <Style>Solid</Style>
+            <Color>#555555</Color>
+          </Border>
+          <BackgroundColor>#f9f9f9</BackgroundColor>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Economic Sector -->
+      <Textbox Name="TxtEconomic">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Loại hình kinh tế doanh nghiệp: </Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Parameters!p_EconomicSectorName.Value</Value>
+                <Style>
+                  <FontFamily>Times New Roman</FontFamily>
+                  <FontSize>9.5pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>2.76in</Top>
+        <Left>0.1in</Left>
+        <Height>0.24in</Height>
+        <Width>9.75in</Width>
+        <Style>
+          <Border><Style>None</Style></Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+
+      <!-- Main Data Table -->
+      <Tablix Name="Tablix1">
+        <TablixBody>
+          <TablixColumns>
+            <TablixColumn><Width>3.2in</Width></TablixColumn>
+            <TablixColumn><Width>0.75in</Width></TablixColumn>
+            <TablixColumn><Width>0.85in</Width></TablixColumn>
+            <TablixColumn><Width>1.1in</Width></TablixColumn>
+            <TablixColumn><Width>0.85in</Width></TablixColumn>
+            <TablixColumn><Width>1.1in</Width></TablixColumn>
+            <TablixColumn><Width>0.85in</Width></TablixColumn>
+            <TablixColumn><Width>1.05in</Width></TablixColumn>
+          </TablixColumns>
+          <TablixRows>
+            <!-- Header Row 1 -->
+            <TablixRow>
+              <Height>0.28in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_ColA_Top">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value /></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_ColB_Top">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value /></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Grp1">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Thực hiện tháng báo cáo</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                    <ColSpan>2</ColSpan>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell />
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Grp2">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Cộng dồn từ đầu năm đến cuối tháng báo cáo</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                    <ColSpan>2</ColSpan>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell />
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Grp3">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Dự tính tháng tiếp theo</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                    <ColSpan>2</ColSpan>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell />
+              </TablixCells>
+            </TablixRow>
+
+            <!-- Header Row 2 (Sub-headers) -->
+            <TablixRow>
+              <Height>0.28in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_ColA">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Tên chỉ tiêu</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_ColB">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Đơn vị tính</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Sub1">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Lượng</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Sub2">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Giá trị (1,000 USD)</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Sub3">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Lượng</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Sub4">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Giá trị (1,000 USD)</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Sub5">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Lượng</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="H_Sub6">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>Giá trị (1,000 USD)</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9.5pt</FontSize><FontWeight>Bold</FontWeight></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#f2f4f7</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+
+            <!-- Header Row 3 (Column indices A, B, 1..6) -->
+            <TablixRow>
+              <Height>0.22in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_A">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>A</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_B">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>B</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_1">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>1</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_2">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>2</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_3">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>3</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_4">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>4</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_5">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>5</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Idx_6">
+                      <Paragraphs><Paragraph><TextRuns><TextRun><Value>6</Value><Style><FontFamily>Times New Roman</FontFamily><FontSize>9pt</FontSize><FontStyle>Italic</FontStyle></Style></TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs>
+                      <Style><Border><Style>Solid</Style><Color>#555555</Color></Border><BackgroundColor>#fafafa</BackgroundColor><VerticalAlign>Middle</VerticalAlign></Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+
+            <!-- Data Detail Row -->
+            <TablixRow>
+              <Height>0.25in</Height>
+              <TablixCells>
+                <!-- Targets (Tên chỉ tiêu) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_Targets">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!Targets.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <FontWeight>=IIf(Fields!InDam.Value, "Bold", "Default")</FontWeight>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>=CStr(Fields!CapDoThutLe.Value * 14 + 4) &amp; "pt"</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- Unit (Đơn vị tính) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_Unit">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!Unit.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Center</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- ThucHien_Luong (1) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_ThucHien_Luong">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!ThucHien_Luong.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <FontWeight>=IIf(Fields!InDam.Value, "Bold", "Default")</FontWeight>
+                                <Format>#,##0.00;(#,##0.00);''</Format>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Right</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- ThucHien_GiaTri (2) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_ThucHien_GiaTri">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!ThucHien_GiaTri.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <FontWeight>=IIf(Fields!InDam.Value, "Bold", "Default")</FontWeight>
+                                <Format>#,##0.00;(#,##0.00);''</Format>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Right</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- CongDon_Luong (3) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_CongDon_Luong">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!CongDon_Luong.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <FontWeight>=IIf(Fields!InDam.Value, "Bold", "Default")</FontWeight>
+                                <Format>#,##0.00;(#,##0.00);''</Format>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Right</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- CongDon_GiaTri (4) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_CongDon_GiaTri">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!CongDon_GiaTri.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <FontWeight>=IIf(Fields!InDam.Value, "Bold", "Default")</FontWeight>
+                                <Format>#,##0.00;(#,##0.00);''</Format>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Right</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- DuTinh_Luong (5) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_DuTinh_Luong">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!DuTinh_Luong.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <Format>#,##0.00;(#,##0.00);''</Format>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Right</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+
+                <!-- DuTinh_GiaTri (6) -->
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Tb_DuTinh_GiaTri">
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!DuTinh_GiaTri.Value</Value>
+                              <Style>
+                                <FontFamily>Times New Roman</FontFamily>
+                                <FontSize>9.5pt</FontSize>
+                                <Format>#,##0.00;(#,##0.00);''</Format>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style><TextAlign>Right</TextAlign></Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <Style>
+                        <Border><Style>Solid</Style><Color>#666666</Color></Border>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>4pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+          </TablixRows>
+        </TablixBody>
+        <TablixColumnHierarchy>
+          <TablixMembers>
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+          </TablixMembers>
+        </TablixColumnHierarchy>
+        <TablixRowHierarchy>
+          <TablixMembers>
+            <TablixMember><KeepWithGroup>After</KeepWithGroup></TablixMember>
+            <TablixMember><KeepWithGroup>After</KeepWithGroup></TablixMember>
+            <TablixMember><KeepWithGroup>After</KeepWithGroup></TablixMember>
+            <TablixMember><Group Name="Details" /></TablixMember>
+          </TablixMembers>
+        </TablixRowHierarchy>
+        <DataSetName>HoatDong_XuatKhauHangHoa</DataSetName>
+        <Top>3.12in</Top>
+        <Left>0.1in</Left>
+        <Height>1.03in</Height>
+        <Width>9.75in</Width>
+        <Style>
+          <Border><Style>Solid</Style><Color>#555555</Color></Border>
+        </Style>
+      </Tablix>
+    </ReportItems>
+    <Height>4.3in</Height>
+    <Style />
+  </Body>
+  <Width>10.0in</Width>
+  <Page>
+    <PageHeight>8.27in</PageHeight>
+    <PageWidth>11.69in</PageWidth>
+    <LeftMargin>0.5in</LeftMargin>
+    <RightMargin>0.5in</RightMargin>
+    <TopMargin>0.5in</TopMargin>
+    <BottomMargin>0.5in</BottomMargin>
+    <Style />
+  </Page>
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="Data_HoatDong_XuatKhauHangHoa">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>e5399581-7994-4d8b-967a-5936ad90c6a2</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="HoatDong_XuatKhauHangHoa">
+      <Query>
+        <DataSourceName>Data_HoatDong_XuatKhauHangHoa</DataSourceName>
+        <CommandText>/* Local Query */</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="SortGroup">
+          <DataField>SortGroup</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="SortSub">
+          <DataField>SortSub</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="Level">
+          <DataField>Level</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Code">
+          <DataField>Code</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Targets">
+          <DataField>Targets</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Unit">
+          <DataField>Unit</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="InDam">
+          <DataField>InDam</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="CapDoThutLe">
+          <DataField>CapDoThutLe</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="ThucHien_Luong">
+          <DataField>ThucHien_Luong</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="ThucHien_GiaTri">
+          <DataField>ThucHien_GiaTri</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="CongDon_Luong">
+          <DataField>CongDon_Luong</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="CongDon_GiaTri">
+          <DataField>CongDon_GiaTri</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="DuTinh_Luong">
+          <DataField>DuTinh_Luong</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="DuTinh_GiaTri">
+          <DataField>DuTinh_GiaTri</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+      </Fields>
+      <rd:DataSetInfo>
+        <rd:DataSetName>Data_HoatDong_XuatKhauHangHoa</rd:DataSetName>
+        <rd:TableName>HoatDong_XuatKhauHangHoa</rd:TableName>
+      </rd:DataSetInfo>
+    </DataSet>
+  </DataSets>
+  <ReportParameters>
+    <ReportParameter Name="p_OnMonth">
+      <DataType>String</DataType>
+      <Prompt>p_OnMonth</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_Month">
+      <DataType>String</DataType>
+      <Prompt>p_Month</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_Year">
+      <DataType>String</DataType>
+      <Prompt>p_Year</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_EnterpriseName">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_EnterpriseName</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_TaxCode">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_TaxCode</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_Address">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_Address</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_Phone">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_Phone</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_Email">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_Email</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_MainIndustryName">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_MainIndustryName</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_MainIndustryCode">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_MainIndustryCode</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_EconomicSectorName">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_EconomicSectorName</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="p_EconomicSectorCode">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>p_EconomicSectorCode</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>8a45fe73-6781-420a-8bf8-d3369a19c9e8</rd:ReportID>
+</Report>
