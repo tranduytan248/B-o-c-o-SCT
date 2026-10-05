@@ -171,8 +171,7 @@ function initTableDataImport() {
                                 "&onMonth=" +
                                 moment(row.ForMonth).format("YYYY-MM-DD"),
                                 "",
-                                "Xoá",
-                                800);
+                                "Xoá");
                         }
                     }
                     return html;

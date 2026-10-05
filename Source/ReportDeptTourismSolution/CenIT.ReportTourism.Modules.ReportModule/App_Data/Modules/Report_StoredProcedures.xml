@@ -27,8 +27,11 @@
                      Value="p_Report_Reports_03_DoanhNghiepChuaGuiBaoCao" />
           <Procedure Name="Report_Reports_04_BaoCaoHoatDongDoanhNghiep"
                      Value="p_Report_Reports_04_BaoCaoHoatDongDoanhNghiep" />
+          
           <Procedure Name="usp_Report_KTXH_TheoEnterprise" Value="usp_Report_KTXH_TheoEnterprise" />
           <Procedure Name="usp_Report_KTXH_Tong" Value="usp_Report_KTXH_Tong" />
+          <Procedure Name="usp_Report_KTXH_Type2_TheoEnterprise" Value="usp_Report_KTXH_Type2_TheoEnterprise" />
+          <Procedure Name="usp_Report_KTXH_Type2_Tong" Value="usp_Report_KTXH_Type2_Tong" />
 
           <Procedure Name="Report_Dashboard_StatisticEnterprise" Value="p_Report_Dashboard_StatisticEnterprise" />
           <Procedure Name="Report_Dashboard_StatisticTypeBusiness" Value="p_Report_Dashboard_StatisticTypeBusiness" />

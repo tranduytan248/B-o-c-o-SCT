@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Hosting;
 using System.Web.Mvc;
@@ -13,6 +12,7 @@ using CenIT.ReportTourism.Core.Apps;
 using CenIT.ReportTourism.Models.Cate;
 using CenIT.ReportTourism.Models.Sys;
 using CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models;
+using Newtonsoft.Json;
 using TSFramework.App.Attributes;
 using TSFramework.App.Processors;
 using TSFramework.Core.Enums;
@@ -547,7 +547,7 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                     status = true,
                     message = CreateMessage($"{_funcName}", EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 });
-            ViewBag.ConfirmMessage = $"Bạn muốn ngưng hoạt động <b>{_funcName} [{model.FullName}]</b>";
+            ViewBag.ConfirmMessage = $"Bạn muốn ngưng hoạt động <b class='text-primary'>{_funcName} [{model.FullName}]</b>";
             return PartialView("_DeActive", model);
         }
 
@@ -613,17 +613,24 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                     status = true,
                     message = CreateMessage("Tài khoản", EnumProcessType.DataNotExist, EnumMsgIcon.Error)
                 }, JsonRequestBehavior.AllowGet);
-            var enterprises = _cateEnterpriseCache.GetAll()
-                .Select(u => new ListItem(u.BusinessName, u.EnterpriseId.ToString())).ToList();
-            var enterprisesSelected = _cateEnterpriseCache.GetCateEnterprisePermissions(currentUser.UserName)
+
+            //var enterprises = _cateEnterpriseCache.GetAll()
+            //    .Select(u => new ListItem(u.BusinessName, u.EnterpriseId.ToString())).ToList();
+
+            var listPermittedEnterpise = _cateEnterpriseCache.GetCateEnterprisePermissions(currentUser.UserName);
+                //.Select(o => new ListItem(o.BusinessName, o.EnterpriseId.ToString())).ToList();
+
+            var enterprisesSelected = listPermittedEnterpise
                 .Select(o => o.EnterpriseId).ToList();
+
             return PartialView("_EnterprisePermissions", new EnterpriseUserModel
             {
                 FullName = currentUser.FullName,
                 UserName = currentUser.UserName,
                 Email = currentUser.Email,
-                //Enterprises = new List<ListItem>(),
-                Enterprises = enterprises,
+                Enterprises = new List<ListItem>(),
+                //Enterprises = permittedEnterpise,
+                SelectedEnterprise = JsonConvert.SerializeObject(listPermittedEnterpise.Select(e => new {id = e.EnterpriseId, text = e.BusinessName}).ToArray()),
                 StrEnterprisesSelected = string.Join(",", enterprisesSelected)
             });
         }
@@ -633,6 +640,7 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
         [ActionType(Type = EnumActionType.Edit)]
         public ActionResult EnterprisesUser(EnterpriseUserModel model)
         {
+            model.StrEnterprisesSelected = string.Join(",", model.ListEnterpiseIds);
             var cateEnterprisePermissionsModel = new CateEnterprisePermissionsModel
             {
                 ForUser = model.UserName,
@@ -644,6 +652,32 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                 status = true,
                 message = CreateMessage($"Phân quyền quản lý doanh nghiệp cho <b> tài khoản [{model.UserName}]</b>",
                     EnumProcessType.Edit, EnumMsgIcon.Success)
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [AjaxOnly]
+        [ActionType(Type = EnumActionType.View)]
+        public ActionResult SearchEnterprise(string q, string username)
+        {
+            var currentUser = _userCache.GetByUserName(username);
+            List<int> enterprisesSelected = new List<int>();
+            
+            if (currentUser != null)
+            {
+                enterprisesSelected = _cateEnterpriseCache.GetCateEnterprisePermissions(currentUser.UserName)
+                    .Select(o => o.EnterpriseId).ToList();
+            }
+
+            var resultEnterpise = _cateEnterpriseCache.GetAll()
+                .Where(o => enterprisesSelected.All(e => e != o.EnterpriseId) && o.BusinessName.ToLower().Contains(q.ToLower()))
+                .Select(u => new { id = u.EnterpriseId, text = u.BusinessName }).ToArray();
+
+           
+            return Json(new
+            {
+                status = true,
+                results = resultEnterpise
             }, JsonRequestBehavior.AllowGet);
         }
     }

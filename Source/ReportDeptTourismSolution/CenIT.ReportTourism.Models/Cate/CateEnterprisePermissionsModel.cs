@@ -3,6 +3,7 @@
     public class CateEnterprisePermissionsModel
     {
         public int EnterpriseId { get; set; }
+        public string BusinessName { get; set; }
         public string ForUser { get; set; }
         public string EnterpriseIds { get; set; }
     }

@@ -18,6 +18,10 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Models
         [CustomDisplayName("Enterprises_Label_Name")]
         public string StrEnterprisesSelected { get; set; }
 
+        public string SelectedEnterprise { get; set; }
+
+        public List<int> ListEnterpiseIds { get; set; }
+
         public List<ListItem> Enterprises { get; set; }
     }
 }

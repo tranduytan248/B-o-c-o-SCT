@@ -12,6 +12,7 @@ using CenIT.ReportTourism.Core.Apps;
 using CenIT.ReportTourism.Core.Helpers;
 using CenIT.ReportTourism.Models.Sys;
 using FastMember;
+using Newtonsoft.Json;
 using TSFramework.App.Attributes;
 using TSFramework.App.Processors;
 using TSFramework.Core.Enums;
@@ -21,14 +22,8 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
     public class ModulesController : AppController
     {
         private readonly string _funcName = AppProcessor.Messagor.GetMessage("Module_Title");
-        private readonly SysModuleCache _sysModuleCache;
-        private readonly SysUserCache _sysUserCache;
-
-        public ModulesController()
-        {
-            _sysModuleCache = new SysModuleCache();
-            _sysUserCache = new SysUserCache();
-        }
+        private readonly SysModuleCache _sysModuleCache = new SysModuleCache();
+        private readonly SysUserCache _sysUserCache = new SysUserCache();
 
         // GET: Modules
         [ActionType(Type = EnumActionType.View)]
@@ -376,7 +371,8 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                 ModuleId = module.ModuleId,
                 Users = _sysUserCache.GetAll().Where(u => u.IsActive)
                     .Select(u => new ListItem(u.FullName, u.UserId.ToString())).ToList(),
-                PermissionUserIDs = permissionUsers != null
+                SelectedUser = JsonConvert.SerializeObject(permissionUsers.Select(e => new { id = e.UserId, text = e.FullName }).ToArray()),
+                PermissionUserIds = permissionUsers != null
                     ? string.Join(",", permissionUsers.Select(u => u.UserId).ToList())
                     : string.Empty
             };
@@ -398,11 +394,38 @@ namespace CenIT.ReportTourism.Modules.SysModule.Areas.Sys.Controllers
                         EnumProcessType.NonFormat, retId > 0 ? EnumMsgIcon.Success : EnumMsgIcon.Error);
                 return Json(new { status = true, message = response });
             }
+            var permissionUsers = _sysModuleCache.GetPermissionUsers(model.ModuleId);
 
             model.Users = _sysUserCache.GetAll().Where(u => u.IsActive)
                 .Select(u => new ListItem(u.FullName, u.UserId.ToString())).ToList();
-
+            model.SelectedUser = JsonConvert.SerializeObject(permissionUsers.Select(e => new { id = e.UserId, text = e.FullName }).ToArray());
             return PartialView("_PermissionModule", model);
+        }
+
+        [HttpGet]
+        [AjaxOnly]
+        [ActionType(Type = EnumActionType.View)]
+        public ActionResult SearchUser(string q, int moduleId)
+        {
+            var currentModule = _sysModuleCache.GetById(moduleId);
+            List<int?> enterprisesSelected = new List<int?>();
+
+            if (currentModule != null)
+            {
+                enterprisesSelected = _sysModuleCache.GetPermissionUsers(currentModule.ModuleId)
+                    .Select(o => o.UserId).ToList();
+            }
+
+            var resultModule = _sysModuleCache.GetAll()
+                .Where(o => enterprisesSelected.All(e => e != o.ModuleId) && o.ModuleName.ToLower().Contains(q.ToLower()))
+                .Select(u => new { id = u.ModuleId, text = u.ModuleName }).ToArray();
+
+
+            return Json(new
+            {
+                status = true,
+                results = resultModule
+            }, JsonRequestBehavior.AllowGet);
         }
 
         #region Private function

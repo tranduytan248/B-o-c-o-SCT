@@ -178,14 +178,14 @@ namespace CenIT.ReportTourism.Caches.Cate
         [DataObjectMethod(DataObjectMethodType.Select, true)]
         public List<CateEnterprisePermissionsModel> GetCateEnterprisePermissions(string userId)
         {
-            var rawKey = string.Concat("GroupsByUserID-", userId);
+            var rawKey = string.Concat("EnterprisesByUserID-", userId);
             // See if the item is in the cache
-            if (GetCacheItem(rawKey) is List<CateEnterprisePermissionsModel> groups) return groups;
+            if (GetCacheItem(rawKey) is List<CateEnterprisePermissionsModel> enterprises) return enterprises;
             // Item not found in cache - retrieve it and insert it into the cache
-            groups = Api.GetCateEnterprisePermissions(userId);
-            if (groups != null) AddCacheItem(rawKey, groups);
+            enterprises = Api.GetCateEnterprisePermissions(userId);
+            if (enterprises != null) AddCacheItem(rawKey, enterprises);
 
-            return groups;
+            return enterprises;
         }
 
         [DataObjectMethod(DataObjectMethodType.Update, false)]

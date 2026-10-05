@@ -16,7 +16,13 @@ namespace CenIT.ReportTourism.Models.Sys
 
         [CustomDisplayName("AppModule_Label_PermissionUsers")]
         [CustomRequired]
-        public string PermissionUserIDs { get; set; }
+        public List<int> ListUserIds { get; set; }
+
+        [CustomDisplayName("AppModule_Label_PermissionUsers")]
+        public string PermissionUserIds { get; set; }
+
+        public string SelectedUser { get; set; }
+
 
         [CustomDisplayName("AppModule_Label_PermissionUsers")]
         public List<ListItem> Users { get; set; }

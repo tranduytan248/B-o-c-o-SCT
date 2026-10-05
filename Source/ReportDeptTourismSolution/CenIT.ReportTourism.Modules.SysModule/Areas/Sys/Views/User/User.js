@@ -5,6 +5,15 @@ var _tableUser;
 
 $(document).ready(function() {
     initTableUser();
+
+    $('.dataTables_filter input')
+        .unbind('keypress keyup input')
+        .bind('keypress', function (e) {
+            // Check if the pressed key is Enter (keycode 13)
+            if (e.which == 13) {
+                _tableUser.search(this.value).draw();
+            }
+        });
 });
 
 function initTableUser() {
@@ -17,6 +26,9 @@ function initTableUser() {
         "lengthChange": true,
         "processing": true,
         "serverSide": true,
+        "search": {
+            return: true
+        },
         "ajax":
         {
             "url": _UserActionURLs.User_GetData,

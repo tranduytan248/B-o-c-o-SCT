@@ -154,8 +154,7 @@ namespace CenIT.ReportTourism.Biz.Sys
         public int SavePermissionModule(SysPermissionModuleModel model)
         {
             var result = AppProcessor.ProcedureProvider.Execute(_sysModulePermissionSave, DATA_PROVIDER_NAME,
-                model.ModuleId,
-                EString.SplitToTable(model.PermissionUserIDs, new[] { ',' })
+                model.ModuleId, EString.SplitToTable(model.PermissionUserIds, new[] { ',' })
             );
 
             return result.GetValueOrDefault(0);
