@@ -316,6 +316,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>_02ThongKeQuocTichKhachDuLich.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Chatbot\ChatbotOptions.cs" />
+    <Compile Include="Chatbot\ChatbotCapability.cs" />
+    <Compile Include="Chatbot\ChatbotCatalog.cs" />
+    <Compile Include="Chatbot\ChatbotTools.cs" />
+    <Compile Include="Chatbot\ChatbotAnalytics.cs" />
+    <Compile Include="Chatbot\ChatbotQueries.cs" />
+    <Compile Include="Chatbot\ChatbotAccess.cs" />
+    <Compile Include="Controllers\ChatbotController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -1617,6 +1625,7 @@
     <Content Include="Areas\Report\Views\Dashboard\Progress.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardNavigation.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardFilters.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardEnterpriseDetail.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardAlerts.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardSubmissionDetails.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_EnterpriseMovement.cshtml" />
@@ -1703,6 +1712,9 @@
     <Content Include="Contents\plugins\vegas\zepto.min.js" />
     <Content Include="Contents\plugins\widget\jquery-ui.custom.min.js" />
     <Content Include="Contents\plugins\widget\widget.css" />
+    <Content Include="Chatbot\external-tools.json" />
+    <Content Include="Contents\js\chatbot.js" />
+    <Content Include="Views\Shared\_Chatbot.cshtml" />
     <Content Include="Global.asax" />
     <Content Include="Libraries\Connectors\Plugable.OracleConnectority.dll" />
     <Content Include="Libraries\Connectors\Plugable.SQLConnectority.dll" />

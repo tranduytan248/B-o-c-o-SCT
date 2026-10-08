@@ -187,6 +187,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Report\Controllers\DashboardController.cs" />
+    <Compile Include="Areas\Report\Controllers\IndustryScopedReportController.cs" />
     <Compile Include="Areas\Report\Controllers\HomeController.cs" />
     <Compile Include="Areas\Report\Controllers\ImportController.cs" />
     <Compile Include="Areas\Report\Controllers\ReportController.cs" />
@@ -258,6 +259,7 @@
     <Content Include="Areas\Report\Views\Dashboard\Warnings.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\Progress.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardFilters.cshtml" />
+    <Content Include="Areas\Report\Views\Dashboard\_DashboardEnterpriseDetail.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardNavigation.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_EnterpriseMovement.cshtml" />
     <Content Include="Areas\Report\Views\Dashboard\_DashboardAlerts.cshtml" />

@@ -1,0 +1,759 @@
+{
+  "date": "2026-10-07",
+  "method": "Read-only SELECT bodies with proposed scope functions inlined; no schema deployment or data changes",
+  "caseCount": 51,
+  "cases": [
+    {
+      "case": "enterprise_0_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": true,
+        "HasExplicitAssignments": true,
+        "CanReadProvince": false,
+        "CanReadDashboard": false,
+        "CanReadImports": true,
+        "CanReadRegistryDetail": false
+      }
+    },
+    {
+      "case": "enterprise_0_foreign_id",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 0
+    },
+    {
+      "case": "enterprise_1_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": true,
+        "HasExplicitAssignments": true,
+        "CanReadProvince": false,
+        "CanReadDashboard": false,
+        "CanReadImports": true,
+        "CanReadRegistryDetail": false
+      }
+    },
+    {
+      "case": "enterprise_1_foreign_id",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 0
+    },
+    {
+      "case": "admin_0_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": false,
+        "HasExplicitAssignments": true,
+        "CanReadProvince": false,
+        "CanReadDashboard": true,
+        "CanReadImports": true,
+        "CanReadRegistryDetail": true
+      }
+    },
+    {
+      "case": "admin_0_visible_population",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 5
+    },
+    {
+      "case": "admin_1_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": false,
+        "HasExplicitAssignments": false,
+        "CanReadProvince": true,
+        "CanReadDashboard": true,
+        "CanReadImports": true,
+        "CanReadRegistryDetail": true
+      }
+    },
+    {
+      "case": "admin_1_visible_population",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 18854
+    },
+    {
+      "case": "admin_2_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": false,
+        "HasExplicitAssignments": false,
+        "CanReadProvince": true,
+        "CanReadDashboard": true,
+        "CanReadImports": true,
+        "CanReadRegistryDetail": true
+      }
+    },
+    {
+      "case": "admin_2_visible_population",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 18854
+    },
+    {
+      "case": "admin_3_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": false,
+        "HasExplicitAssignments": false,
+        "CanReadProvince": true,
+        "CanReadDashboard": true,
+        "CanReadImports": true,
+        "CanReadRegistryDetail": true
+      }
+    },
+    {
+      "case": "admin_3_visible_population",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 18854
+    },
+    {
+      "case": "admin_4_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": false,
+        "HasExplicitAssignments": false,
+        "CanReadProvince": true,
+        "CanReadDashboard": true,
+        "CanReadImports": false,
+        "CanReadRegistryDetail": true
+      }
+    },
+    {
+      "case": "admin_4_visible_population",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 18854
+    },
+    {
+      "case": "admin_5_flags",
+      "rows": 1,
+      "columns": [
+        "UserId",
+        "UserName",
+        "HasEnterpriseRole",
+        "HasProvinceRole",
+        "HasExplicitAssignments",
+        "CanReadProvince",
+        "CanReadDashboard",
+        "CanReadImports",
+        "CanReadRegistryDetail"
+      ],
+      "expectedDenial": false,
+      "flags": {
+        "HasEnterpriseRole": false,
+        "HasExplicitAssignments": false,
+        "CanReadProvince": true,
+        "CanReadDashboard": true,
+        "CanReadImports": false,
+        "CanReadRegistryDetail": true
+      }
+    },
+    {
+      "case": "admin_5_visible_population",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 18854
+    },
+    {
+      "case": "unknown_account_denial",
+      "denied": true
+    },
+    {
+      "case": "unknown_account_empty_scope",
+      "rows": 1,
+      "columns": [
+        "VisibleCount"
+      ],
+      "expectedDenial": false,
+      "visible": 0
+    },
+    {
+      "case": "p_Report_Chatbot_FilterOptions_admin",
+      "rows": 5,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 5
+    },
+    {
+      "case": "p_Report_Chatbot_FilterOptions_province_admin",
+      "rows": 10,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 18854
+    },
+    {
+      "case": "p_Report_Chatbot_FilterOptions_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "p_Report_Chatbot_Snapshot_admin",
+      "rows": 3,
+      "columns": [
+        "ForMonth",
+        "TypeReport",
+        "EnterpriseId",
+        "BusinessName",
+        "TaxCode",
+        "WardId",
+        "WardName",
+        "EconomicSectorId",
+        "EconomicSectorName",
+        "IndustryIds",
+        "IndustryName",
+        "DataImported",
+        "FileSubmittedAnyType",
+        "ImportLate",
+        "FileLate",
+        "FirstImportedAt",
+        "LastImportedAt",
+        "FileCreatedAt",
+        "Reason",
+        "PrimaryValue",
+        "SecondaryValue",
+        "TertiaryValue",
+        "PrimaryConflict",
+        "SecondaryConflict",
+        "TertiaryConflict",
+        "DuplicateMetric",
+        "InvalidUnit",
+        "InvalidNumber",
+        "MetricConflict"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "p_Report_Chatbot_Snapshot_province_admin",
+      "rows": 70,
+      "columns": [
+        "ForMonth",
+        "TypeReport",
+        "EnterpriseId",
+        "BusinessName",
+        "TaxCode",
+        "WardId",
+        "WardName",
+        "EconomicSectorId",
+        "EconomicSectorName",
+        "IndustryIds",
+        "IndustryName",
+        "DataImported",
+        "FileSubmittedAnyType",
+        "ImportLate",
+        "FileLate",
+        "FirstImportedAt",
+        "LastImportedAt",
+        "FileCreatedAt",
+        "Reason",
+        "PrimaryValue",
+        "SecondaryValue",
+        "TertiaryValue",
+        "PrimaryConflict",
+        "SecondaryConflict",
+        "TertiaryConflict",
+        "DuplicateMetric",
+        "InvalidUnit",
+        "InvalidNumber",
+        "MetricConflict"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "p_Report_Chatbot_Snapshot_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "p_Report_Chatbot_Summary_admin",
+      "rows": 1,
+      "columns": [
+        "ActiveEnterprises",
+        "ConfiguredEnterprises",
+        "MissingBusinessRow",
+        "MissingIndustry",
+        "MissingReportType",
+        "Type1Expected",
+        "Type2Expected",
+        "Type3Expected",
+        "TypeZeroRows",
+        "FutureDatedRows",
+        "OutsideCohortEnterprises"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "p_Report_Chatbot_Summary_province_admin",
+      "rows": 1,
+      "columns": [
+        "ActiveEnterprises",
+        "ConfiguredEnterprises",
+        "MissingBusinessRow",
+        "MissingIndustry",
+        "MissingReportType",
+        "Type1Expected",
+        "Type2Expected",
+        "Type3Expected",
+        "TypeZeroRows",
+        "FutureDatedRows",
+        "OutsideCohortEnterprises"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "p_Report_Chatbot_Summary_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "p_Report_Chatbot_ProgressDetails_admin",
+      "rows": 5,
+      "columns": [
+        "TotalRow",
+        "EnterpriseId",
+        "BusinessName",
+        "TaxCode",
+        "WardId",
+        "WardName",
+        "EconomicSectorId",
+        "EconomicSectorName",
+        "IndustryIds",
+        "IndustryName",
+        "DataImported",
+        "FileSubmittedAnyType",
+        "ImportLate",
+        "FileLate",
+        "FirstImportedAt",
+        "LastImportedAt",
+        "FileCreatedAt",
+        "Reason",
+        "PrimaryValue",
+        "SecondaryValue",
+        "TertiaryValue",
+        "PrimaryConflict",
+        "SecondaryConflict",
+        "TertiaryConflict",
+        "DuplicateMetric",
+        "InvalidUnit",
+        "InvalidNumber",
+        "MetricConflict",
+        "RowNo"
+      ],
+      "expectedDenial": false,
+      "total": 5
+    },
+    {
+      "case": "p_Report_Chatbot_ProgressDetails_province_admin",
+      "rows": 10,
+      "columns": [
+        "TotalRow",
+        "EnterpriseId",
+        "BusinessName",
+        "TaxCode",
+        "WardId",
+        "WardName",
+        "EconomicSectorId",
+        "EconomicSectorName",
+        "IndustryIds",
+        "IndustryName",
+        "DataImported",
+        "FileSubmittedAnyType",
+        "ImportLate",
+        "FileLate",
+        "FirstImportedAt",
+        "LastImportedAt",
+        "FileCreatedAt",
+        "Reason",
+        "PrimaryValue",
+        "SecondaryValue",
+        "TertiaryValue",
+        "PrimaryConflict",
+        "SecondaryConflict",
+        "TertiaryConflict",
+        "DuplicateMetric",
+        "InvalidUnit",
+        "InvalidNumber",
+        "MetricConflict",
+        "RowNo"
+      ],
+      "expectedDenial": false,
+      "total": 18854
+    },
+    {
+      "case": "p_Report_Chatbot_ProgressDetails_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "p_Report_Chatbot_Metadata_admin",
+      "rows": 1,
+      "columns": [
+        "ActiveIndicatorRows",
+        "ObservedEnterpriseIds",
+        "FirstSourcePeriod",
+        "LastSourcePeriod",
+        "ObservedMonths",
+        "OrphanIndicatorRows"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "p_Report_Chatbot_Metadata_province_admin",
+      "rows": 1,
+      "columns": [
+        "ActiveIndicatorRows",
+        "ObservedEnterpriseIds",
+        "FirstSourcePeriod",
+        "LastSourcePeriod",
+        "ObservedMonths",
+        "OrphanIndicatorRows"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "p_Report_Chatbot_Metadata_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "p_Report_Chatbot_IndicatorData_admin",
+      "rows": 10,
+      "columns": [
+        "TotalRow",
+        "ReportId",
+        "EnterpriseId",
+        "BusinessName",
+        "TaxCode",
+        "WardId",
+        "ReportMonth",
+        "SourcePeriod",
+        "TypeReport",
+        "TypeReportName",
+        "Index",
+        "Level",
+        "Code",
+        "Targets",
+        "Unit",
+        "PerformPreviousPeriod",
+        "PerformInPeriod",
+        "AccumulatedBeginingOfYear",
+        "ComparedSamePeriodLastYear",
+        "IsLate",
+        "CreatedDate",
+        "LastModifiedDate",
+        "ExactCodeRows"
+      ],
+      "expectedDenial": false,
+      "total": 18
+    },
+    {
+      "case": "p_Report_Chatbot_IndicatorData_province_admin",
+      "rows": 10,
+      "columns": [
+        "TotalRow",
+        "ReportId",
+        "EnterpriseId",
+        "BusinessName",
+        "TaxCode",
+        "WardId",
+        "ReportMonth",
+        "SourcePeriod",
+        "TypeReport",
+        "TypeReportName",
+        "Index",
+        "Level",
+        "Code",
+        "Targets",
+        "Unit",
+        "PerformPreviousPeriod",
+        "PerformInPeriod",
+        "AccumulatedBeginingOfYear",
+        "ComparedSamePeriodLastYear",
+        "IsLate",
+        "CreatedDate",
+        "LastModifiedDate",
+        "ExactCodeRows"
+      ],
+      "expectedDenial": false,
+      "total": 474
+    },
+    {
+      "case": "p_Report_Chatbot_IndicatorData_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "p_Report_Chatbot_ReportFiles_admin",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "EnterpriseId",
+        "BusinessName",
+        "ReportMonth",
+        "SourcePeriod",
+        "IsDeleted",
+        "IsLate",
+        "Reason",
+        "CreatedDate",
+        "LastModifiedDate"
+      ],
+      "expectedDenial": false,
+      "total": 0
+    },
+    {
+      "case": "p_Report_Chatbot_ReportFiles_province_admin",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "EnterpriseId",
+        "BusinessName",
+        "ReportMonth",
+        "SourcePeriod",
+        "IsDeleted",
+        "IsLate",
+        "Reason",
+        "CreatedDate",
+        "LastModifiedDate"
+      ],
+      "expectedDenial": false,
+      "total": 1
+    },
+    {
+      "case": "p_Report_Chatbot_ReportFiles_enterprise_denial",
+      "denied": true
+    },
+    {
+      "case": "products_own",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "ProductId",
+        "ProductCode",
+        "ProductName",
+        "Unit",
+        "IndustryId",
+        "IndustryName",
+        "IsMainProduct",
+        "DisplayOrder"
+      ],
+      "expectedDenial": false,
+      "total": 0
+    },
+    {
+      "case": "products_foreign",
+      "denied": true
+    },
+    {
+      "case": "scoped_selector_latest",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 1
+    },
+    {
+      "case": "scoped_selector_year",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 1
+    },
+    {
+      "case": "scoped_selector_ward",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 1
+    },
+    {
+      "case": "scoped_selector_sector",
+      "rows": 1,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 1
+    },
+    {
+      "case": "scoped_selector_industry",
+      "rows": 2,
+      "columns": [
+        "TotalRow",
+        "Value",
+        "Text"
+      ],
+      "expectedDenial": false,
+      "total": 2
+    },
+    {
+      "case": "scoped_metadata_catalog",
+      "rows": 10,
+      "columns": [
+        "TotalRow",
+        "TypeReport",
+        "Code",
+        "Targets",
+        "Unit",
+        "SourceKind",
+        "SourceRows",
+        "SuppliedRows",
+        "FirstSourcePeriod",
+        "LastSourcePeriod",
+        "ParentCode"
+      ],
+      "expectedDenial": false,
+      "total": 56
+    },
+    {
+      "case": "scoped_metadata_policy",
+      "rows": 2,
+      "columns": [
+        "ConfigKey",
+        "ConfigValue",
+        "ConfigDesc"
+      ],
+      "expectedDenial": false
+    },
+    {
+      "case": "category_scope_assigned_enterprise",
+      "rows": 1,
+      "expectedDenial": false
+    },
+    {
+      "case": "category_scope_detail_enterprise",
+      "denied": true
+    },
+    {
+      "case": "category_scope_detail_assigned_admin",
+      "rows": 5,
+      "expectedDenial": false
+    }
+  ]
+}

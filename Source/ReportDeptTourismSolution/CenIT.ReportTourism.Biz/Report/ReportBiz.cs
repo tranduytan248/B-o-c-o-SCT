@@ -9,7 +9,7 @@ namespace CenIT.ReportTourism.Biz.Report
 
         public DataTable GetDataReport(string procedureName, params object[] p)
         {
-            var dataReport = AppProcessor.ProcedureProvider.ExecuteProcedure(procedureName, DATA_PROVIDER_NAME, p);
+            var dataReport = AppProcessor.ProcedureProvider.ExecuteProcedure(ReportIndustryScope.Procedure(procedureName), DATA_PROVIDER_NAME, ReportIndustryScope.Parameters(p));
             return dataReport ?? new DataTable();
         }
     }
