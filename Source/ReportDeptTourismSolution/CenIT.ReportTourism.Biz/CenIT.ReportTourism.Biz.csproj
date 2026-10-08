@@ -34,6 +34,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Data.DataSetExtensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cate\CateEnterpriseRegisterNotifyBiz.cs" />
@@ -52,6 +54,7 @@
     <Compile Include="Cate\CateEnterpriseTypeBiz.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Report\ReportBiz.cs" />
+    <Compile Include="Report\ReportIndustryScope.cs" />
     <Compile Include="Report\ReportDashboardBiz.cs" />
     <Compile Include="Report\ReportDataImportBiz.cs" />
     <Compile Include="Report\ReportExtendInfoBiz.cs" />

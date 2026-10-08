@@ -1,0 +1,298 @@
+connection,provider,logicalName,physicalSP,deployed,parameters,mappingFile
+BaseApp,SysProvider,Cate_Province_Delete,p_Cate_Province_Delete,True,@ProvinceId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Province_Get,p_Cate_Province_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Province_GetById,p_Cate_Province_GetById,True,@ProvinceId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Province_Save,p_Cate_Province_Save,True,@ProvinceId int; @ProvinceCode varchar; @ProvinceName nvarchar; @UserSave varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Province_GetViaWardId,p_Cate_Province_GetViaWardId,True,@WardId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Street_Delete,p_Cate_Street_Delete,True,@StreetId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Street_Get,p_Cate_Street_Get,True,@ProvinceId int; @WardId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Street_GetById,p_Cate_Street_GetById,True,@StreetId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Street_Save,p_Cate_Street_Save,True,@StreetId int; @ParentId int; @StreetCode varchar; @StreetName nvarchar; @WardIds TypeWards; @UserSave varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Street_GetByWard,p_Cate_Street_GetByWard,True,@WardId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Ward_Delete,p_Cate_Ward_Delete,True,@WardId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Ward_Get,p_Cate_Ward_Get,True,@ProvincesIds varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Ward_GetById,p_Cate_Ward_GetById,True,@WardId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Ward_Save,p_Cate_Ward_Save,True,@WardId int; @ProvinceId int; @WardCode varchar; @WardName nvarchar; @UserSave varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Ward_GetByProvinceId,p_Cate_Ward_GetByProvinceId,True,@ProvinceId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Ward_GetByStreetId,p_Cate_Ward_GetByStreetId,True,@StreetId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Team_Delete,p_Cate_Team_Delete,True,@TeamId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Team_Get,p_Cate_Team_Get,True,@ProvinceId int; @WardId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Team_GetById,p_Cate_Team_GetById,True,@TeamId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Team_Save,p_Cate_Team_Save,True,@TeamId int; @WardId int; @TeamCode varchar; @TeamName nvarchar; @UserSave varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Team_GetByWardId,Cate_Team_GetByWardId,False,,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_National_Get,p_Cate_National_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_National_Save,p_Cate_National_Save,True,@NationalID int; @NationalCode nvarchar; @NationalName nvarchar; @ContinentId int; @ContinentName nvarchar; @CreatedBy varchar; @LastModifiedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_National_Delete,p_Cate_National_Delete,True,@NationalID int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_National_GetByID,p_Cate_National_GetByID,True,@NationalID int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_Get,p_Cate_Enterprises_Get,True,@ForUser varchar; @TypeBusinessIds varchar; @WardIds varchar; @ProvinceIds varchar; @IndustryIds varchar; @EnterpriseTypeIds varchar; @EconomicSectorIds varchar; @StatusIds varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_Save,p_Cate_Enterprises_Save,True,@EnterpriseId int; @OwnerEnterpriseName nvarchar; @BusinessName nvarchar; @TaxCode varchar; @BusinessAddress nvarchar; @StreetName nvarchar; @WardId int; @WardName nvarchar; @IndustryIds varchar; @TypeBusinessIds varchar; @EnterpriseTypeId int; @EconomicSectorId int; @EnterpriseStatusId int; @LegalRepresentationName nvarchar; @LegalRepresentationPhone varchar; @LegalRepresentationEmail varchar; @Website varchar; @Phone varchar; @Email varchar; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_Delete,p_Cate_Enterprises_Delete,True,@EnterpriseId int; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_GetByID,p_Cate_Enterprises_GetByID,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_SaveDocs,p_Cate_Enterprises_SaveDocs,True,@EnterpriseIdId int; @RefDocs CateDoc; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_ChangeStatus,p_Cate_Enterprises_ChangeStatus,True,@EnterpriseId int; @IsActive bit; @Reason nvarchar; @UpdatedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_GetViaUser,p_Cate_Enterprises_GetViaUser,True,@ForUser varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_GetNotSumitReportYet,p_Cate_Enterprises_GetNotSumitReportYet,True,@OnMonth datetime,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_Import,p_Cate_Enterprises_Import,True,@TypeBusiness int; @TypeBusinessName nvarchar; @DataImport DataEnterpriseImport; @ImportBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_Search,p_Cate_Enterprises_Search,True,@TaxCode varchar; @Email varchar; @BusinessName nvarchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_Register,p_Cate_Enterprises_Register,True,@EnterpriseId int; @OwnerEnterpriseName nvarchar; @BusinessName nvarchar; @TaxCode varchar; @BusinessAddress nvarchar; @StreetName nvarchar; @WardId int; @WardName nvarchar; @IndustryIds varchar; @TypeBusinessIds varchar; @EnterpriseTypeId int; @EconomicSectorId int; @EnterpriseStatusId int; @LegalRepresentationName nvarchar; @LegalRepresentationPhone varchar; @LegalRepresentationEmail varchar; @Website varchar; @Phone varchar; @Email varchar; @Password varchar; @Salt varchar; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Enterprises_SearchSelect2,p_Cate_Enterprises_SearchSelect2,True,@Keyword nvarchar; @TypeBusiness varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseRegisterNotifies_Get,p_Cate_EnterpriseRegisterNotifies_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseRegisterNotifies_Save,p_Cate_EnterpriseRegisterNotifies_Save,True,@EnterpriseID int; @HasProcessed bit; @IsConfirm bit; @CompletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseRegisterNotifies_GetByID,p_Cate_EnterpriseRegisterNotifies_GetByID,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_PublicCates_Get,p_Cate_PublicCates_Get,True,@CateTypeIds varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_PublicCates_Save,p_Cate_PublicCates_Save,True,@CateId int; @CateName nvarchar; @CateTypeId int; @CateTypeName nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_PublicCates_Delete,p_Cate_PublicCates_Delete,True,@CateId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_PublicCates_GetByID,p_Cate_PublicCates_GetByID,True,@CateId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Docs_Delete,p_Cate_Docs_Delete,True,@DocId uniqueidentifier; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Docs_GetByID,p_Cate_Docs_GetByID,True,@DocId uniqueidentifier,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_SaveCertificates,p_Cate_AccommodationServices_SaveCertificates,True,@EnterpriseId int; @SecurityCertificate uniqueidentifier; @SecurityDocs CateDoc; @FireProtectionCertificate uniqueidentifier; @FireProtectionDocs CateDoc; @EnvironmentalProtectionCertificate uniqueidentifier; @EnvProtectionDocs CateDoc; @HygieneFoodSafetyCertificate uniqueidentifier; @HygieneFoodSafetyDocs CateDoc; @ConstructionPermit uniqueidentifier; @ConstructionPermitDocs CateDoc; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_GetCertificates,p_Cate_AccommodationServices_GetCertificates,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_GetInfrastructures,p_Cate_AccommodationServices_GetInfrastructures,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_SaveInfrastructures,p_Cate_AccommodationServices_SaveInfrastructures,True,@EnterpriseId int; @InitialInvestmentCapital float; @UpgradeInvestmentCapital float; @TotalArea float; @TotalConstructionArea float; @TotalRoom int; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_GetHRInformations,p_Cate_AccommodationServices_GetHRInformations,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_SaveHRInformations,p_Cate_AccommodationServices_SaveHRInformations,True,@EnterpriseId int; @TotalStaff int; @StaffOnLeader int; @StaffOnManager int; @StaffOnReceptionist int; @StaffOnRestaurant int; @StaffOnBar int; @StaffOnKitchen int; @StaffOnRoom int; @StaffOnLiteracyOnCollege int; @StaffOnUniversity int; @StaffOnCollege int; @StaffOnIntermediate int; @StaffOnHighSchool int; @HaveForeignLanguageCertificate int; @HaveProfessionalCertificate int; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_GetInfo,p_Cate_AccommodationServices_GetInfo,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_SaveInfo,p_Cate_AccommodationServices_SaveInfo,True,@AccommodationServiceId int; @EnterpriseId int; @AccommodationClass int; @AccommodationClassCertificate uniqueidentifier; @DataCertificate CateDoc; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_Infrastructures_Rooms_Get,p_Cate_AccommodationServices_Infrastructures_Rooms_Get,True,@EnterpriseId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_Infrastructures_Rooms_Save,p_Cate_AccommodationServices_Infrastructures_Rooms_Save,True,@InfrastructureRoomId int; @EnterpriseId int; @RoomType int; @TotalRooms int; @AnnouncedPrice float; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_Infrastructures_Rooms_Delete,p_Cate_AccommodationServices_Infrastructures_Rooms_Delete,True,@InfrastructureRoomId int; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_Infrastructures_Rooms_GetByID,p_Cate_AccommodationServices_Infrastructures_Rooms_GetByID,True,@InfrastructureRoomId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_TypeServices_Get,p_Cate_AccommodationServices_TypeServices_Get,True,@EnterpriseId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_TypeServices_Save,p_Cate_AccommodationServices_TypeServices_Save,True,@AccommodationTypeServiceId int; @EnterpriseId int; @ServiceId int; @ServiceName nvarchar; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_TypeServices_Delete,p_Cate_AccommodationServices_TypeServices_Delete,True,@AccommodationTypeServiceId int; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_AccommodationServices_TypeServices_GetByID,p_Cate_AccommodationServices_TypeServices_GetByID,True,@AccommodationTypeServiceId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_SaveCertificates,p_Cate_TravelingServices_SaveCertificates,True,@EnterpriseId int; @LicenseFile uniqueidentifier; @LicenseDocs CateDoc; @LicenseNumber varchar; @ReleaseDate datetime; @TimeRelease int; @Inbound bit; @Outbound bit; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_GetCertificates,p_Cate_TravelingServices_GetCertificates,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_SaveCertificateTravelEscrows,p_Cate_TravelingServices_SaveCertificateTravelEscrows,True,@EnterpriseId int; @CertificateId uniqueidentifier; @CertificateDocs CateDoc; @BankName nvarchar; @BankAccountNo varchar; @Amount float; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_GetCertificateTravelEscrows,p_Cate_TravelingServices_GetCertificateTravelEscrows,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_GetHRInformations,p_Cate_TravelingServices_GetHRInformations,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_SaveHRInformations,p_Cate_TravelingServices_SaveHRInformations,True,@EnterpriseId int; @TotalStaff int; @StaffOnLeader int; @StaffOnManager int; @TourGuide int; @StaffOnLiteracyOnCollege int; @StaffOnUniversity int; @StaffOnCollege int; @StaffOnIntermediate int; @StaffOnHighSchool int; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_BranchOffices_Get,p_Cate_TravelingServices_BranchOffices_Get,True,@EnterpriseId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_BranchOffices_Save,p_Cate_TravelingServices_BranchOffices_Save,True,@BranchOfficeId int; @EnterpriseId int; @BranchName nvarchar; @BranchAddress nvarchar; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_BranchOffices_Delete,p_Cate_TravelingServices_BranchOffices_Delete,True,@BranchOfficeId int; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TravelingServices_BranchOffices_GetByID,p_Cate_TravelingServices_BranchOffices_GetByID,True,@BranchOfficeId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_SaveCertificates,p_Cate_TransportTouristsServices_SaveCertificates,True,@EnterpriseId int; @LicenseFile uniqueidentifier; @LicenseDocs CateDoc; @LicenseNumber varchar; @ReleaseDate datetime; @TimeRelease int; @WaterWay bit; @Road bit; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_GetCertificates,p_Cate_TransportTouristsServices_GetCertificates,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_GetHRInformations,p_Cate_TransportTouristsServices_GetHRInformations,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_SaveHRInformations,p_Cate_TransportTouristsServices_SaveHRInformations,True,@EnterpriseId int; @TotalStaff int; @StaffOnLiteracyOnCollege int; @StaffOnUniversity int; @StaffOnCollege int; @StaffOnIntermediate int; @StaffOnHighSchool int; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_GetInfrastructures,p_Cate_TransportTouristsServices_GetInfrastructures,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_SaveInfrastructures,p_Cate_TransportTouristsServices_SaveInfrastructures,True,@EnterpriseId int; @TotalTransports float; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_Infrastructures_ClassTransports_Get,p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Get,True,@EnterpriseId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_Infrastructures_ClassTransports_Save,p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Save,True,@InfrastructureClassTransportId int; @EnterpriseId int; @TypeTransport int; @TypeTransportName nvarchar; @ClassTransportName nvarchar; @TotalTransports int; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_Infrastructures_ClassTransports_Delete,p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_Delete,True,@InfrastructureClassTransportId int; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TransportTouristsServices_Infrastructures_ClassTransports_GetByID,p_Cate_TransportTouristsServices_Infrastructures_ClassTransports_GetByID,True,@InfrastructureClassTransportId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_SaveCertificates,p_Cate_TouristAttractions_SaveCertificates,True,@EnterpriseId int; @LicenseFile uniqueidentifier; @LicenseDocs CateDoc; @LicenseNumber varchar; @ReleaseDate datetime; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_GetCertificates,p_Cate_TouristAttractions_GetCertificates,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_GetHRInformations,p_Cate_TouristAttractions_GetHRInformations,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_SaveHRInformations,p_Cate_TouristAttractions_SaveHRInformations,True,@EnterpriseId int; @TotalStaff int; @StaffOnLiteracyOnCollege int; @StaffOnUniversity int; @StaffOnCollege int; @StaffOnIntermediate int; @StaffOnHighSchool int; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_GetInfrastructures,p_Cate_TouristAttractions_GetInfrastructures,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_SaveInfrastructures,p_Cate_TouristAttractions_SaveInfrastructures,True,@EnterpriseId int; @InitialInvestmentCapital float; @UpgradeInvestmentCapital float; @TotalArea float; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_GetInfo,p_Cate_TouristAttractions_GetInfo,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_SaveInfo,p_Cate_TouristAttractions_SaveInfo,True,@TouristAttractionId int; @EnterpriseId int; @TypeTourismActivities varchar; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_TypeServices_Get,p_Cate_TouristAttractions_TypeServices_Get,True,@EnterpriseId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_TypeServices_Save,p_Cate_TouristAttractions_TypeServices_Save,True,@TouristAttractionTypeServiceId int; @EnterpriseId int; @ServiceName nvarchar; @Reason nvarchar; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_TypeServices_Delete,p_Cate_TouristAttractions_TypeServices_Delete,True,@TouristAttractionTypeServiceId int; @Reason nvarchar; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_TouristAttractions_TypeServices_GetByID,p_Cate_TouristAttractions_TypeServices_GetByID,True,@TouristAttractionTypeServiceId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_SaveCertificates,p_Cate_ServicesForTourists_SaveCertificates,True,@EnterpriseId int; @LicenseFile uniqueidentifier; @LicenseDocs CateDoc; @LicenseNumber varchar; @ReleaseDate date; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_GetCertificates,p_Cate_ServicesForTourists_GetCertificates,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_GetHRInformations,p_Cate_ServicesForTourists_GetHRInformations,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_SaveHRInformations,p_Cate_ServicesForTourists_SaveHRInformations,True,@EnterpriseId int; @TotalStaff int; @StaffOnLiteracyOnCollege int; @StaffOnUniversity int; @StaffOnCollege int; @StaffOnIntermediate int; @StaffOnHighSchool int; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_GetInfrastructures,p_Cate_ServicesForTourists_GetInfrastructures,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_SaveInfrastructures,p_Cate_ServicesForTourists_SaveInfrastructures,True,@EnterpriseId int; @InitialInvestmentCapital float; @UpgradeInvestmentCapital float; @TotalArea float; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_GetInfo,p_Cate_ServicesForTourists_GetInfo,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_ServicesForTourists_SaveInfo,p_Cate_ServicesForTourists_SaveInfo,True,@ServicesForTouristId int; @EnterpriseId int; @TypeServicesForTourists varchar; @Reason nvarchar; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterprisePermissions_Get,p_Cate_EnterprisePermissions_Get,True,@UserName nvarchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterprisePermissions_Detele,p_Cate_EnterprisePermissions_Detele,True,@EnterpriseId int; @UserName nvarchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterprisePermissions_Save,p_Cate_EnterprisePermissions_Save,True,@EnterpriseIds varchar; @UserName varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessIndustry_Get,p_Cate_BusinessIndustry_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessIndustry_Save,p_Cate_BusinessIndustry_Save,True,@IndustryId int; @IndustryCode varchar; @IndustryName nvarchar; @ParentId int; @DisplayOrder int; @IsActive bit; @SaveBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessIndustry_Delete,p_Cate_BusinessIndustry_Delete,True,@IndustryId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessIndustry_GetByID,p_Cate_BusinessIndustry_GetByID,True,@IndustryId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProduct_Get,p_Cate_BusinessProduct_Get,True,@IndustryId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProduct_Save,p_Cate_BusinessProduct_Save,True,@ProductId int; @ProductCode varchar; @ProductName nvarchar; @IndustryId int; @ParentId int; @Unit nvarchar; @DisplayOrder int; @IsActive bit; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProduct_Delete,p_Cate_BusinessProduct_Delete,True,@ProductId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProduct_GetByID,p_Cate_BusinessProduct_GetByID,True,@ProductId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProducts_GetViaEnterprise,p_Cate_BusinessProducts_GetViaEnterprise,True,@EnterpriseId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProducts_GetByPrefix,p_Cate_BusinessProducts_GetByPrefix,True,@EnterpriseId int; @ProductCodePrefix nvarchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_BusinessProducts_GetUnconfiguredByPrefix,p_Cate_BusinessProducts_GetUnconfiguredByPrefix,True,@EnterpriseId int; @ProductCodePrefix nvarchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EconomicSector_Get,p_Cate_EconomicSector_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EconomicSector_Save,p_Cate_EconomicSector_Save,True,@EconomicSectorId int; @Code varchar; @Name nvarchar; @DisplayOrder int; @IsActive bit; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EconomicSector_Delete,p_Cate_EconomicSector_Delete,True,@EconomicSectorId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EconomicSector_GetByID,p_Cate_EconomicSector_GetByID,True,@EconomicSectorId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseStatus_Get,p_Cate_EnterpriseStatus_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseStatus_Save,p_Cate_EnterpriseStatus_Save,True,@EnterpriseStatusId int; @Code varchar; @Name nvarchar; @DisplayOrder int; @IsActive bit; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseStatus_Delete,p_Cate_EnterpriseStatus_Delete,True,@EnterpriseStatusId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseStatus_GetByID,p_Cate_EnterpriseStatus_GetByID,True,@EnterpriseStatusId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseType_Get,p_Cate_EnterpriseType_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseType_Save,p_Cate_EnterpriseType_Save,True,@EnterpriseTypeId int; @Code varchar; @Name nvarchar; @DisplayOrder int; @IsActive bit; @SavedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseType_Delete,p_Cate_EnterpriseType_Delete,True,@EnterpriseTypeId int; @DeletedBy varchar,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_EnterpriseType_GetByID,p_Cate_EnterpriseType_GetByID,True,@EnterpriseTypeId int,Cate_StoredProcedures.xml
+BaseApp,SysProvider,Cate_Chatbot_EnterpriseProducts,p_Cate_Chatbot_EnterpriseProducts,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @EnterpriseId int; @Offset int; @Limit int,Cate_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_ImportDatas,p_Report_DataImports_ImportDatas,True,@EnterpriseId int; @ForMonth datetime; @TypeReport int; @TypeReportName nvarchar; @DataReport DataReportWithIndexLevel; @ReportFile nvarchar; @Reason nvarchar; @ImportBy varchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_Get,p_Report_DataImports_Get,True,@ForEmp varchar; @EnterpriseIds varchar; @FromMonth datetime; @ToMonth datetime; @TypeBusinessIds varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_GetDataImport,p_Report_DataImports_GetDataImport,True,@EnterpriseId int; @ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_Delete,p_Report_DataImports_Delete,True,@EnterpriseId int; @OnMonth datetime; @Reason nvarchar; @DeleteBy varchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_GetForUserOnMonth,p_Report_DataImports_GetForUserOnMonth,True,@ForUser varchar; @OnMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_GetViaEnterpriseOnMonth,p_Report_DataImports_GetViaEnterpriseOnMonth,True,@EnterpriseId int; @ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_GenerateSaleOfTourism,p_Report_DataImports_GenerateSaleOfTourism,True,@ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_CheckDataImport,p_Report_DataImports_CheckDataImport,True,@OnMonth datetime; @EnterpriseId int; @DataImport DataReport,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ThongKe_BaoCaoTrongThang,p_Report_ThongKe_BaoCaoTrongThang,True,@Thang nvarchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ThongKe_BaoCaoTre,p_Report_ThongKe_BaoCaoTre,True,@Thang nvarchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ThongKe_BaoCaoChuaNop,p_Report_ThongKe_BaoCaoChuaNop,True,@Thang nvarchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ThongKe_BaoCaoDoanhNghiep,p_Report_ThongKe_BaoCaoDoanhNghiep,True,@ForMonth nvarchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_DataImports_Get,p_Report_DataImports_Get,True,@ForEmp varchar; @EnterpriseIds varchar; @FromMonth datetime; @ToMonth datetime; @TypeBusinessIds varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Reports_01_UocKetQuaHoatDongKinhDoanh,p_Report_Reports_01_UocKetQuaHoatDongKinhDoanh,True,@ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Reports_02_ThongKeQuocTichKhachDuLich,p_Report_Reports_02_ThongKeQuocTichKhachDuLich,True,@ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Reports_03_DoanhNghiepChuaGuiBaoCao,p_Report_Reports_03_DoanhNghiepChuaGuiBaoCao,True,@ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Reports_04_BaoCaoHoatDongDoanhNghiep,p_Report_Reports_04_BaoCaoHoatDongDoanhNghiep,True,@ForMonth datetime; @EnterpriseId int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_StatisticEnterprise,p_Report_Dashboard_StatisticEnterprise,True,@OnMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_StatisticTypeBusiness,p_Report_Dashboard_StatisticTypeBusiness,True,@OnMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_StatisticVisitor,p_Report_Dashboard_StatisticVisitor,True,@OnMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_StatisticMapVisitor,p_Report_Dashboard_StatisticMapVisitor,True,@OnMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_StatisticIncome,p_Report_Dashboard_StatisticIncome,True,@OnMonth datetime; @TypeStatistic int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_IndustrialSnapshot,p_Report_Dashboard_IndustrialSnapshot,True,@ForMonth date; @TypeReport int; @WardId int; @EconomicSectorId int; @IndustryId int; @EnterpriseId int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_FilterOptions,p_Report_Dashboard_FilterOptions,False,,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_ProgressDetails,p_Report_Dashboard_ProgressDetails,False,,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Dashboard_OverviewSummary,p_Report_Dashboard_OverviewSummary,True,@ForMonth date,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ExtendInfos_Get,p_Report_ExtendInfos_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ExtendInfos_Save,p_Report_ExtendInfos_Save,True,@Id int; @ForMonth datetime; @TotalGuestViaShip int; @Reason nvarchar; @SaveBy varchar,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ExtendInfos_GetByID,p_Report_ExtendInfos_GetByID,True,@Id int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_ExtendInfos_GetViaMonth,p_Report_ExtendInfos_GetViaMonth,True,@ForMonth datetime,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_IndicatorData,p_Report_Chatbot_IndicatorData,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @FromMonth date; @ToMonth date; @TypeReport int; @EnterpriseId int; @WardId int; @EconomicSectorId int; @IndustryId int; @Code varchar(50); @CodePrefix varchar(50); @Search nvarchar(250); @Offset int; @Limit int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_ReportFiles,p_Report_Chatbot_ReportFiles,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @EnterpriseId int; @FromMonth date; @ToMonth date; @Offset int; @Limit int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_Metadata,p_Report_Chatbot_Metadata,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @Kind varchar(20); @TypeReport int; @Search nvarchar(250); @Offset int; @Limit int,Report_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_Token,p_Sys_User_Token,True,@UserName nvarchar; @Password varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_Login,p_Sys_User_Login,True,@UserName nvarchar; @Password varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_LoginViaEmail,p_Sys_User_LoginViaEmail,True,@Email nvarchar; @Password varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_Save,p_Sys_User_Save,True,@UserId int; @Email varchar; @FullName nvarchar; @UserName varchar; @Password varchar; @Salt varchar; @RoleIDs DataVal; @IsActive bit; @Reason nvarchar; @CreatedBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_Get,p_Sys_User_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_GetByUserName,p_Sys_User_GetByUserName,True,@UserName varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_GetByEmail,p_Sys_User_GetByEmail,True,@Email varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_Delete,p_Sys_User_Delete,True,@UserId int; @Reason nvarchar; @DelBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_ChangePassword,p_Sys_User_ChangePassword,True,@UserName varchar; @OldPassword varchar; @NewPassword varchar; @Salt varchar; @Reason nvarchar; @ChangeBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_ResetPassword,p_Sys_User_ResetPassword,True,@UserName varchar; @Password varchar; @Salt varchar; @Reason nvarchar; @ChangeBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_Active,p_Sys_User_Active,True,@UserId int; @Reason nvarchar; @DelBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_DeActive,p_Sys_User_DeActive,True,@UserId int; @Reason nvarchar; @DelBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_SaveLogin,p_Sys_User_SaveLogin,True,@UserName nvarchar; @IsValid bit; @IpLogIn varchar; @Header nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_User_GetById,p_Sys_User_GetById,True,@UserId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Function_Register,p_Sys_Function_Register,False,,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Function_Save,p_Sys_Function_Save,True,@FunctionId int; @ModuleId int; @Area varchar; @Name nvarchar; @Description nvarchar; @Actions DataVal,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Function_Get,p_Sys_Function_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Function_GetById,p_Sys_Function_GetById,True,@FunctionId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Function_Delete,p_Sys_Function_Delete,True,@FunctionId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Function_GetAction,p_Sys_Function_GetAction,True,@FunctionId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Role_Save,p_Sys_Role_Save,True,@ID int; @Name nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Role_Get,p_Sys_Role_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Role_GetById,p_Sys_Role_GetById,True,@ID int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Role_GetByUserId,p_Sys_Role_GetByUserId,True,@UserId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Role_Delete,p_Sys_Role_Delete,True,@ID int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Role_GetAction,p_Sys_Role_GetAction,False,,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Permission_Get,p_Sys_Permission_Get,False,,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Permission_GetByRoleId,p_Sys_Permission_GetByRoleId,True,@RoleId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Permission_Save,p_Sys_Permission_Save,True,@RoleId int; @Permissions DataVal,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Permission_IsAllow,p_Sys_Permission_IsAllow,True,@UserName varchar; @AreaName varchar; @Function varchar; @Action varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Permission_GetViaUser,p_Sys_Permission_GetViaUser,True,@UserName varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Message_Get,p_Sys_Message_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Message_GetByKey,p_Sys_Message_GetByKey,True,@LabelKey varchar; @LangCode varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Message_Save,p_Sys_Message_Save,True,@LangCode varchar; @LabelKey varchar; @Message ntext,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Message_GetByLangCode,p_Sys_Message_GetByLangCode,True,@LangCode varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Message_GetById,p_Sys_Message_GetById,True,@Id varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Message_Delete,p_Sys_Message_Delete,True,@LangCode varchar; @LabelKey varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_FunctionAction_GetAll,p_Sys_FunctionAction_GetAll,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Menu_Save,p_Sys_Menu_Save,True,@MenuId int; @ParentId int; @FunctionActionId int; @Name nvarchar; @Position int; @Level int; @Depth nvarchar; @URL nvarchar; @Icon nvarchar; @IsShow bit,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Menu_Get,p_Sys_Menu_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Menu_GetById,p_Sys_Menu_GetById,True,@Id int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Menu_Delete,p_Sys_Menu_Delete,True,@ID int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Menu_GetByUserName,p_Sys_Menu_GetByUserName,True,@UserName varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Menu_GetMenuChilds,p_Sys_Menu_GetMenuChilds,True,@IdMenu int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_Save,p_Sys_Layout_Save,True,@ID int; @LayoutName nvarchar; @LayoutView nvarchar; @Note nvarchar; @NumberContentPanel int; @NumberCol int; @Creator nvarchar; @Updater nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_Get,p_Sys_Layout_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_GetById,p_Sys_Layout_GetById,True,@ID int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_Delete,p_Sys_Layout_Delete,True,@ID int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_GetByName,p_Sys_Layout_GetByName,True,@Name nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_GetActivated,p_Sys_Layout_GetActivated,True,,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Layout_Activated,p_Sys_Layout_Activated,True,@LayoutID int; @Updated varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ContentPanel_GetByLayoutName,p_Sys_ContentPanel_GetByLayoutName,True,@LayoutName nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ContentPanel_GetByLayoutId,p_Sys_ContentPanel_GetByLayoutId,True,@LayoutID nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ModuleContentPanel_GetByLayout,p_Sys_ModuleContentPanel_GetByLayout,True,@LayoutName nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ModuleContentPanel_GetByUser,p_Sys_ModuleContentPanel_GetByUser,True,@UserName varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ModuleContentPanel_Save,p_Sys_ModuleContentPanel_Save,True,@ContentPanelName nvarchar; @ModuleId int; @Creator nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ModuleContentPanel_SaveList,p_Sys_ModuleContentPanel_SaveList,True,@PanelModules ContentPanelModule; @Creator nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_ModuleContentPanel_DeleteModule,p_Sys_ModuleContentPanel_DeleteModule,True,@ModuleId int; @PanelName nvarchar; @Updater nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_Save,p_Sys_Module_Save,True,@ModuleId int; @ModuleName nvarchar; @AssemblyName varchar; @MainController varchar; @ModuleView nvarchar; @Description nvarchar; @Icon varchar; @Creator nvarchar; @Updater nvarchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_Get,p_Sys_Module_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_GetById,p_Sys_Module_GetById,True,@ModuleId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_Delete,p_Sys_Module_Delete,True,@ModuleId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_GetNotInContentPanel,p_Sys_Module_GetNotInContentPanel,True,@ContentPanelName varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_GetByUser,p_Sys_Module_GetByUser,True,@UserName varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_Permission_Save,p_Sys_Module_Permission_Save,True,@ModuleId int; @UserIds DataVal,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Module_Permission_GetUsers,p_Sys_Module_GetUserPermission,True,@ModuleId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_IPRequest_GetByIp,p_Sys_IPRequest_GetByIp,True,@IpRequest varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Configs_Get,p_Sys_Configs_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Configs_Save,p_Sys_Configs_Save,True,@ConfigId int; @ConfigKey nvarchar; @ConfigValue nvarchar; @ConfigDesc nvarchar; @CreatedBy varchar; @LastModifiedBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Configs_Delete,p_Sys_Configs_Delete,True,@ConfigId int; @DeletedBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Configs_GetByID,p_Sys_Configs_GetByID,True,@ConfigId int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Configs_GetViaKey,p_Sys_Configs_GetViaKey,True,@ConfigKey varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Job_Get,p_Sys_Job_Get,True,@Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Job_Save,p_Sys_Job_Save,True,@JobId uniqueidentifier; @JobName nvarchar; @JobDescription nvarchar; @CronExpression varchar; @JobLibrary varchar; @IsActive bit; @SavedBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Job_Delete,p_Sys_Job_Delete,True,@JobId uniqueidentifier; @DeletedBy varchar,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Job_GetByID,p_Sys_Job_GetByID,True,@JobId uniqueidentifier,System_StoredProcedures.xml
+BaseApp,SysProvider,Sys_Job_ChangeStatus,p_Sys_Job_ChangeStatus,True,@JobId uniqueidentifier; @Status bit; @SaveBy varchar,System_StoredProcedures.xml
+BaseApp,,,fn_UpdateEnterpriseTaxCode,True,@OldTaxCode varchar; @NewTaxCode varchar; @ResetPassword bit; @Apply bit; @ChangeBy varchar; @Reason nvarchar,unmapped
+BaseApp,,,p_Cate_BusinessEnterpriseProduct_Delete,True,@EnterpriseId bigint; @ProductId int,unmapped
+BaseApp,,,p_Cate_BusinessEnterpriseProduct_Get,True,@EnterpriseId bigint; @ProductId int; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,unmapped
+BaseApp,,,p_Cate_BusinessEnterpriseProduct_GetByID,True,@EnterpriseId bigint; @ProductId int,unmapped
+BaseApp,,,p_Cate_BusinessEnterpriseProduct_GetMainProduct,True,@EnterpriseId int,unmapped
+BaseApp,,,p_Cate_BusinessEnterpriseProduct_Save,True,@EnterpriseId bigint; @ProductId int; @IsMainProduct bit; @DisplayOrder int; @CreatedBy varchar,unmapped
+BaseApp,,,p_Cate_BusinessEnterpriseProduct_SaveMainProduct,True,@EnterpriseId int; @ProductId int; @CreatedBy nvarchar,unmapped
+BaseApp,,,p_Cate_BusinessProductImpExp_Delete,True,@ProductId int; @DeletedBy varchar,unmapped
+BaseApp,,,p_Cate_BusinessProductImpExp_Get,True,@Search nvarchar; @IndustryId int; @IsImport bit; @IsExport bit; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,unmapped
+BaseApp,,,p_Cate_BusinessProductImpExp_GetByID,True,@ProductId int,unmapped
+BaseApp,,,p_Cate_BusinessProductImpExp_Save,True,@ProductId int; @ProductCode varchar; @ProductName nvarchar; @IndustryId int; @ParentId int; @Unit nvarchar; @DisplayOrder int; @IsActive bit; @IsImport bit; @IsExport bit; @SavedBy varchar,unmapped
+BaseApp,,,p_Cate_BusinessProducts_GetByIndustries,True,@IndustryIds varchar; @IsLevel int,unmapped
+BaseApp,,,p_Cate_Enterprises_Get_Remove,True,@ForUser varchar; @TypeBusinessIds varchar; @WardIds varchar; @ProvinceIds varchar; @IndustryIds varchar; @EnterpriseTypeIds varchar; @EconomicSectorIds varchar; @StatusIds varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,unmapped
+BaseApp,,,p_Cate_Enterprises_SaveInfo,True,@EnterpriseId int; @OwnerEnterpriseName nvarchar; @BusinessName nvarchar; @TaxCode varchar; @BusinessAddress nvarchar; @StreetName nvarchar; @WardId int; @WardName nvarchar; @IndustryIds varchar; @TypeBusinessIds varchar; @EnterpriseTypeId int; @EconomicSectorId int; @EnterpriseStatusId int; @LegalRepresentationName nvarchar; @LegalRepresentationPhone varchar; @LegalRepresentationEmail varchar; @Website varchar; @Phone varchar; @Email varchar; @Reason nvarchar; @SaveBy varchar,unmapped
+BaseApp,,,p_Cate_Team_GetByWardCode,True,@WardCode varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,unmapped
+BaseApp,,,p_Cate_Ward_GetByProvinceCode,True,@ProvinceCode varchar; @Search nvarchar; @Order varchar; @OrderDir varchar; @PageIndex int; @PageSize int,unmapped
+BaseApp,,,p_SCT_Enterprise_Upsert,True,@TaxCode varchar; @OwnerEnterpriseName nvarchar; @BusinessName nvarchar; @BusinessAddress nvarchar; @WardName nvarchar; @TypeBusiness varchar; @IndustryCode varchar; @Apply bit; @CreatedBy varchar; @Reason nvarchar,unmapped
+BaseApp,,,p_Sys_Menu_GetByUserId,True,@UserId int,unmapped
+BaseApp,,,p_Sys_User_ChangeRequiredPassword,True,@UserName varchar; @Password varchar; @Salt varchar; @Reason nvarchar; @ChangeBy varchar,unmapped
+BaseApp,,,p_Sys_User_CheckEmail,True,@Email varchar,unmapped
+BaseApp,,,p_Sys_User_GetRequireChangePassword,True,@UserName varchar,unmapped
+BaseApp,,,p_Sys_User_Register,True,@UserId int; @Email varchar; @UserName varchar; @Password varchar; @Salt varchar; @IsActive bit; @Reason nvarchar; @CreatedBy varchar,unmapped
+BaseApp,,,p_Sys_User_ResetPassword_ByUserId,True,@UserId int; @Password varchar; @Reason nvarchar; @ChangeBy varchar,unmapped
+BaseApp,,,p_Sys_User_SetRequireChangePassword,True,@UserName varchar; @MustChangePassword bit; @Reason nvarchar; @ChangeBy varchar,unmapped
+ReportTourismDB,,,p_Report_Dashboard_IndustrialSnapshot_BAK,True,@ForMonth date; @WardId int; @EconomicSectorId int; @IndustryId int; @EnterpriseId int,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_ByCode,True,@Title nvarchar; @ForMonth datetime; @Code varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_Sum,True,@Title nvarchar; @ForMonth datetime; @Code1 varchar; @Code2 varchar; @Code3 varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumAmount,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @Code varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumCustomer,True,@Title nvarchar; @ForMonth datetime; @Code1 varchar; @Code2 varchar; @Code3 varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumPercentForAVG,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumPercentForOther,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumPercentForStart,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @Class int; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumRevenue,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @Code1 varchar; @Code2 varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_GenerateSaleOfTourism_SumViaShip,True,@Title nvarchar; @ForMonth datetime; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_Manufacturing,True,@ForMonth datetime; @TypeReport int; @EnterpriseId int,unmapped
+ReportTourismDB,,,p_Report_Manufacturing_ByEnterprise,True,@ForMonth datetime; @TypeReport int; @EnterpriseId int,unmapped
+ReportTourismDB,,,p_Report_Manufacturing_Total,True,@ForMonth datetime; @TypeReport int,unmapped
+ReportTourismDB,,,p_Report_ReportFiles_Save,True,@EnterpriseId int; @ForMonth date; @ReportFile nvarchar; @IsLate bit; @Reason nvarchar; @SaveBy varchar,unmapped
+ReportTourismDB,,,p_Report_ThongKe_BaoCaoTongHop,True,@NgayBaoCao datetime,unmapped
+ReportTourismDB,,,p_Report_ThongKe_CongSuatPhong_ByStar,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @Class varchar; @BaseListCodes varchar; @SellListCodes varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_ThongKe_CongSuatPhong_TrungBinh,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @BaseListCodes varchar; @SellListCodes varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_ThongKe_TongDoanhThu,True,@Title nvarchar; @ForMonth datetime; @Unit nvarchar; @ListCodes varchar; @Level varchar,unmapped
+ReportTourismDB,,,p_Report_ThongKe_TongKhachDuLich,True,@Title nvarchar; @Unit nvarchar; @ForMonth datetime; @ListCodes varchar; @Level varchar; @TypeReports varchar,unmapped
+ReportTourismDB,,,p_Report_ThongKe_TongKhachDuLich_ByCode,True,@Title nvarchar; @Unit nvarchar; @ForMonth datetime; @ListCodes varchar; @Level varchar; @TypeReports varchar,unmapped
+ReportTourismDB,,,p_Report_Trading,True,@ForMonth datetime; @TypeReport int; @EnterpriseId int,unmapped
+ReportTourismDB,,,p_Report_Trading_ByEnterprise,True,@ForMonth datetime; @EnterpriseId int,unmapped
+ReportTourismDB,,,p_Report_Trading_Total,True,@ForMonth datetime,unmapped
+ReportTourismDB,,,p_Sys_User_ChangeRequiredPassword,True,@UserName varchar; @Password varchar; @Salt varchar; @Reason nvarchar; @ChangeBy varchar,unmapped
+ReportTourismDB,,,p_Sys_User_GetRequireChangePassword,True,@UserName varchar,unmapped
+ReportTourismDB,,,p_Sys_User_SetRequireChangePassword,True,@UserName varchar; @MustChangePassword bit; @Reason nvarchar; @ChangeBy varchar,unmapped
+ReportTourismDB,,,usp_Report_KTXH,True,@ForMonth datetime; @TypeReport int; @EnterpriseId int,unmapped
+ReportTourismDB,,,usp_Report_KTXH_TheoEnterprise,True,@ForMonth datetime; @TypeReport int; @EnterpriseId int,unmapped
+ReportTourismDB,,,usp_Report_KTXH_Tong,True,@ForMonth datetime; @TypeReport int,unmapped
+BaseApp,SysProvider,Cate_Chatbot_EnterpriseScope,p_Cate_Chatbot_EnterpriseScope,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @Mode varchar(20); @EnterpriseId int,Cate_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_FilterOptions,p_Report_Chatbot_FilterOptions,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @OptionKind varchar(20); @TypeReport int; @Search nvarchar(250); @Page int; @PageSize int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_ProgressDetails,p_Report_Chatbot_ProgressDetails,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @ForMonth date; @TypeReport int; @WardId int; @EconomicSectorId int; @IndustryId int; @EnterpriseId int; @Status varchar(20); @Page int; @PageSize int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_Snapshot,p_Report_Chatbot_Snapshot,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @ForMonth date; @TypeReport int; @WardId int; @EconomicSectorId int; @IndustryId int; @EnterpriseId int,Report_StoredProcedures.xml
+ReportTourismDB,ReportTourismProvider,Report_Chatbot_Summary,p_Report_Chatbot_Summary,False,@ChatbotUserId int; @ProvinceRoleIds varchar(500); @EnterpriseRoleIds varchar(500); @ForMonth date; @WardId int; @EconomicSectorId int; @IndustryId int; @EnterpriseId int; @GroupBy varchar(10),Report_StoredProcedures.xml

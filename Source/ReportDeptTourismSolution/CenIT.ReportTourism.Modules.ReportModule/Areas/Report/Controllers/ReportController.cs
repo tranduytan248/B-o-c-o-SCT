@@ -12,7 +12,7 @@ using TSFramework.Core.Enums;
 
 namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 {
-    public class ReportController : AppController
+    public class ReportController : IndustryScopedReportController
     {
         private readonly string _reportTitle = AppProcessor.Messagor.GetMessage("Report_Title");
         private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
@@ -39,7 +39,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ViewName = pReport.ViewName,
                 Reporter = User.FullName
             };
-            var enterprise = _enterpriseCache.GetViaUser(User.UserName).FirstOrDefault();
+            var enterprise = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList().FirstOrDefault();
             ViewBag.EnterpriseId = enterprise?.EnterpriseId;
             ViewBag.EnterpriseName = enterprise?.BusinessName ?? User.FullName;
             ViewBag.TaxCode = enterprise?.TaxCode ?? string.Empty;

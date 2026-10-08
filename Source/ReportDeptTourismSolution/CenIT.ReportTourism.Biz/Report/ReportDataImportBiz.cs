@@ -33,13 +33,13 @@ namespace CenIT.ReportTourism.Biz.Report
                 PageSize = -1
             };
             var dataImports = AppProcessor.ProcedureProvider.ExecuteTypedList<ReportDataImportModel>(
-                _reportDataImportsGet, DATA_PROVIDER_NAME,
-                forEmp, enterpriseIds, fromMonth, toMonth, typeBusinessIds,
+                ReportIndustryScope.Procedure(_reportDataImportsGet), DATA_PROVIDER_NAME,
+                ReportIndustryScope.Parameters(forEmp, enterpriseIds, fromMonth, toMonth, typeBusinessIds,
                 search.Search,
                 search.Order,
                 search.OrderDir,
                 search.StartIndex,
-                search.PageSize);
+                search.PageSize));
             total = 0;
             if (dataImports != null && dataImports.Count > 0)
                 total = int.Parse(dataImports.First().TotalRow.ToString());
@@ -49,24 +49,24 @@ namespace CenIT.ReportTourism.Biz.Report
         public List<ReportDataImportModel> GetForUserOnMonth(string forUser, DateTime? onMonth)
         {
             var dataImports = AppProcessor.ProcedureProvider.ExecuteTypedList<ReportDataImportModel>(
-                _reportDataImportsGetForUserOnMonth, DATA_PROVIDER_NAME,
-                forUser, onMonth);
+                ReportIndustryScope.Procedure(_reportDataImportsGetForUserOnMonth), DATA_PROVIDER_NAME,
+                ReportIndustryScope.Parameters(forUser, onMonth));
             return dataImports;
         }
 
         public ReportDataImportModel GetDataImportViaEnterpriseOnMonth(int? enterpriseId, DateTime? forMonth)
         {
             var dataImports = AppProcessor.ProcedureProvider.ExecuteScalarObject<ReportDataImportModel>(
-                _reportDataImportsGetViaEnterpriseOnMonth, DATA_PROVIDER_NAME,
-                enterpriseId, forMonth);
+                ReportIndustryScope.Procedure(_reportDataImportsGetViaEnterpriseOnMonth), DATA_PROVIDER_NAME,
+                ReportIndustryScope.Parameters(enterpriseId, forMonth));
             return dataImports;
         }
 
         public List<ReportDataImportModel> GetViaEnterpriseOnMonth(int? enterpriseId, DateTime? forMonth)
         {
             var dataImports = AppProcessor.ProcedureProvider.ExecuteTypedList<ReportDataImportModel>(
-                _reportDataImportsGetDataImport, DATA_PROVIDER_NAME,
-                enterpriseId, forMonth);
+                ReportIndustryScope.Procedure(_reportDataImportsGetDataImport), DATA_PROVIDER_NAME,
+                ReportIndustryScope.Parameters(enterpriseId, forMonth));
             return dataImports;
         }
 
