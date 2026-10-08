@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -40,7 +40,7 @@ using VnptHashSignatures.Interface;
 
 namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 {
-    public class ImportController : AppController
+    public class ImportController : IndustryScopedReportController
     {
         private readonly SysConfigsCache _configCache = new SysConfigsCache();
         private readonly CateEnterpriseCache _enterpriseCache = new CateEnterpriseCache();
@@ -101,7 +101,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         // GET: Cate/ReportDataImport
         public ActionResult Index()
         {
-            var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+            var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
             var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
             var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                 .Where(e => lstReportsViaUsers == null || !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
@@ -136,8 +136,9 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             try
             {
-                var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
-                if (lstEnterpisePermits != null && lstEnterpisePermits.Count > 0)
+                var assignedEnterprises = _enterpriseCache.GetViaUser(User.UserName);
+                var lstEnterpisePermits = IndustryScope.Filter(assignedEnterprises, e => e.EnterpriseId).ToList();
+                if (assignedEnterprises != null && assignedEnterprises.Count > 0)
                 {
                     var filtered = lstEnterpisePermits.Where(e =>
                         (string.IsNullOrEmpty(typeBusiness) || e.TypeBusiness == typeBusiness) &&
@@ -170,8 +171,8 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                     try
                     {
                         list = AppProcessor.ProcedureProvider.ExecuteTypedList<CateEnterpriseModel>(
-                            "Cate_Enterprises_SearchSelect2", "SysProvider",
-                            keyword, typeBiz, pageIndex, pageSize);
+                            "Report_Industry_Enterprises_SearchSelect2", "ReportTourismProvider",
+                            keyword, typeBiz, pageIndex, pageSize, User.UserName);
                     }
                     catch (Exception exSp)
                     {
@@ -316,7 +317,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [ActionType(Type = EnumActionType.View)]
         public async Task<ActionResult> DownloadTemplate(string templateName = "TemplateImport_LuHanh.xlsx")
         {
-            var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+            var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
             var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
             var lstEnterpriseOther = lstEnterpisePermits
                 .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
@@ -373,7 +374,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [ActionType(Type = EnumActionType.View)]
         public ActionResult ViewAction()
         {
-            var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+            var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
             var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
             var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                 .Where(e => lstReportsViaUsers == null || !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
@@ -422,7 +423,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [HttpGet]
         public ActionResult ImportData()
         {
-            var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+            var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
             var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
             var lstEnterpriseOther = lstEnterpisePermits
                 .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
@@ -471,7 +472,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
                 ModelState.Remove("FileImport");
                 if (!ModelState.IsValid)
                 {
-                    var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+                    var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
                     var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
                     var lstEnterpriseOther = lstEnterpisePermits
                         .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
@@ -640,7 +641,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+                    var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
                     var lstReportsViaUsers = _importCache.GetForUserOnMonth(User.UserName, DateTime.Now);
                     var lstEnterpriseOther = lstEnterpisePermits
                         .Where(e => !lstReportsViaUsers.Exists(r => r.EnterpriseId == e.EnterpriseId)).ToList();
@@ -970,7 +971,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.ListEnterprises = _enterpriseCache.GetViaUser(User.UserName)
+                model.ListEnterprises = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList()
                     .Select(e => new ListItem(e.BusinessName, e.EnterpriseId.ToString())).ToList();
                 return PartialView("_ImportView", model);
             }
@@ -1358,7 +1359,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
         [ActionType(Type = EnumActionType.Add)]
         public ActionResult Add()
         {
-            var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+            var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
             var lstEnterpriseOther = (lstEnterpisePermits ?? new List<CateEnterpriseModel>())
                 .Where(e => !string.IsNullOrWhiteSpace(e.TypeBusiness))
                 .OrderBy(e => e.BusinessName)
@@ -1420,7 +1421,7 @@ namespace CenIT.ReportTourism.Modules.ReportModule.Areas.Report.Controllers
 
             if (!ModelState.IsValid)
             {
-                var lstEnterpisePermits = _enterpriseCache.GetViaUser(User.UserName);
+                var lstEnterpisePermits = IndustryScope.Filter(_enterpriseCache.GetViaUser(User.UserName), e => e.EnterpriseId).ToList();
                 var lstEnterpriseOther = lstEnterpisePermits
                     .Where(e => e.TypeBusiness == "1").ToList();
 

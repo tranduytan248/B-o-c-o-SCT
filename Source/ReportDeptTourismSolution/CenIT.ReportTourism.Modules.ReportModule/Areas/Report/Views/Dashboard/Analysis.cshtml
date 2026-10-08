@@ -19,7 +19,7 @@
     var momIcon = Model.Mom > 0 ? "fa-arrow-up" : Model.Mom < 0 ? "fa-arrow-down" : "fa-minus";
     var yoyTone = Model.Yoy > 0 ? "bg-green" : Model.Yoy < 0 ? "bg-red" : "bg-gray";
     var yoyIcon = Model.Yoy > 0 ? "fa-arrow-up" : Model.Yoy < 0 ? "fa-arrow-down" : "fa-minus";
-    var sectors = Model.Sectors.Where(x => x.Value > 0).Take(6).ToList();
+    var sectors = Model.Sectors.Take(10).ToList();
 }
 <div class="management-dashboard dashboard-analysis-page">
     <div class="nav-tabs-custom">
@@ -37,7 +37,7 @@
                     <p><b>@DashboardText.Get("Analysis_CurrentPeriodCode") · @Model.SelectedMetric.Code</b><br />@Model.SelectedMetric.Label</p>
                 </div>
                 <div class="icon"><i class="fa fa-line-chart" aria-hidden="true"></i></div>
-                <div class="small-box-footer">@DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</div>
+                <div class="small-box-footer">Có giá trị: @DashboardNumber.Count(Model.MetricCoverage)/@DashboardNumber.Count(Model.Assigned) DN · @DashboardText.Get("Month") @Model.Filters.Month.ToString("00")/@Model.Filters.Year</div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
@@ -47,27 +47,27 @@
                     <p><b>@DashboardText.Get("Analysis_YtdTitle")</b></p>
                 </div>
                 <div class="icon"><i class="fa fa-calendar" aria-hidden="true"></i></div>
-                <div class="small-box-footer"><b>@Model.YtdMonths/@Model.Filters.Month</b> @DashboardText.Get("Analysis_YtdNote")</div>
+                <div class="small-box-footer"><b>@Model.YtdMonths/@Model.Filters.Month</b> @DashboardText.Get("Analysis_YtdNote") · Tổng các tháng đã có dữ liệu; chưa phải chuỗi đủ từ đầu năm</div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
             <div class="small-box @momTone">
                 <div class="inner">
-                    <h3>@(Model.Mom.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Mom.Value) : "—")</h3>
+                    <h3>@(Model.Mom.HasValue ? DashboardNumber.SignedPercent(Model.Mom.Value) : "—")</h3>
                     <p><b>@DashboardText.Get("Analysis_Mom")</b></p>
                 </div>
                 <div class="icon"><i class="fa @momIcon" aria-hidden="true"></i></div>
-                <div class="small-box-footer"><b>@Model.MomCompared/@Model.Assigned</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
+                <div class="small-box-footer"><b>@DashboardNumber.Count(Model.MomCompared)/@DashboardNumber.Count(Model.Assigned)</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-6">
             <div class="small-box @yoyTone">
                 <div class="inner">
-                    <h3>@(Model.Yoy.HasValue ? String.Format("{0:+0.0;-0.0;0.0}%", Model.Yoy.Value) : "—")</h3>
+                    <h3>@(Model.Yoy.HasValue ? DashboardNumber.SignedPercent(Model.Yoy.Value) : "—")</h3>
                     <p><b>@DashboardText.Get("Analysis_Yoy")</b></p>
                 </div>
                 <div class="icon"><i class="fa @yoyIcon" aria-hidden="true"></i></div>
-                <div class="small-box-footer"><b>@Model.YoyCompared/@Model.Assigned</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
+                <div class="small-box-footer"><b>@DashboardNumber.Count(Model.YoyCompared)/@DashboardNumber.Count(Model.Assigned)</b> @DashboardText.Get("Analysis_ComparedCoverage")</div>
             </div>
         </div>
     </div>
@@ -80,7 +80,7 @@
                     <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Months12") · @unit</span></div>
                 </div>
                 <div class="box-body">
-                    <div id="analysis-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("Value") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart dashboard-chart" role="img" aria-label="@DashboardText.Get("Analysis_TrendAria") @Model.SelectedMetric.Label"></div>
+                    <p class="text-muted small">Tổng giá trị đã báo cáo; số DN đóng góp có thể thay đổi theo tháng. MoM/YoY tính trên DN có dữ liệu ở cả hai kỳ.</p><div id="analysis-trend-chart" data-labels="@(Newtonsoft.Json.JsonConvert.SerializeObject(new[] { DashboardText.Get("Value") }))" data-empty="@DashboardText.Get("ChartEmpty")" class="chart dashboard-chart" role="img" aria-label="@DashboardText.Get("Analysis_TrendAria") @Model.SelectedMetric.Label"></div>
                     <script type="application/json" class="md-chart-data" data-chart="analysis-trend">@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Trend))</script>
                 </div>
                 <div class="box-footer">
@@ -88,8 +88,8 @@
                     <div id="analysis-trend-values" class="collapse">
                         <div class="table-responsive">
                             <table class="table table-condensed table-striped">
-                                <thead><tr><th>@DashboardText.Get("Month")</th><th class="text-right">@DashboardText.Get("Value") (@unit)</th></tr></thead>
-                                <tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td class="text-right">@(point.Value.HasValue ? point.Value.Value.ToString("#,##0.##") : DashboardText.Get("Analysis_NoData"))</td></tr> }</tbody>
+                                <thead><tr><th>@DashboardText.Get("Month")</th><th class="text-right">@DashboardText.Get("Value") (@unit)</th><th>DN có giá trị / được phân</th></tr></thead>
+                                <tbody>@foreach (var point in Model.Trend) { <tr><td>@point.Month</td><td class="text-right">@(point.Value.HasValue ? DashboardNumber.Amount(point.Value.Value) : DashboardText.Get("Analysis_NoData"))</td><td>@DashboardNumber.Count(point.Coverage) / @DashboardNumber.Count(point.Expected)</td></tr> }</tbody>
                             </table>
                         </div>
                     </div>
@@ -100,17 +100,34 @@
         <div class="col-xs-12">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-pie-chart text-aqua" aria-hidden="true"></i> @DashboardText.Get("Analysis_SectorTitle")</h3>
+                    <h3 class="box-title"><i class="fa fa-pie-chart text-aqua" aria-hidden="true"></i> @(Model.Filters.Breakdown == "industry" ? "Nhóm ngành được phân" : Model.Filters.Breakdown == "enterprise" ? "Doanh nghiệp" : "Thành phần kinh tế")</h3>
+                    <div class="btn-group btn-group-xs pull-right">
+                        @foreach (var dimension in new[] { new { Key="sector",Text="Thành phần" },new { Key="industry",Text="Ngành" },new { Key="enterprise",Text="Doanh nghiệp" } })
+                        { <a class="btn btn-default @(Model.Filters.Breakdown==dimension.Key ? "active" : "")" href="@Url.Action("Analysis","Dashboard",new { year=Model.Filters.Year,month=Model.Filters.Month,reportType=Model.Filters.ReportType,metric=Model.Filters.Metric,areaId=Model.Filters.AreaId,economicSectorId=Model.Filters.EconomicSectorId,industryId=Model.Filters.IndustryId,enterpriseId=Model.Filters.EnterpriseId,breakdown=dimension.Key })">@dimension.Text</a> }
+                    </div>
                     <div class="box-tools pull-right"><span class="label label-default">@DashboardText.Get("Analysis_Share")</span></div>
                 </div>
-                <div class="box-body dashboard-breakdown-grid">
+                <div class="box-body dashboard-breakdown-grid"><p class="text-muted small">Giữ nguyên số và đơn vị khai báo; dùng nhóm Doanh nghiệp để đối chiếu các số lớn. Nhóm nhiều ngành chỉ được cộng một lần.</p>
                     @if (!sectors.Any()) { <p class="text-muted no-margin">@DashboardText.Get("Analysis_NoSectorValue")</p> }
                     @foreach (var item in sectors)
                     {
                         <div class="progress-group">
-                            <span class="progress-text">@item.Name</span>
-                            <span class="progress-number"><b>@String.Format("{0:0.#}%", item.Share)</b></span>
-                            <div class="progress sm"><div class="progress-bar progress-bar-aqua" style="width: @Math.Min(100, item.Share).ToString("0.#", invariant)%"></div></div>
+                            <span class="progress-text">
+                            @if (Model.Filters.Breakdown == "sector" && !String.IsNullOrEmpty(item.Key))
+                            { <a href="@Url.Action("Analysis","Dashboard",new { year=Model.Filters.Year,month=Model.Filters.Month,reportType=Model.Filters.ReportType,metric=Model.Filters.Metric,areaId=Model.Filters.AreaId,economicSectorId=item.Key,industryId=Model.Filters.IndustryId,enterpriseId=Model.Filters.EnterpriseId,breakdown="industry" })">@item.Name</a> }
+                            else if (Model.Filters.Breakdown == "enterprise")
+                            { <a class="dashboard-detail-link" href="@Url.Action("EnterpriseDetail","Dashboard",new { enterpriseId=item.Key,year=Model.Filters.Year,month=Model.Filters.Month,reportType=Model.Filters.ReportType })">@item.Name</a> }
+                            else { @item.Name }
+                            </span>
+                            @if (Model.Filters.Breakdown == "industry") {
+                                <details><summary>Doanh nghiệp trong nhóm (@item.Members.Count)</summary>
+                                    <ul class="list-unstyled">@foreach (var member in item.Members) {
+                                        <li><a class="dashboard-detail-link" href="@Url.Action("EnterpriseDetail","Dashboard",new { enterpriseId=member.Key,year=Model.Filters.Year,month=Model.Filters.Month,reportType=Model.Filters.ReportType })">@member.Name</a> · @DashboardNumber.Amount(member.Value) @unit</li>
+                                    }</ul>
+                                </details>
+                            }
+                            <span class="progress-number"><b>@DashboardNumber.Amount(item.Value) @unit</b> · @(item.Value.HasValue && Model.Sectors.Sum(x => x.Value ?? 0) > 0 ? DashboardNumber.Percent(item.Share) : "—")</span>
+                            <div class="progress sm"><div class="progress-bar progress-bar-aqua" style="width: @Math.Max(0, Math.Min(100, item.Share)).ToString("0.#", invariant)%"></div></div>
                         </div>
                     }
                 </div>
@@ -134,13 +151,13 @@
                     {
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover no-margin">
-                                <thead><tr><th style="width: 40px;">#</th><th>@DashboardText.Get("Enterprise")</th><th class="text-right">@DashboardText.Get("PreviousPeriod") (@unit)</th><th class="text-right">@DashboardText.Get("CurrentPeriod") (@unit)</th><th class="text-right">@DashboardText.Get("Change")</th></tr></thead>
+                                <thead><tr><th style="width: 40px;">#</th><th>@DashboardText.Get("Enterprise")</th><th class="text-right">@DashboardText.Get("PreviousPeriod") (@unit)</th><th class="text-right">@DashboardText.Get("CurrentPeriod") (@unit)</th><th class="text-right">@DashboardText.Get("Change")</th><th>Giải trình do doanh nghiệp cung cấp</th></tr></thead>
                                 <tbody>
                                     @{ var rank = 0; }
                                     @foreach (var item in Model.Movements)
                                     {
                                         rank++;
-                                        <tr><td>@(rank).</td><td>@item.Name</td><td class="text-right">@item.PreviousValue.ToString("#,##0.##")</td><td class="text-right">@item.CurrentValue.ToString("#,##0.##")</td><td class="text-right text-bold @(item.Change < 0 ? "text-red" : "text-green")">@String.Format("{0:+#,##0.##;-#,##0.##;0}", item.Change)</td></tr>
+                                        <tr><td>@(rank).</td><td><a class="dashboard-detail-link" href="@Url.Action("EnterpriseDetail","Dashboard",new { enterpriseId=item.EnterpriseId,year=Model.Filters.Year,month=Model.Filters.Month,reportType=Model.Filters.ReportType })">@item.Name</a></td><td class="text-right">@DashboardNumber.Amount(item.PreviousValue)</td><td class="text-right">@DashboardNumber.Amount(item.CurrentValue)</td><td class="text-right text-bold @(item.Change < 0 ? "text-red" : "text-green")">@DashboardNumber.Signed(item.Change)</td><td>@item.Reason</td></tr>
                                     }
                                 </tbody>
                             </table>

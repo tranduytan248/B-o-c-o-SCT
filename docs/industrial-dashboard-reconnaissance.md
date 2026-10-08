@@ -1,5 +1,7 @@
 # Industrial dashboard: database reconnaissance and design (2026-09-28)
 
+> Historical audit of the previous database. For the current connection, SQL contracts, and implementation, see [dashboard-implementation.md](dashboard-implementation.md).
+
 ## A. Database reconnaissance summary
 
 The configured `ReportTourismDB` connects to `baocao.sct.cenit.vn` on `APPDEMO\MSSQL2012`; `BaseApp` connects to `baocao.sct.cenit.vn.cate`. Both use schema `dbo`. No relevant synonyms or summary views exist in the report database. Its only view, `Get_RandValue`, and functions `fnSplit` and `fGenerate_RandomNumber` are utilities, not analytical sources.
